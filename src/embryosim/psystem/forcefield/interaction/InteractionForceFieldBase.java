@@ -1,6 +1,6 @@
-package embryosim.forcefield.interaction;
+package embryosim.psystem.forcefield.interaction;
 
-import embryosim.forcefield.ForceFieldBase;
+import embryosim.psystem.forcefield.ForceFieldBase;
 
 public abstract class InteractionForceFieldBase extends ForceFieldBase
                                              implements

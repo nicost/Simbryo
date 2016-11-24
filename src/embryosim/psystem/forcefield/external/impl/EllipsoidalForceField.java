@@ -1,35 +1,44 @@
-package embryosim.forcefield.external.impl;
+package embryosim.psystem.forcefield.external.impl;
 
-import embryosim.forcefield.external.ExternalForceFieldBase;
-import embryosim.forcefield.external.ExternalForceFieldInterface;
+import embryosim.psystem.forcefield.external.ExternalForceFieldBase;
+import embryosim.psystem.forcefield.external.ExternalForceFieldInterface;
 import embryosim.util.DoubleBufferingFloatArray;
 
 /**
- * Applies a spheri(petal+/fugal-) force to the particles. if the the force is
- * positive then it is a spheripetal force, otherwise it is a spherifugal force.
+ * Applies a ellipsoi(petal+/fugal-) force to the particles. if the the force
+ * is positive then it is a ellipsoipetal force, otherwise it is a
+ * ellipsoifugal force.
+ * 
+ * For example:
+ * 
+ * <pre>
+ *  {@code}
+ *   applyCentriForceEllipsoidal(0.001, 0.5f, 0.5f, 0.5f, 1.0f, 2.0f, 4.0f)
+ * </pre>
+ * 
+ * Sets a force with center (xc,yc,zc) = (0.5, 0.5, 0.5) and (a,b,c) = (1,2,4)
+ * 
+ * The equation is: ((x-xc)/a)^2+((y-yc)/b)^2+((z-zc)/c)^2 - R^2 =0
  * 
  * @param pForce
- *          force intesnity
- * @param pRadius
- *          sphere radius
- * @param pCenter
- *          sphere center
+ *          force intensity
+ * @param pCenterAndAxis
+ *          force field center + ellipsoid axes length
  */
-public class SphericalForceField extends ExternalForceFieldBase
-                                 implements
-                                 ExternalForceFieldInterface
+public class EllipsoidalForceField extends ExternalForceFieldBase
+                                   implements ExternalForceFieldInterface
 {
 
   private volatile float mRadius;
-  private float[] mCenter;
+  private float[] mCenterAndAxis;
 
-  public SphericalForceField(float pForce,
-                             float pRadius,
-                             float... pCenter)
+  public EllipsoidalForceField(float pForce,
+                               float pRadius,
+                               float... pCenterAndAxis)
   {
     super(pForce);
     mRadius = pRadius;
-    mCenter = pCenter;
+    mCenterAndAxis = pCenterAndAxis;
 
   }
 
@@ -57,18 +66,19 @@ public class SphericalForceField extends ExternalForceFieldBase
       for (int d = 0; d < pDimension; d++)
       {
         float px = lPositionsRead[i + d];
-        float cx = mCenter[d];
-        float dx = cx - px;
+        float cx = mCenterAndAxis[d];
+        float ax = mCenterAndAxis[pDimension + d];
+        float dx = (cx - px) / (ax * ax);
         lVector[d] = dx;
 
         lSquaredLength += dx * dx;
       }
 
-      float lDistance = (float) Math.sqrt(lSquaredLength);
+      float lLength = (float) Math.sqrt(lSquaredLength);
 
-      float lInverseLengthTimesForce = (float) (mForce / lDistance);
+      float lInverseLengthTimesForce = (float) (mForce / lLength);
 
-      float lSignedDistanceToSphere = (lDistance - mRadius);
+      float lSignedDistanceToSphere = (lLength - mRadius);
 
       float lForceSign = Math.signum(lSignedDistanceToSphere);
 

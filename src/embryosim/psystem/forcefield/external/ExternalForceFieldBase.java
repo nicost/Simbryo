@@ -1,6 +1,6 @@
-package embryosim.forcefield.external;
+package embryosim.psystem.forcefield.external;
 
-import embryosim.forcefield.ForceFieldBase;
+import embryosim.psystem.forcefield.ForceFieldBase;
 
 public abstract class ExternalForceFieldBase extends ForceFieldBase
                                              implements

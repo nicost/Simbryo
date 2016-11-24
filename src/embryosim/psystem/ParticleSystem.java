@@ -2,9 +2,9 @@ package embryosim.psystem;
 
 import java.util.SplittableRandom;
 
-import embryosim.forcefield.external.ExternalForceFieldInterface;
-import embryosim.forcefield.interaction.InteractionForceFieldInterface;
 import embryosim.neighborhood.NeighborhoodCellGrid;
+import embryosim.psystem.forcefield.external.ExternalForceFieldInterface;
+import embryosim.psystem.forcefield.interaction.InteractionForceFieldInterface;
 import embryosim.util.DoubleBufferingFloatArray;
 
 /**

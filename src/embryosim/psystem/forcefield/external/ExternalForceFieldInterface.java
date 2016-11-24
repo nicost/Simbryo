@@ -1,6 +1,6 @@
-package embryosim.forcefield.external;
+package embryosim.psystem.forcefield.external;
 
-import embryosim.forcefield.ForceFieldInterface;
+import embryosim.psystem.forcefield.ForceFieldInterface;
 import embryosim.util.DoubleBufferingFloatArray;
 
 public interface ExternalForceFieldInterface extends

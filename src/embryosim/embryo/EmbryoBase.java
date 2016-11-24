@@ -1,7 +1,7 @@
 package embryosim.embryo;
 
-import embryosim.forcefield.interaction.impl.CollisionForceField;
 import embryosim.psystem.ParticleSystem;
+import embryosim.psystem.forcefield.interaction.impl.CollisionForceField;
 import embryosim.viewer.ParticleViewerInterface;
 import embryosim.viewer.three.ParticleViewer3D;
 

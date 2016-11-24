@@ -2,8 +2,8 @@ package embryosim.viewer.two.demo;
 
 import org.junit.Test;
 
-import embryosim.forcefield.interaction.impl.CollisionForceField;
 import embryosim.psystem.ParticleSystem;
+import embryosim.psystem.forcefield.interaction.impl.CollisionForceField;
 import embryosim.util.timing.Timming;
 import embryosim.viewer.two.ParticleViewer2D;
 

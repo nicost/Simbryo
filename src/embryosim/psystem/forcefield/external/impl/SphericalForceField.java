@@ -1,29 +1,31 @@
-package embryosim.forcefield.external.impl;
+package embryosim.psystem.forcefield.external.impl;
 
-import embryosim.forcefield.external.ExternalForceFieldBase;
-import embryosim.forcefield.external.ExternalForceFieldInterface;
-import embryosim.neighborhood.NeighborhoodCellGrid;
+import embryosim.psystem.forcefield.external.ExternalForceFieldBase;
+import embryosim.psystem.forcefield.external.ExternalForceFieldInterface;
 import embryosim.util.DoubleBufferingFloatArray;
 
 /**
- * Applies a centri(petal+/fugal-) force to the particles. if the the force is
- * positive then it is a centripetal force, otherwise it is a centrifugal force.
+ * Applies a spheri(petal+/fugal-) force to the particles. if the the force is
+ * positive then it is a spheripetal force, otherwise it is a spherifugal force.
  * 
  * @param pForce
- *          force intensity
+ *          force intesnity
+ * @param pRadius
+ *          sphere radius
  * @param pCenter
- *          force field center
+ *          sphere center
  */
-public class CentriForceField extends ExternalForceFieldBase
-                              implements ExternalForceFieldInterface
+public class SphericalForceField extends ExternalForceFieldBase
+                                 implements
+                                 ExternalForceFieldInterface
 {
 
   private volatile float mRadius;
   private float[] mCenter;
 
-  public CentriForceField(float pForce,
-                          float pRadius,
-                          float... pCenter)
+  public SphericalForceField(float pForce,
+                             float pRadius,
+                             float... pCenter)
   {
     super(pForce);
     mRadius = pRadius;
@@ -39,7 +41,6 @@ public class CentriForceField extends ExternalForceFieldBase
                               final DoubleBufferingFloatArray pVelocities,
                               final DoubleBufferingFloatArray pRadii)
   {
-
     final float[] lPositionsRead = pPositions.getReadArray();
     final float[] lPositionsWrite = pPositions.getWriteArray();
     final float[] lVelocitiesRead = pVelocities.getReadArray();
@@ -63,14 +64,18 @@ public class CentriForceField extends ExternalForceFieldBase
         lSquaredLength += dx * dx;
       }
 
-      float lInverseLengthTimesForce =
-                                     (float) (mForce
-                                              / Math.sqrt(lSquaredLength));
+      float lDistance = (float) Math.sqrt(lSquaredLength);
+
+      float lInverseLengthTimesForce = (float) (mForce / lDistance);
+
+      float lSignedDistanceToSphere = (lDistance - mRadius);
+
+      float lForceSign = Math.signum(lSignedDistanceToSphere);
 
       for (int d = 0; d < pDimension; d++)
       {
         lVelocitiesWrite[i + d] = lVelocitiesRead[i + d]
-                                  + lVector[d]
+                                  + lVector[d] * lForceSign
                                     * lInverseLengthTimesForce;
       }
 

@@ -2,8 +2,8 @@ package embryosim.viewer.three.demo;
 
 import org.junit.Test;
 
-import embryosim.forcefield.interaction.impl.CollisionForceField;
 import embryosim.psystem.ParticleSystem;
+import embryosim.psystem.forcefield.interaction.impl.CollisionForceField;
 import embryosim.util.jfx.JavaFXUtil;
 import embryosim.util.timing.Timming;
 import embryosim.viewer.three.ParticleViewer3D;

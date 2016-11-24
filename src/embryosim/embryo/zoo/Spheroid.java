@@ -1,7 +1,7 @@
 package embryosim.embryo.zoo;
 
 import embryosim.embryo.EmbryoBase;
-import embryosim.forcefield.external.impl.SphericalForceField;
+import embryosim.psystem.forcefield.external.impl.SphericalForceField;
 
 public class Spheroid extends EmbryoBase
 {

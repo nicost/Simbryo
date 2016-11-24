@@ -1,7 +1,7 @@
-package embryosim.forcefield.interaction;
+package embryosim.psystem.forcefield.interaction;
 
-import embryosim.forcefield.ForceFieldInterface;
 import embryosim.neighborhood.NeighborhoodCellGrid;
+import embryosim.psystem.forcefield.ForceFieldInterface;
 import embryosim.util.DoubleBufferingFloatArray;
 
 public interface InteractionForceFieldInterface extends

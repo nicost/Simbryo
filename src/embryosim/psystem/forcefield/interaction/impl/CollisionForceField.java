@@ -1,8 +1,8 @@
-package embryosim.forcefield.interaction.impl;
+package embryosim.psystem.forcefield.interaction.impl;
 
-import embryosim.forcefield.interaction.InteractionForceFieldBase;
-import embryosim.forcefield.interaction.InteractionForceFieldInterface;
 import embryosim.neighborhood.NeighborhoodCellGrid;
+import embryosim.psystem.forcefield.interaction.InteractionForceFieldBase;
+import embryosim.psystem.forcefield.interaction.InteractionForceFieldInterface;
 import embryosim.util.DoubleBufferingFloatArray;
 
 /**

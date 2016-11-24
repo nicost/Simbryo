@@ -1,7 +1,7 @@
 package embryosim.embryo.zoo;
 
 import embryosim.embryo.EmbryoBase;
-import embryosim.forcefield.external.impl.CentriForceField;
+import embryosim.psystem.forcefield.external.impl.CentriForceField;
 
 public class Organoid extends EmbryoBase
 {

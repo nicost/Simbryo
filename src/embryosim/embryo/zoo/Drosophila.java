@@ -1,7 +1,7 @@
 package embryosim.embryo.zoo;
 
 import embryosim.embryo.EmbryoBase;
-import embryosim.forcefield.external.impl.EllipsoidalForceField;
+import embryosim.psystem.forcefield.external.impl.EllipsoidalForceField;
 
 public class Drosophila extends EmbryoBase
 {
