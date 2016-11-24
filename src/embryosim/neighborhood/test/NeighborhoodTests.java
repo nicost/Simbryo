@@ -14,7 +14,9 @@ public class NeighborhoodTests
   @Test
   public void testNoRadius()
   {
-    NeighborhoodCellGrid lNeighborhood = new NeighborhoodCellGrid(2, 4, 10);
+    NeighborhoodCellGrid lNeighborhood = new NeighborhoodCellGrid(2,
+                                                                  4,
+                                                                  10);
 
     lNeighborhood.clear();
 
@@ -69,7 +71,9 @@ public class NeighborhoodTests
   @Test
   public void testWithRadius()
   {
-    NeighborhoodCellGrid lNeighborhood = new NeighborhoodCellGrid(2, 4, 10);
+    NeighborhoodCellGrid lNeighborhood = new NeighborhoodCellGrid(2,
+                                                                  4,
+                                                                  10);
 
     lNeighborhood.clear();
 
@@ -97,14 +101,14 @@ public class NeighborhoodTests
     assertEquals(2, lNeighborhood.getCellContents(1, 3)[0]);
     assertEquals(3, lNeighborhood.getCellContents(3, 3)[0]);
 
-
-
   }
-  
+
   @Test
   public void testWithRadiusQuery()
   {
-    NeighborhoodCellGrid lNeighborhood = new NeighborhoodCellGrid(2, 4, 10);
+    NeighborhoodCellGrid lNeighborhood = new NeighborhoodCellGrid(2,
+                                                                  4,
+                                                                  10);
 
     lNeighborhood.clear();
 
@@ -115,31 +119,38 @@ public class NeighborhoodTests
 
     lNeighborhood.updateCells(lPositions, lRadius);
 
-    
-    int[] lNeighboors = new int[4*4*10];
-    
-    int lNumberOfNeighboors = lNeighborhood.getAllNeighborsForParticle(lNeighboors,lPositions,0,0.5f);
-    
+    int[] lNeighboors = new int[4 * 4 * 10];
+    int[] lNeighboorsTemp = new int[lNeighboors.length];
+
+    int lNumberOfNeighboors =
+                            lNeighborhood.getAllNeighborsForParticle(lNeighboors,
+                                                                     lNeighboorsTemp,
+                                                                     lPositions,
+                                                                     0,
+                                                                     0.5f);
+
     System.out.println(lNumberOfNeighboors);
     System.out.println(Arrays.toString(lNeighboors));
 
-    assertEquals(3,lNumberOfNeighboors);
-    assertEquals(0,lNeighboors[0]);
-    assertEquals(1,lNeighboors[1]);
-    assertEquals(2,lNeighboors[2]);
-    assertEquals(-1,lNeighboors[3]);
-    
-    
-    lNumberOfNeighboors = lNeighborhood.getAllNeighborsForParticle(lNeighboors,lPositions,2,0.25f);
-    
+    assertEquals(3, lNumberOfNeighboors);
+    assertEquals(0, lNeighboors[0]);
+    assertEquals(1, lNeighboors[1]);
+    assertEquals(2, lNeighboors[2]);
+    assertEquals(-1, lNeighboors[3]);
+
+    lNumberOfNeighboors =
+                        lNeighborhood.getAllNeighborsForParticle(lNeighboors,
+                                                                 lNeighboorsTemp,
+                                                                 lPositions,
+                                                                 2,
+                                                                 0.25f);
+
     System.out.println(lNumberOfNeighboors);
     System.out.println(Arrays.toString(lNeighboors));
 
-    assertEquals(1,lNumberOfNeighboors);
-    assertEquals(2,lNeighboors[0]);
-    assertEquals(-1,lNeighboors[1]);
-
-    
+    assertEquals(1, lNumberOfNeighboors);
+    assertEquals(2, lNeighboors[0]);
+    assertEquals(-1, lNeighboors[1]);
 
   }
 

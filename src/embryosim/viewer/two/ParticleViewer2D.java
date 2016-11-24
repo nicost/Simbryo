@@ -1,24 +1,51 @@
-package embryosim.viewer;
+package embryosim.viewer.two;
 
 import clearcl.viewer.jfx.PanZoomScene;
 import embryosim.psystem.ParticleSystem;
-import embryosim.viewer.jfx.ViewParticlesCanvas;
+import embryosim.util.jfx.JavaFXUtil;
+import embryosim.viewer.ParticleViewerInterface;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 /**
- * Particle system viewer.
+ * 2D Particle system viewer.
  *
  * @author royer
  */
-public class ParticleViewer
+public class ParticleViewer2D extends Stage
+                              implements ParticleViewerInterface
 {
 
-  private Stage mStage = null;
-  private ViewParticlesCanvas mViewParticles2D;
+  private ParticleViewerCanvas mViewParticles2D;
   private ParticleSystem mParticleSystem;
   private PanZoomScene mPanZoomScene;
+
+  /**
+   * Opens up a particle viewer, taking care that JavaFX is initialized.
+   * 
+   * @param pParticleSystem
+   *          particle system
+   * @param pWindowTitle
+   *          window title
+   * @param pWindowWidth
+   *          window width
+   * @param pWindowHeight
+   *          window height
+   * @return viewer.
+   */
+  public static ParticleViewer2D view(ParticleSystem pParticleSystem,
+                                      String pWindowTitle,
+                                      int pWindowWidth,
+                                      int pWindowHeight)
+  {
+    return JavaFXUtil.runAndWait(() -> {
+      return new ParticleViewer2D(pParticleSystem,
+                                  pWindowTitle,
+                                  pWindowWidth,
+                                  pWindowHeight);
+    });
+  }
 
   /**
    * Creates a view for a given image, window title.
@@ -28,7 +55,7 @@ public class ParticleViewer
    * @param pWindowTitle
    *          window title
    */
-  public ParticleViewer(ParticleSystem pParticleSystem)
+  public ParticleViewer2D(ParticleSystem pParticleSystem)
   {
     this(pParticleSystem, "Particle System Viewer", 512, 512);
   }
@@ -47,25 +74,24 @@ public class ParticleViewer
    *          window height
    */
   @SuppressWarnings("restriction")
-  public ParticleViewer(ParticleSystem pParticleSystem,
-                        String pWindowTitle,
-                        int pWindowWidth,
-                        int pWindowHeight)
+  public ParticleViewer2D(ParticleSystem pParticleSystem,
+                          String pWindowTitle,
+                          int pWindowWidth,
+                          int pWindowHeight)
   {
     super();
     mParticleSystem = pParticleSystem;
 
-    mStage = new Stage();
-    mStage.setTitle(pWindowTitle);
+    setTitle(pWindowTitle);
 
-    mViewParticles2D = new ViewParticlesCanvas(pWindowWidth,
-                                               pWindowHeight);
+    mViewParticles2D = new ParticleViewerCanvas(pWindowWidth,
+                                                pWindowHeight);
 
     StackPane lStackPane = new StackPane();
 
     lStackPane.getChildren().addAll(mViewParticles2D);
 
-    mPanZoomScene = new PanZoomScene(mStage,
+    mPanZoomScene = new PanZoomScene(this,
                                      lStackPane,
                                      mViewParticles2D,
                                      pWindowWidth,
@@ -73,10 +99,8 @@ public class ParticleViewer
                                      Color.BLACK);
     mPanZoomScene.setFill(Color.BLACK);
 
-    mStage.setScene(mPanZoomScene);
-
-    mStage.show();
-
+    setScene(mPanZoomScene);
+    show();
   }
 
   /**
@@ -109,16 +133,6 @@ public class ParticleViewer
   }
 
   /**
-   * Returns true if image view is showing.
-   * 
-   * @return true if showing
-   */
-  public boolean isShowing()
-  {
-    return mStage.isShowing();
-  }
-
-  /**
    * Returns the mouse's x coordinate
    * 
    * @return mouse x
@@ -140,18 +154,20 @@ public class ParticleViewer
 
   /**
    * Returns the scene's width
+   * 
    * @return width
    */
-  public double getWidth()
+  public double getSceneWidth()
   {
     return mPanZoomScene.getWidth();
   }
 
   /**
    * Returns the scene's height
+   * 
    * @return height
    */
-  public double getHeight()
+  public double getSceneHeight()
   {
     return mPanZoomScene.getHeight();
   }

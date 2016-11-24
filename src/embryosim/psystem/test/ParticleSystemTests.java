@@ -10,10 +10,10 @@ public class ParticleSystemTests
   @Test
   public void test()
   {
-    ParticleSystem lParticleSystem = new ParticleSystem(1000,
-                                                        100,
+    ParticleSystem lParticleSystem = new ParticleSystem(2,
                                                         4,
-                                                        4);
+                                                        50,
+                                                        4000);
 
     lParticleSystem.addParticle(0f, 0f);
     lParticleSystem.addParticle(1f, 1f);

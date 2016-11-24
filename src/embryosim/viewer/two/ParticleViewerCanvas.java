@@ -1,44 +1,48 @@
-package embryosim.viewer.jfx;
+package embryosim.viewer.two;
 
 import java.util.concurrent.CountDownLatch;
 
-import embryosim.interfaces.ParticleViewerInterface;
 import embryosim.psystem.ParticleSystem;
 import javafx.application.Platform;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-public class ViewParticlesCanvas extends Canvas
-                                 implements ParticleViewerInterface
+public class ParticleViewerCanvas extends Canvas
 {
 
   private CountDownLatch mCountDownLatch;
   private volatile boolean mDisplayGrid, mDisplayElapsedTime;
 
-  private volatile long mLastUpdateTimeInNanos;
+  private volatile long mLastUpdateTimeInNanos = System.nanoTime();
   private volatile float mElapsedTime;
   private float[] mPositions;
   private float[] mVelocities;
   private float[] mRadiis;
 
-  public ViewParticlesCanvas()
+  public ParticleViewerCanvas()
   {
     this(512, 512);
   }
 
-  public ViewParticlesCanvas(double pWidth, double pHeight)
+  public ParticleViewerCanvas(double pWidth, double pHeight)
   {
     super(pWidth, pHeight);
   }
 
-  @Override
+ 
   public void updateDisplay(ParticleSystem pParticleSystem,
                             boolean pBlocking)
   {
     long lNow = System.nanoTime();
-    mElapsedTime = (float) (1e-6 * (lNow - mLastUpdateTimeInNanos));
+    float lNewElapsedTime =
+                          (float) (1e-6
+                                   * (lNow - mLastUpdateTimeInNanos));
+
     mLastUpdateTimeInNanos = lNow;
+
+    mElapsedTime = (float) (0.99 * mElapsedTime
+                            + 0.01 * lNewElapsedTime);
 
     if (pBlocking)
     {
@@ -57,10 +61,11 @@ public class ViewParticlesCanvas extends Canvas
     final int lNumberOfParticles =
                                  pParticleSystem.getNumberOfParticles();
 
-    if (mPositions == null || mPositions.length != lNumberOfParticles*lDimension)
+    if (mPositions == null
+        || mPositions.length != lNumberOfParticles * lDimension)
     {
-      mPositions = new float[lNumberOfParticles*lDimension];
-      mVelocities = new float[lNumberOfParticles*lDimension];
+      mPositions = new float[lNumberOfParticles * lDimension];
+      mVelocities = new float[lNumberOfParticles * lDimension];
       mRadiis = new float[lNumberOfParticles];
     }
 
@@ -140,9 +145,10 @@ public class ViewParticlesCanvas extends Canvas
 
       if (isDisplayElapsedTime())
       {
+        gc.setFill(Color.WHITE);
         String lFrameRateText =
                               String.format("%.3f ms", mElapsedTime);
-        gc.fillText(lFrameRateText, 10, 10);
+        gc.fillText(lFrameRateText, 10, 20);
       }
 
       gc.beginPath();

@@ -3,7 +3,8 @@ package embryosim.demos;
 import java.util.Optional;
 
 import embryosim.psystem.ParticleSystem;
-import embryosim.viewer.ParticleViewer;
+import embryosim.util.timing.Timming;
+import embryosim.viewer.two.ParticleViewer2D;
 import javafx.application.Application;
 import javafx.scene.control.TextInputDialog;
 import javafx.stage.Stage;
@@ -13,10 +14,11 @@ public class Collider extends Application
 
   public int N = 20;
   public float V = 0.000000f;
-  public float F = 0.0001f;
+  public float Fc = 0.0001f;
   public float R;
   public float D = 0.99f;
-  public float Grav = 0.000001f;
+  public float Db = 0.5f;
+  public float Fg = 0.000001f;
   public int G;
 
   Thread mThread;
@@ -56,11 +58,11 @@ public class Collider extends Application
 
       ParticleSystem lParticleSystem = new ParticleSystem(2, N, R, R);
 
-      ParticleViewer lParticleViewer =
-                                     new ParticleViewer(lParticleSystem,
-                                                        "Collider",
-                                                        768,
-                                                        768);
+      ParticleViewer2D lParticleViewer =
+                                       new ParticleViewer2D(lParticleSystem,
+                                                            "Particles Are Fun",
+                                                            768,
+                                                            768);
       lParticleViewer.setDisplayGrid(false);
       lParticleViewer.setDisplayElapsedTime(true);
 
@@ -88,23 +90,27 @@ public class Collider extends Application
 
         // System.out.println(Arrays.toString(lParticleSystem.getVelocities()));
 
+        Timming lTimming = new Timming();
+
         while (lParticleViewer.isShowing())
         {
+          lTimming.syncAtPeriod(1);
 
           // lParticleSystem.repelAround(lMouseX, lMouseY, 0.00001f);
           lParticleSystem.updateNeighborhoodCells();
-          lParticleSystem.applyForcesForElasticParticleCollisions(F, D);
-          if (Grav > 0)
-            lParticleSystem.applyForce(0f, Grav);
+          lParticleSystem.applyForcesForParticleCollisions(Fc,
+                                                                  D);
+          if (Fg > 0)
+            lParticleSystem.applyForce(0f, Fg);
           lParticleSystem.intergrateEuler();
-          lParticleSystem.enforceBoundsWithElasticBouncing();
+          lParticleSystem.enforceBounds(Db);
 
           float lMouseX = (float) (lParticleViewer.getMouseX());
           float lMouseY = (float) (lParticleViewer.getMouseY());
 
           lParticleSystem.setPosition(0, lMouseX, lMouseY);
           lParticleViewer.updateDisplay(true);
-          // sleep(1);
+
         }
 
         lParticleViewer.waitWhileShowing();

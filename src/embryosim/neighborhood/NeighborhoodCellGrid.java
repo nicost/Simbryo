@@ -199,6 +199,8 @@ public class NeighborhoodCellGrid
    * 
    * @param pNeighboors
    *          array in which to store the list of ids.
+   * @param pNeighboorsTemp
+   *          aorking array of same length as pNeighboors.
    * @param pPositions
    *          array of particle positions
    * @param pParticleId
@@ -208,6 +210,7 @@ public class NeighborhoodCellGrid
    * @return number of particle ids written in array.
    */
   public final int getAllNeighborsForParticle(int[] pNeighboors,
+                                              int[] pNeighboorsTemp,
                                               float[] pPositions,
                                               int pParticleId,
                                               float pRadius)
@@ -220,6 +223,7 @@ public class NeighborhoodCellGrid
     final int[] lCellCoordCurrent = new int[lDimension];
 
     return getAllNeighborsForParticle(pNeighboors,
+                                      pNeighboorsTemp,
                                       pPositions,
                                       pParticleId,
                                       pRadius,
@@ -235,6 +239,8 @@ public class NeighborhoodCellGrid
    * 
    * @param pNeighboors
    *          array in which to store the list of ids.
+   * @param pNeighboors
+   *          working array of the same size as pNeighboors, used internally.
    * @param pPositions
    *          array of particle positions
    * @param pParticleId
@@ -252,6 +258,7 @@ public class NeighborhoodCellGrid
    * @return number of particle ids written in array.
    */
   public final int getAllNeighborsForParticle(int[] pNeighboors,
+                                              int[] pNeighboorsTemp,
                                               float[] pPositions,
                                               int pParticleId,
                                               float pRadius,

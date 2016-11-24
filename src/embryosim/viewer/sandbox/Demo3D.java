@@ -18,13 +18,15 @@ import javafx.stage.Stage;
 
 public class Demo3D extends Application
 {
-  final Group root = new Group();
-  final XformWorld world = new XformWorld();
-  final PerspectiveCamera camera = new PerspectiveCamera(true);
-  final XformCamera cameraXform = new XformCamera();
   private static final double CAMERA_INITIAL_DISTANCE = -1000;
   private static final double CAMERA_NEAR_CLIP = 0.1;
   private static final double CAMERA_FAR_CLIP = 10000.0;
+  
+  final Group mRoot = new Group();
+  final WorldGroup mWorldGroup = new WorldGroup();
+  final PerspectiveCamera mPerspectiveCamera = new PerspectiveCamera(true);
+  final CameraGroup mCameraGroup = new CameraGroup();
+
   double mousePosX, mousePosY, mouseOldX, mouseOldY, mouseDeltaX,
       mouseDeltaY;
   double mouseFactorX, mouseFactorY;
@@ -32,28 +34,28 @@ public class Demo3D extends Application
   @Override
   public void start(Stage primaryStage)
   {
-    root.getChildren().add(world);
-    root.setDepthTest(DepthTest.ENABLE);
+    mRoot.getChildren().add(mWorldGroup);
+    mRoot.setDepthTest(DepthTest.ENABLE);
     buildCamera();
     buildBodySystem();
-    Scene scene = new Scene(root, 800, 600, true);
+    Scene scene = new Scene(mRoot, 800, 600, true);
     scene.setFill(Color.GREY);
     handleMouse(scene);
     primaryStage.setTitle("TrafoTest");
     primaryStage.setScene(scene);
     primaryStage.show();
-    scene.setCamera(camera);
+    scene.setCamera(mPerspectiveCamera);
     mouseFactorX = 180.0 / scene.getWidth();
     mouseFactorY = 180.0 / scene.getHeight();
   }
 
   private void buildCamera()
   {
-    root.getChildren().add(cameraXform);
-    cameraXform.getChildren().add(camera);
-    camera.setNearClip(CAMERA_NEAR_CLIP);
-    camera.setFarClip(CAMERA_FAR_CLIP);
-    camera.setTranslateZ(CAMERA_INITIAL_DISTANCE);
+    mRoot.getChildren().add(mCameraGroup);
+    mCameraGroup.getChildren().add(mPerspectiveCamera);
+    mPerspectiveCamera.setNearClip(CAMERA_NEAR_CLIP);
+    mPerspectiveCamera.setFarClip(CAMERA_FAR_CLIP);
+    mPerspectiveCamera.setTranslateZ(CAMERA_INITIAL_DISTANCE);
   }
 
   private void buildBodySystem()
@@ -71,8 +73,8 @@ public class Demo3D extends Application
     sphere.setTranslateX(200.0);
     sphere.setTranslateY(-100.0);
     sphere.setTranslateZ(-50.0);
-    world.getChildren().addAll(box);
-    world.getChildren().addAll(sphere);
+    mWorldGroup.getChildren().addAll(box);
+    mWorldGroup.getChildren().addAll(sphere);
   }
 
   private void handleMouse(Scene scene)
@@ -92,12 +94,12 @@ public class Demo3D extends Application
       mouseDeltaY = (mousePosY - mouseOldY);
       if (me.isPrimaryButtonDown())
       {
-        cameraXform.ry(mouseDeltaX * 180.0 / scene.getWidth());
-        cameraXform.rx(-mouseDeltaY * 180.0 / scene.getHeight());
+        mCameraGroup.ry(mouseDeltaX * 180.0 / scene.getWidth());
+        mCameraGroup.rx(-mouseDeltaY * 180.0 / scene.getHeight());
       }
       else if (me.isSecondaryButtonDown())
       {
-        camera.setTranslateZ(camera.getTranslateZ() + mouseDeltaY);
+        mPerspectiveCamera.setTranslateZ(mPerspectiveCamera.getTranslateZ() + mouseDeltaY);
       }
     });
   }
@@ -109,28 +111,28 @@ public class Demo3D extends Application
 
 }
 
-class XformWorld extends Group
+class WorldGroup extends Group
 {
   final Translate t = new Translate(0.0, 0.0, 0.0);
   final Rotate rx = new Rotate(0, 0, 0, 0, Rotate.X_AXIS);
   final Rotate ry = new Rotate(0, 0, 0, 0, Rotate.Y_AXIS);
   final Rotate rz = new Rotate(0, 0, 0, 0, Rotate.Z_AXIS);
 
-  public XformWorld()
+  public WorldGroup()
   {
     super();
     this.getTransforms().addAll(t, rx, ry, rz);
   }
 }
 
-class XformCamera extends Group
+class CameraGroup extends Group
 {
   Point3D px = new Point3D(1.0, 0.0, 0.0);
   Point3D py = new Point3D(0.0, 1.0, 0.0);
   Rotate r;
   Transform t = new Rotate();
 
-  public XformCamera()
+  public CameraGroup()
   {
     super();
   }

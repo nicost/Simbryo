@@ -2,6 +2,7 @@ package embryosim.psystem;
 
 import java.util.SplittableRandom;
 
+import embryosim.forcefield.ForceField;
 import embryosim.neighborhood.NeighborhoodCellGrid;
 import embryosim.util.DoubleBufferingFloatArray;
 
@@ -20,13 +21,13 @@ public class ParticleSystem
   private final int mMaxNumberOfParticlesPerGridCell;
   private int mNumberOfParticles;
 
-  private final DoubleBufferingFloatArray mPositions;
-  private final DoubleBufferingFloatArray mVelocities;
-  private final DoubleBufferingFloatArray mRadii;
+  protected final DoubleBufferingFloatArray mPositions;
+  protected final DoubleBufferingFloatArray mVelocities;
+  protected final DoubleBufferingFloatArray mRadii;
 
   private final NeighborhoodCellGrid mNeighborhood;
 
-  private int[] mNeighboorsTempArray;
+  private int[] mNeighboorsArray, mNeighboorsTempArray;
 
   private SplittableRandom mRandom = new SplittableRandom();
 
@@ -65,7 +66,7 @@ public class ParticleSystem
   {
     int lOptimalGridSize =
                          (int) Math.max(4,
-                                        1 / (3 * 2 * pTypicalRadius));
+                                        1 / (2 * 2 * pTypicalRadius));
 
     return lOptimalGridSize;
   }
@@ -133,7 +134,7 @@ public class ParticleSystem
                                            pGridSize,
                                            pMaxNumberOfParticlesPerGridCell);
   }
-  
+
   /**
    * returns current number of particles.
    * 
@@ -165,6 +166,18 @@ public class ParticleSystem
   }
 
   /**
+   * Returns a particle radius.
+   * 
+   * @param pParticleId
+   *          particle id.
+   * @return radius
+   */
+  public float getRadius(int pParticleId)
+  {
+    return mRadii.getCurrentArray()[pParticleId];
+  }
+
+  /**
    * Adds a particle to this particle system at a given position. The particle
    * id is returned.
    * 
@@ -173,16 +186,19 @@ public class ParticleSystem
    */
   public int addParticle(float... pPosition)
   {
+    if (mNumberOfParticles >= mMaxNumberOfParticles)
+      return -1;
+
     final int lDimension = mDimension;
     final float[] lPositions = mPositions.getCurrentArray();
     final float[] lVelocities = mVelocities.getCurrentArray();
     final int lParticleId = mNumberOfParticles;
     final int i = lParticleId * lDimension;
 
-    for (int d = 0; d < mDimension; d++)
+    for (int d = 0; d < Math.min(mDimension, pPosition.length); d++)
     {
       lPositions[i + d] = pPosition[d];
-      lVelocities[i + d] = 0;
+      // lVelocities[i + d] = 0;
     }
 
     mNumberOfParticles++;
@@ -232,6 +248,25 @@ public class ParticleSystem
     }
 
     lRadii[pDestinationParticleId] = lRadii[pSourceParticleId];
+  }
+
+  /**
+   * Clones a particle and adds some noise to its position.
+   * 
+   * @param pSourceParticleId
+   *          source id
+   * @param pNoiseFactor
+   *          noise factorf
+   * @return new particle id.
+   */
+  public int cloneParticle(int pSourceParticleId, float pNoiseFactor)
+  {
+    int lNewParticleId = addParticle();
+    if (lNewParticleId < 0)
+      return lNewParticleId;
+    copyParticle(pSourceParticleId, lNewParticleId);
+    addNoiseToParticle(lNewParticleId, pNoiseFactor, 0, 0);
+    return lNewParticleId;
   }
 
   /**
@@ -375,37 +410,51 @@ public class ParticleSystem
 
   /**
    * Enforces bounds [0,1]^d by bouncing the particles elastically.
+   *
+   * @param pDampening
+   *          how much should velocity be dampened.
    */
-  public void enforceBoundsWithElasticBouncing()
+  public void enforceBounds(float pDampening)
   {
     final int lDimension = mDimension;
     final float[] lPositionsRead = mPositions.getReadArray();
     final float[] lPositionsWrite = mPositions.getWriteArray();
     final float[] lVelocitiesRead = mVelocities.getReadArray();
     final float[] lVelocitiesWrite = mVelocities.getWriteArray();
-    final int lLength = mNumberOfParticles * lDimension;
+    final float[] lRadiiRead = mRadii.getReadArray();
 
-    for (int i = 0; i < lLength; i++)
+    for (int id = 0; id < mNumberOfParticles; id++)
     {
-      if (lPositionsRead[i] < 0)
+      for (int d = 0; d < lDimension; d++)
       {
-        lPositionsWrite[i] = 0;
-        lVelocitiesWrite[i] = -lVelocitiesRead[i];
-      }
-      else if (lPositionsRead[i] > 1)
-      {
-        lPositionsWrite[i] = 1;
-        lVelocitiesWrite[i] = -lVelocitiesRead[i];
-      }
-      else
-      {
-        lPositionsWrite[i] = lPositionsRead[i];
-        lVelocitiesWrite[i] = lVelocitiesRead[i];
+        int i = id * lDimension + d;
+        float lRadius = lRadiiRead[id];
+
+        if (lPositionsRead[i] < lRadius)
+        {
+          lPositionsWrite[i] = lRadius;
+          lVelocitiesWrite[i] = -pDampening * lVelocitiesRead[i];
+        }
+        else if (lPositionsRead[i] > 1 - lRadius)
+        {
+          lPositionsWrite[i] = 1 - lRadius;
+          lVelocitiesWrite[i] = -pDampening * lVelocitiesRead[i];
+        }
+        else
+        {
+          lPositionsWrite[i] = lPositionsRead[i];
+          lVelocitiesWrite[i] = lVelocitiesRead[i];
+        }
       }
     }
 
     mPositions.swap();
     mVelocities.swap();
+  }
+  
+  public void applyForce(ForceField pForceField)
+  {
+    //TODO: apply force field.
   }
 
   /**
@@ -431,6 +480,183 @@ public class ParticleSystem
   }
 
   /**
+   * Applies a centri(petal+/fugal-) force to the particles. if the the force is
+   * positive then it is a centripetal force, otherwise it is a centrifugal
+   * force.
+   * 
+   * @param pForce
+   *          force intensity
+   * @param pCenter
+   *          force field center
+   */
+  public void applyCentriForce(float pForce, float... pCenter)
+  {
+    final int lDimension = mDimension;
+    final float[] lPositionsRead = mPositions.getReadArray();
+    final float[] lPositionsWrite = mPositions.getWriteArray();
+    final float[] lVelocitiesRead = mVelocities.getReadArray();
+    final float[] lVelocitiesWrite = mVelocities.getWriteArray();
+    final int lLength = mNumberOfParticles * lDimension;
+
+    final float[] lVector = new float[lDimension];
+
+    for (int i = 0; i < lLength; i += lDimension)
+    {
+      float lSquaredLength = 0;
+      for (int d = 0; d < lDimension; d++)
+      {
+        float px = lPositionsRead[i + d];
+        float cx = pCenter[d];
+        float dx = cx - px;
+        lVector[d] = dx;
+
+        lSquaredLength += dx * dx;
+      }
+
+      float lInverseLengthTimesForce =
+                                     (float) (pForce
+                                              / Math.sqrt(lSquaredLength));
+
+      for (int d = 0; d < lDimension; d++)
+      {
+        lVelocitiesWrite[i + d] = lVelocitiesRead[i + d]
+                                  + lVector[d]
+                                    * lInverseLengthTimesForce;
+      }
+
+    }
+
+    mVelocities.swap();
+  }
+
+  /**
+   * Applies a spheri(petal+/fugal-) force to the particles. if the the force is
+   * positive then it is a spheripetal force, otherwise it is a spherifugal
+   * force.
+   * 
+   * @param pForce
+   *          force intesnity
+   * @param pRadius
+   *          sphere radius
+   * @param pCenter
+   *          sphere center
+   */
+  public void applySpheriForce(float pForce,
+                               float pRadius,
+                               float... pCenter)
+  {
+    final int lDimension = mDimension;
+    final float[] lPositionsRead = mPositions.getReadArray();
+    final float[] lPositionsWrite = mPositions.getWriteArray();
+    final float[] lVelocitiesRead = mVelocities.getReadArray();
+    final float[] lVelocitiesWrite = mVelocities.getWriteArray();
+    final int lLength = mNumberOfParticles * lDimension;
+
+    final float[] lVector = new float[lDimension];
+
+    for (int i = 0; i < lLength; i += lDimension)
+    {
+      float lSquaredLength = 0;
+      for (int d = 0; d < lDimension; d++)
+      {
+        float px = lPositionsRead[i + d];
+        float cx = pCenter[d];
+        float dx = cx - px;
+        lVector[d] = dx;
+
+        lSquaredLength += dx * dx;
+      }
+
+      float lDistance = (float) Math.sqrt(lSquaredLength);
+
+      float lInverseLengthTimesForce = (float) (pForce / lDistance);
+
+      float lSignedDistanceToSphere = (lDistance - pRadius);
+
+      float lForceSign = Math.signum(lSignedDistanceToSphere);
+
+      for (int d = 0; d < lDimension; d++)
+      {
+        lVelocitiesWrite[i + d] = lVelocitiesRead[i + d]
+                                  + lVector[d] * lForceSign
+                                    * lInverseLengthTimesForce;
+      }
+
+    }
+
+    mVelocities.swap();
+  }
+
+  /**
+   * Applies a ellipsoi(petal+/fugal-) force to the particles. if the the force
+   * is positive then it is a ellipsoipetal force, otherwise it is a
+   * ellipsoifugal force.
+   * 
+   * For example:
+   * 
+   * <pre>
+   *  {@code}
+   *   applyCentriForceEllipsoidal(0.001, 0.5f, 0.5f, 0.5f, 1.0f, 2.0f, 4.0f)
+   * </pre>
+   * 
+   * Sets a force with center (xc,yc,zc) = (0.5, 0.5, 0.5) and (a,b,c) = (1,2,4)
+   * 
+   * The equation is: ((x-xc)/a)^2+((y-yc)/b)^2+((z-zc)/c)^2 - R^2 =0
+   * 
+   * @param pForce
+   *          force intensity
+   * @param pCenterAndAxis
+   *          force field center + ellipsoid axes length
+   */
+  public void applyEllipsoidalForce(float pForce,
+                                    float pRadius,
+                                    float... pCenterAndAxis)
+  {
+    final int lDimension = mDimension;
+    final float[] lPositionsRead = mPositions.getReadArray();
+    final float[] lPositionsWrite = mPositions.getWriteArray();
+    final float[] lVelocitiesRead = mVelocities.getReadArray();
+    final float[] lVelocitiesWrite = mVelocities.getWriteArray();
+    final int lArrayLength = mNumberOfParticles * lDimension;
+
+    final float[] lVector = new float[lDimension];
+
+    for (int i = 0; i < lArrayLength; i += lDimension)
+    {
+      float lSquaredLength = 0;
+      for (int d = 0; d < lDimension; d++)
+      {
+        float px = lPositionsRead[i + d];
+        float cx = pCenterAndAxis[d];
+        float ax = pCenterAndAxis[lDimension + d];
+        float dx = (cx - px) / (ax * ax);
+        lVector[d] = dx;
+
+        lSquaredLength += dx * dx;
+      }
+
+      float lLength = (float) Math.sqrt(lSquaredLength);
+
+      float lInverseLengthTimesForce = (float) (pForce / lLength);
+
+      float lSignedDistanceToSphere = (lLength - pRadius);
+
+      float lForceSign = Math.signum(lSignedDistanceToSphere);
+
+      for (int d = 0; d < lDimension; d++)
+      {
+        lVelocitiesWrite[i + d] = lVelocitiesRead[i + d]
+                                  + lVector[d] * lForceSign
+                                    * lInverseLengthTimesForce;
+      }
+
+    }
+
+    mVelocities.swap();
+
+  }
+
+  /**
    * Euler integration
    */
   public void intergrateEuler()
@@ -453,6 +679,32 @@ public class ParticleSystem
   }
 
   /**
+   * Trapezoidal integration
+   */
+  public void intergrateTrapezoidal()
+  {
+    final int lDimension = mDimension;
+    final float[] lPositionsRead = mPositions.getReadArray();
+    final float[] lPositionsWrite = mPositions.getWriteArray();
+    final float[] lVelocitiesCurrent = mVelocities.getCurrentArray();
+    final float[] lVelocitiesPrevious =
+                                      mVelocities.getPreviousArray();
+    final int lLength = mNumberOfParticles * lDimension;
+
+    for (int i = 0; i < lLength; i += lDimension)
+    {
+      for (int d = 0; d < lDimension; d++)
+        lPositionsWrite[i + d] = lPositionsRead[i + d]
+                                 + 0.5f
+                                   * (lVelocitiesCurrent[i + d]
+                                      + lVelocitiesPrevious[i + d]);
+    }
+
+    mPositions.swap();
+
+  }
+
+  /**
    * Applies the force for elastic particle-to-particle collision.
    * 
    * @param pForce
@@ -460,7 +712,7 @@ public class ParticleSystem
    * @param pDrag
    *          drag applied to slow down particles.
    */
-  public void applyForcesForElasticParticleCollisions(float pForce,
+  public void applyForcesForParticleCollisions(float pForce,
                                                       float pDrag)
   {
     final int lDimension = mDimension;
@@ -476,16 +728,20 @@ public class ParticleSystem
 
     int lNeighboorhoodListMaxLength = lMaxNumberOfParticlesPerGridCell
                                       * lTotalNumberOfCells;
-    if (mNeighboorsTempArray == null
-        || mNeighboorsTempArray.length != lNeighboorhoodListMaxLength)
+    if (mNeighboorsArray == null
+        || mNeighboorsArray.length != lNeighboorhoodListMaxLength)
+    {
+      mNeighboorsArray = new int[lNeighboorhoodListMaxLength];
       mNeighboorsTempArray = new int[lNeighboorhoodListMaxLength];
+    }
 
-    final int[] lNeighboors = mNeighboorsTempArray;
+    final int[] lNeighboors = mNeighboorsArray;
+    final int[] lNeighboorsTemp = mNeighboorsArray;
     final float[] lCellCoord = new float[lDimension];
     final int[] lCellCoordMin = new int[lDimension];
     final int[] lCellCoordMax = new int[lDimension];
     final int[] lCellCoordCurrent = new int[lDimension];
-
+    
     for (int idu = 0; idu < lNumberOfParticles; idu++)
     {
       final int i = idu * lDimension;
@@ -494,6 +750,7 @@ public class ParticleSystem
 
       int lNumberOfNeighboors =
                               mNeighborhood.getAllNeighborsForParticle(lNeighboors,
+                                                                       lNeighboorsTemp,
                                                                        lPositionsRead,
                                                                        idu,
                                                                        ru,
@@ -562,7 +819,6 @@ public class ParticleSystem
                                                     pIdv));
   }
 
-
   private static float computeSquaredDistance(int pDimension,
                                               float[] pPositions,
                                               int pIdu,
@@ -582,7 +838,6 @@ public class ParticleSystem
 
     return lDistance;
   }
-
 
   private static boolean detectBoundingBoxCollision(int pDimension,
                                                     float[] pPositions,
@@ -607,8 +862,6 @@ public class ParticleSystem
 
     return true;
   }
-
-
 
   /**
    * Copies the positions to this array.

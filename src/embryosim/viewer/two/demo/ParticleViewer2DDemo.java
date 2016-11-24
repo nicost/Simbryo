@@ -1,30 +1,27 @@
-package embryosim.viewer.demo;
-
-import java.util.Optional;
+package embryosim.viewer.two.demo;
 
 import org.junit.Test;
 
 import embryosim.psystem.ParticleSystem;
-import embryosim.util.JavaFXUtil;
-import embryosim.viewer.ParticleViewer;
-import javafx.scene.control.TextInputDialog;
+import embryosim.util.jfx.JavaFXUtil;
+import embryosim.util.timing.Timming;
+import embryosim.viewer.three.ParticleViewer3D;
+import embryosim.viewer.two.ParticleViewer2D;
 
-public class ParticleViewerDemo
+public class ParticleViewer2DDemo
 {
 
-  public int G = 16;
-  public int N = 40;
-  public float V = 0.0000001f;
-  public float R = (float) (0.5 / Math.sqrt(N));
-  public float Rm = 0.001f;
-  public float D = 0.9999f;
-  public float Fc = 0.00001f;
-
-  private ParticleViewer mParticleViewer;
-
   @Test
-  public void demo() throws InterruptedException
+  public void demo2D() throws InterruptedException
   {
+    int G = 16;
+    int N = 40;
+    float V = 0.0000001f;
+    float R = (float) (0.5 / Math.sqrt(N));
+    float Rm = 0.001f;
+    float D = 0.99f;
+    float Db = 0.9f;
+    float Fc = 0.001f;
 
     ParticleSystem lParticleSystem = new ParticleSystem(2,
                                                         N,
@@ -55,31 +52,33 @@ public class ParticleViewerDemo
 
     // System.out.println(Arrays.toString(lParticleSystem.getVelocities()));
 
-    JavaFXUtil.runAndWait(() -> {
-      mParticleViewer = new ParticleViewer(lParticleSystem,
-                                           "Particles Are Fun",
-                                           768,
-                                           768);
-    });
+    ParticleViewer2D lParticleViewer2D =
+                                       ParticleViewer2D.view(lParticleSystem,
+                                                             "Particles Are Fun",
+                                                             768,
+                                                             768);
 
-    while (mParticleViewer.isShowing())
+    Timming lTimming = new Timming();
+    
+    while (lParticleViewer2D.isShowing())
     {
-
+      lTimming.syncAtPeriod(3);
+      
       // lParticleSystem.repelAround(lMouseX, lMouseY, 0.00001f);
-      lParticleSystem.applyForcesForElasticParticleCollisions(Fc, D);
+      lParticleSystem.applyForcesForParticleCollisions(Fc, D);
       lParticleSystem.intergrateEuler();
-      lParticleSystem.enforceBoundsWithElasticBouncing();
+      lParticleSystem.enforceBounds(Db);
       lParticleSystem.updateNeighborhoodCells();
 
-      float lMouseX = (float) (mParticleViewer.getMouseX());
-      float lMouseY = (float) (mParticleViewer.getMouseY());
+      float lMouseX = (float) (lParticleViewer2D.getMouseX());
+      float lMouseY = (float) (lParticleViewer2D.getMouseY());
 
       lParticleSystem.setPosition(0, lMouseX, lMouseY);
-      mParticleViewer.updateDisplay(true);
-      Thread.sleep(1);
+      lParticleViewer2D.updateDisplay(true);
+
     }
 
-    mParticleViewer.waitWhileShowing();
+    lParticleViewer2D.waitWhileShowing();
   }
 
 }
