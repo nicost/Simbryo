@@ -14,16 +14,18 @@ public class ParticleViewer2DDemo
   public void demo2D() throws InterruptedException
   {
     int G = 16;
-    int N = 40;
+    int N = 5000;
     float V = 0.0000001f;
-    float R = (float) (0.5 / Math.sqrt(N));
+    float R = (float) (0.4 / Math.sqrt(N));
     float Rm = 0.001f;
     float D = 0.99f;
     float Db = 0.9f;
-    float Fc = 0.001f;
-    
-    
-    CollisionForceField lCollisionForceField = new CollisionForceField(Fc, D);
+    float Fc = 0.00001f;
+    float Fg = 0.0000001f;
+
+    CollisionForceField lCollisionForceField =
+                                             new CollisionForceField(Fc,
+                                                                     D);
 
     ParticleSystem lParticleSystem = new ParticleSystem(2,
                                                         N,
@@ -36,14 +38,13 @@ public class ParticleViewer2DDemo
       float x = (float) Math.random();
       float y = (float) Math.random();
 
-      lParticleSystem.addParticle(x, y);
-      lParticleSystem.setVelocity(i,
+      int lId = lParticleSystem.addParticle(x, y);
+      lParticleSystem.setVelocity(lId,
                                   (float) (V
                                            * (Math.random() - 0.5f)),
                                   (float) (V
                                            * (Math.random() - 0.5f)));
-      lParticleSystem.setRadius(i,
-                                (float) (Rm + (Math.random() * R)));
+      lParticleSystem.setRadius(lId, (float) (Rm + (R)));// Math.random() *
     }
 
     lParticleSystem.setRadius(0, 0.06f);
@@ -61,13 +62,15 @@ public class ParticleViewer2DDemo
                                                              768);
 
     Timming lTimming = new Timming();
-    
+
     while (lParticleViewer2D.isShowing())
     {
       lTimming.syncAtPeriod(3);
-      
+
       // lParticleSystem.repelAround(lMouseX, lMouseY, 0.00001f);
       lParticleSystem.applyForceField(lCollisionForceField);
+      if (Fg > 0)
+        lParticleSystem.applyForce(0f, Fg);
       lParticleSystem.intergrateEuler();
       lParticleSystem.enforceBounds(Db);
       lParticleSystem.updateNeighborhoodCells();

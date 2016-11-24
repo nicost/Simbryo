@@ -16,13 +16,13 @@ public class ParticleViewer3DDemo
   public void demo3D() throws InterruptedException
   {
     int G = 16;
-    int N = 1200;
+    int N = 2000;
     float V = 0.0001f;
-    float R = (float) (0.2 / Math.pow(N, 0.33f));
+    float R = (float) (0.25 / Math.pow(N, 0.33f));
     float Rm = 0.01f;
-    float D = 0.9999f;
+    float D = 0.99f;
     float Db = 0.9f;
-    float Fc = 0.00001f;
+    float Fc = 0.0001f;
     float Fg = 0.000001f;
 
     CollisionForceField lCollisionForceField =
@@ -41,15 +41,17 @@ public class ParticleViewer3DDemo
       float y = (float) Math.random();
       float z = (float) Math.random();
 
-      lParticleSystem.addParticle(x, y, z);
-      lParticleSystem.setVelocity(i,
+      int lId = lParticleSystem.addParticle(x, y, z);
+      lParticleSystem.setVelocity(lId,
                                   (float) (V
                                            * (Math.random() - 0.5f)),
                                   (float) (V
                                            * (Math.random() - 0.5f)),
                                   (float) (V
                                            * (Math.random() - 0.5f)));
-      lParticleSystem.setRadius(i, (float) (Rm + (R))); // Math.random() *
+      lParticleSystem.setRadius(lId,
+                                (float) (Rm + (R)
+                                         + 0.01 * Math.random())); //
     }
 
     lParticleSystem.setRadius(0, 0.06f);

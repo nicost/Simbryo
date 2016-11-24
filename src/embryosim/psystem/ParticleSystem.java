@@ -54,7 +54,7 @@ public class ParticleSystem
          getOptimalGridSize(pDimension,
                             pMaxNumberOfParticles,
                             pTypicalRadius),
-         16 + getOptimalMaxNumberOfParticlesPerGridCell(pDimension,
+         32 + getOptimalMaxNumberOfParticlesPerGridCell(pDimension,
                                                         pMaxNumberOfParticles,
                                                         pMinRradius,
                                                         pTypicalRadius),
@@ -137,13 +137,23 @@ public class ParticleSystem
   }
 
   /**
-   * returns current number of particles.
+   * Returns current number of particles.
    * 
    * @return number of particles
    */
   public int getNumberOfParticles()
   {
     return mNumberOfParticles;
+  }
+
+  /**
+   * Returns max number of particles.
+   * 
+   * @return max number of particles
+   */
+  public int getMaxNumberOfParticles()
+  {
+    return mMaxNumberOfParticles;
   }
 
   /**
@@ -191,14 +201,15 @@ public class ParticleSystem
       return -1;
 
     final int lDimension = mDimension;
-    final float[] lPositions = mPositions.getCurrentArray();
-    final float[] lVelocities = mVelocities.getCurrentArray();
+    final float[] lPositionsRead = mPositions.getReadArray();
+    final float[] lPositionsWrite = mPositions.getWriteArray();
     final int lParticleId = mNumberOfParticles;
     final int i = lParticleId * lDimension;
 
     for (int d = 0; d < Math.min(mDimension, pPosition.length); d++)
     {
-      lPositions[i + d] = pPosition[d];
+      lPositionsRead[i + d] = pPosition[d];
+      lPositionsWrite[i + d] = pPosition[d];
       // lVelocities[i + d] = 0;
     }
 

@@ -119,6 +119,7 @@ public class ParticleViewerCanvas extends Canvas
                              lBrightness));
 
         gc.fillOval(lScreenX, lScreenY, 2 * lRadius, 2 * lRadius);
+        //gc.fillText(""+id, lScreenX, lScreenY);
 
       }
 

@@ -1,5 +1,7 @@
 package embryosim.psystem.forcefield.interaction.impl;
 
+import java.util.SplittableRandom;
+
 import embryosim.neighborhood.NeighborhoodCellGrid;
 import embryosim.psystem.forcefield.interaction.InteractionForceFieldBase;
 import embryosim.psystem.forcefield.interaction.InteractionForceFieldInterface;
@@ -18,7 +20,13 @@ public class CollisionForceField extends InteractionForceFieldBase
                                  InteractionForceFieldInterface
 {
 
+  private static final float cGapCorrectionFactor = 1f;
+  private static final double cGapCorrectionNoiseFactor = 1e-9f;
+
   private float mDrag;
+  private boolean mPreventOverlap = false;
+
+  private SplittableRandom mRandom = new SplittableRandom();
 
   private int[] mNeighboorsArray, mNeighboorsTempArray;
 
@@ -43,6 +51,7 @@ public class CollisionForceField extends InteractionForceFieldBase
     final int lTotalNumberOfCells = mNeighborhood.getVolume();
 
     final float[] lPositionsRead = pPositions.getReadArray();
+    final float[] lPositionsWrite = pPositions.getWriteArray();
     final float[] lVelocitiesWrite = pVelocities.getWriteArray();
     final float[] lRadii = pRadii.getCurrentArray();
 
@@ -64,9 +73,11 @@ public class CollisionForceField extends InteractionForceFieldBase
     final int[] lCellCoordMax = new int[pDimension];
     final int[] lCellCoordCurrent = new int[pDimension];
 
-    for (int idu = pBeginId; idu < pEndId; idu++)
+    for (int idu =
+                 pBeginId, i = idu
+                               * pDimension; idu < pEndId; idu++, i +=
+                                                                    pDimension)
     {
-      final int i = idu * pDimension;
 
       final float ru = lRadii[idu];
 
@@ -104,21 +115,41 @@ public class CollisionForceField extends InteractionForceFieldBase
           float lGap = lDistance - ru - rv;
 
           // testing sphere collision:
-          if (lGap <= 0 && lDistance != 0)
+          if (lGap < 0 && lDistance != 0)
           {
 
             // Collision -> apply force.
-            float lInvDistanceWithAlpha = mForce / lDistance;
+            float lInvDistance = 1.0f / lDistance;
+            float lInvDistanceWithForce = mForce * lInvDistance;
 
             for (int d = 0; d < pDimension; d++)
             {
-              float lAxisVector = lInvDistanceWithAlpha
-                                  * (lPositionsRead[i + d]
-                                     - lPositionsRead[j + d]);
+              float lDelta = lPositionsRead[i + d]
+                             - lPositionsRead[j + d];
+
+              float lAxisVector = lInvDistanceWithForce * lDelta;
 
               lVelocitiesWrite[i + d] += lAxisVector;
               lVelocitiesWrite[j + d] += -lAxisVector;
+
+              if (mPreventOverlap)
+              {
+
+                float lOverlapCorrection = lInvDistance * lDelta
+                                           * (cGapCorrectionFactor
+                                              * -lGap);
+                float lNoise =
+                             (float) ( (mRandom.nextDouble() - 0.5f)
+                                      * cGapCorrectionNoiseFactor);
+                lPositionsWrite[i + d] = lPositionsRead[i + d]
+                                         + lOverlapCorrection
+                                         + lNoise;
+                lPositionsWrite[j + d] = lPositionsRead[j + d]
+                                         + -lOverlapCorrection
+                                         - lNoise;
+              }
             }
+
           }
         }
 
@@ -126,7 +157,11 @@ public class CollisionForceField extends InteractionForceFieldBase
 
     }
 
+    if (mPreventOverlap)
+      pPositions.swap();
+
     pVelocities.swap();
+
   }
 
   private static float computeDistance(int pDimension,

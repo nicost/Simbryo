@@ -14,12 +14,16 @@ public class Collider extends Application
 {
 
   public int N = 20;
-  public float V = 0.000000f;
-  public float Fc = 0.0001f;
+  public float V = 0.0000001f;
+
   public float R;
   public float D = 0.99f;
-  public float Db = 0.5f;
-  public float Fg = 0.000001f;
+  public float Db = 0.9f;
+  public float Fc = 0.00001f;
+  public float Fg = 0.0000001f;
+
+  
+  
   public int G;
 
   Thread mThread;
@@ -61,7 +65,10 @@ public class Collider extends Application
                                                new CollisionForceField(Fc,
                                                                        D);
 
-      ParticleSystem lParticleSystem = new ParticleSystem(2, N, R, R);
+      ParticleSystem lParticleSystem = new ParticleSystem(2,
+                                                          N,
+                                                          0.5f * R,
+                                                          R);
 
       ParticleViewer2D lParticleViewer =
                                        new ParticleViewer2D(lParticleSystem,
@@ -73,21 +80,12 @@ public class Collider extends Application
 
       Runnable lRunnable = () -> {
 
-        for (int i = 0; i < N; i++)
+        for (int i = 0; i < N / 10; i++)
         {
-          float x = (float) Math.random();
-          float y = (float) Math.random();
-
-          lParticleSystem.addParticle(x, y);
-          lParticleSystem.setVelocity(i,
-                                      (float) (V * (Math.random()
-                                                    - 0.5f)),
-                                      (float) (V * (Math.random()
-                                                    - 0.5f)));
-          lParticleSystem.setRadius(i, (float) (1e-9 + (1 * R))); // Math.sqrt(Math.random())
+          addParticle(lParticleSystem);
         }
 
-        lParticleSystem.setRadius(0, 0.06f);
+        // lParticleSystem.setRadius(0, 0.06f);
         // lParticleSystem.setRadius(1, 0.06f);
         // lParticleSystem.setPosition(1, 0.55f, 0.45f);
 
@@ -115,6 +113,7 @@ public class Collider extends Application
           lParticleSystem.setPosition(0, lMouseX, lMouseY);
           lParticleViewer.updateDisplay(true);
 
+          addParticle(lParticleSystem);
         }
 
         lParticleViewer.waitWhileShowing();
@@ -129,6 +128,24 @@ public class Collider extends Application
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
+  }
+
+  private void addParticle(ParticleSystem lParticleSystem)
+  {
+    if (lParticleSystem.getNumberOfParticles() >= lParticleSystem.getMaxNumberOfParticles())
+      return;
+
+    float x = 0.5f+ (float) ((Math.random()-0.5f)*0.001);
+    float y = 0.1f+(float) ((Math.random()-0.5f)*0.001);
+
+    int lId = lParticleSystem.addParticle(x, y);
+
+    // System.out.format("(%d,%d) -> (%g,%g) \n", i, lId, x, y);
+
+    lParticleSystem.setVelocity(lId,
+                                (float) (V * (Math.random() - 0.5f)),
+                                (float) (V * (Math.random() - 0.5f)));
+    lParticleSystem.setRadius(lId, (float) (1e-9 + (1 * R))); // Math.sqrt(Math.random())
   }
 
   private void sleep(int pMillis)
