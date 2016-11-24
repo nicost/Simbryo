@@ -1,6 +1,7 @@
 package embryosim.embryo.zoo;
 
 import embryosim.embryo.EmbryoBase;
+import embryosim.forcefield.external.impl.EllipsoidalForceField;
 
 public class Drosophila extends EmbryoBase
 {
@@ -8,6 +9,7 @@ public class Drosophila extends EmbryoBase
   private static final float Fpetal = 0.0001f;
   private static final float Ri = 0.219f;
   private static final float Fradius = 0.15f;
+  private EllipsoidalForceField mEllipsoidalForceField;
 
   public Drosophila(int pInicialNumberOfCells)
   {
@@ -23,22 +25,26 @@ public class Drosophila extends EmbryoBase
       setRadius(lId, Ri);
       setTargetRadius(lId, getRadius(lId));
     }
+
+    mEllipsoidalForceField = new EllipsoidalForceField(Fpetal,
+                                                       Fradius,
+                                                       0.5f,
+                                                       0.5f,
+                                                       0.5f,
+                                                       1.3f,
+                                                       1,
+                                                       1);
+
   }
 
   @Override
   public void simulationSteps(int pNumberOfSteps)
   {
     for (int i = 0; i < pNumberOfSteps; i++)
-      applyEllipsoidalForce(Fpetal,
-                            Fradius,
-                            0.5f,
-                            0.5f,
-                            0.5f,
-                            1.3f,
-                            1,
-                            1);
-
-    super.simulationSteps(pNumberOfSteps);
+    {
+      applyForceField(mEllipsoidalForceField);
+      super.simulationSteps(1);
+    }
   }
 
   public void triggerCellDivision()

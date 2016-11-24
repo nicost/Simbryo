@@ -2,7 +2,8 @@ package embryosim.psystem;
 
 import java.util.SplittableRandom;
 
-import embryosim.forcefield.ForceField;
+import embryosim.forcefield.external.ExternalForceFieldInterface;
+import embryosim.forcefield.interaction.InteractionForceFieldInterface;
 import embryosim.neighborhood.NeighborhoodCellGrid;
 import embryosim.util.DoubleBufferingFloatArray;
 
@@ -358,7 +359,8 @@ public class ParticleSystem
   }
 
   /**
-   * Updates neighborhood cells.
+   * Updates neighborhood cells. Important: make sure that the particles are
+   * entirely contained within [0,1]^d.
    */
   public void updateNeighborhoodCells()
   {
@@ -451,209 +453,77 @@ public class ParticleSystem
     mPositions.swap();
     mVelocities.swap();
   }
-  
-  public void applyForce(ForceField pForceField)
-  {
-    //TODO: apply force field.
-  }
 
   /**
-   * Applies a spatially invariant force to the particles.
+   * Applies a spatially invariant force to all particles.
    * 
    * @param pForce
    *          force.
    */
   public void applyForce(float... pForce)
   {
+    applyForce(0, getNumberOfParticles(), pForce);
+  }
+
+  /**
+   * Applies a spatially invariant force to a range of particles.
+   * 
+   * @param pBeginId
+   * @param pEndId
+   * @param pForce
+   *          force.
+   */
+  public void applyForce(int pBeginId, int pEndId, float... pForce)
+  {
     final int lDimension = mDimension;
     final float[] lPositionsRead = mPositions.getReadArray();
     final float[] lPositionsWrite = mPositions.getWriteArray();
     final float[] lVelocitiesRead = mVelocities.getReadArray();
     final float[] lVelocitiesWrite = mVelocities.getWriteArray();
-    final int lLength = mNumberOfParticles * lDimension;
 
-    for (int i = 0; i < lLength; i += lDimension)
+    final int lIndexStart = pBeginId * lDimension;
+    final int lIndexEnd = pEndId * lDimension;
+
+    for (int i = lIndexStart; i < lIndexEnd; i += lDimension)
       for (int d = 0; d < lDimension; d++)
         lVelocitiesWrite[i + d] = lVelocitiesRead[i + d] + pForce[d];
 
     mVelocities.swap();
   }
 
-  /**
-   * Applies a centri(petal+/fugal-) force to the particles. if the the force is
-   * positive then it is a centripetal force, otherwise it is a centrifugal
-   * force.
-   * 
-   * @param pForce
-   *          force intensity
-   * @param pCenter
-   *          force field center
-   */
-  public void applyCentriForce(float pForce, float... pCenter)
+  public void applyForceField(ExternalForceFieldInterface pForceField)
   {
-    final int lDimension = mDimension;
-    final float[] lPositionsRead = mPositions.getReadArray();
-    final float[] lPositionsWrite = mPositions.getWriteArray();
-    final float[] lVelocitiesRead = mVelocities.getReadArray();
-    final float[] lVelocitiesWrite = mVelocities.getWriteArray();
-    final int lLength = mNumberOfParticles * lDimension;
-
-    final float[] lVector = new float[lDimension];
-
-    for (int i = 0; i < lLength; i += lDimension)
-    {
-      float lSquaredLength = 0;
-      for (int d = 0; d < lDimension; d++)
-      {
-        float px = lPositionsRead[i + d];
-        float cx = pCenter[d];
-        float dx = cx - px;
-        lVector[d] = dx;
-
-        lSquaredLength += dx * dx;
-      }
-
-      float lInverseLengthTimesForce =
-                                     (float) (pForce
-                                              / Math.sqrt(lSquaredLength));
-
-      for (int d = 0; d < lDimension; d++)
-      {
-        lVelocitiesWrite[i + d] = lVelocitiesRead[i + d]
-                                  + lVector[d]
-                                    * lInverseLengthTimesForce;
-      }
-
-    }
-
-    mVelocities.swap();
+    applyForceField(pForceField, 0, getNumberOfParticles());
   }
 
-  /**
-   * Applies a spheri(petal+/fugal-) force to the particles. if the the force is
-   * positive then it is a spheripetal force, otherwise it is a spherifugal
-   * force.
-   * 
-   * @param pForce
-   *          force intesnity
-   * @param pRadius
-   *          sphere radius
-   * @param pCenter
-   *          sphere center
-   */
-  public void applySpheriForce(float pForce,
-                               float pRadius,
-                               float... pCenter)
+  public void applyForceField(ExternalForceFieldInterface pForceField,
+                              int pBeginId,
+                              int pEndId)
   {
-    final int lDimension = mDimension;
-    final float[] lPositionsRead = mPositions.getReadArray();
-    final float[] lPositionsWrite = mPositions.getWriteArray();
-    final float[] lVelocitiesRead = mVelocities.getReadArray();
-    final float[] lVelocitiesWrite = mVelocities.getWriteArray();
-    final int lLength = mNumberOfParticles * lDimension;
-
-    final float[] lVector = new float[lDimension];
-
-    for (int i = 0; i < lLength; i += lDimension)
-    {
-      float lSquaredLength = 0;
-      for (int d = 0; d < lDimension; d++)
-      {
-        float px = lPositionsRead[i + d];
-        float cx = pCenter[d];
-        float dx = cx - px;
-        lVector[d] = dx;
-
-        lSquaredLength += dx * dx;
-      }
-
-      float lDistance = (float) Math.sqrt(lSquaredLength);
-
-      float lInverseLengthTimesForce = (float) (pForce / lDistance);
-
-      float lSignedDistanceToSphere = (lDistance - pRadius);
-
-      float lForceSign = Math.signum(lSignedDistanceToSphere);
-
-      for (int d = 0; d < lDimension; d++)
-      {
-        lVelocitiesWrite[i + d] = lVelocitiesRead[i + d]
-                                  + lVector[d] * lForceSign
-                                    * lInverseLengthTimesForce;
-      }
-
-    }
-
-    mVelocities.swap();
+    pForceField.applyForceField(getDimension(),
+                                0,
+                                getNumberOfParticles(),
+                                mPositions,
+                                mVelocities,
+                                mRadii);
   }
 
-  /**
-   * Applies a ellipsoi(petal+/fugal-) force to the particles. if the the force
-   * is positive then it is a ellipsoipetal force, otherwise it is a
-   * ellipsoifugal force.
-   * 
-   * For example:
-   * 
-   * <pre>
-   *  {@code}
-   *   applyCentriForceEllipsoidal(0.001, 0.5f, 0.5f, 0.5f, 1.0f, 2.0f, 4.0f)
-   * </pre>
-   * 
-   * Sets a force with center (xc,yc,zc) = (0.5, 0.5, 0.5) and (a,b,c) = (1,2,4)
-   * 
-   * The equation is: ((x-xc)/a)^2+((y-yc)/b)^2+((z-zc)/c)^2 - R^2 =0
-   * 
-   * @param pForce
-   *          force intensity
-   * @param pCenterAndAxis
-   *          force field center + ellipsoid axes length
-   */
-  public void applyEllipsoidalForce(float pForce,
-                                    float pRadius,
-                                    float... pCenterAndAxis)
+  public void applyForceField(InteractionForceFieldInterface pPairwiseForceField)
   {
-    final int lDimension = mDimension;
-    final float[] lPositionsRead = mPositions.getReadArray();
-    final float[] lPositionsWrite = mPositions.getWriteArray();
-    final float[] lVelocitiesRead = mVelocities.getReadArray();
-    final float[] lVelocitiesWrite = mVelocities.getWriteArray();
-    final int lArrayLength = mNumberOfParticles * lDimension;
+    applyForceField(pPairwiseForceField, 0, getNumberOfParticles());
+  }
 
-    final float[] lVector = new float[lDimension];
-
-    for (int i = 0; i < lArrayLength; i += lDimension)
-    {
-      float lSquaredLength = 0;
-      for (int d = 0; d < lDimension; d++)
-      {
-        float px = lPositionsRead[i + d];
-        float cx = pCenterAndAxis[d];
-        float ax = pCenterAndAxis[lDimension + d];
-        float dx = (cx - px) / (ax * ax);
-        lVector[d] = dx;
-
-        lSquaredLength += dx * dx;
-      }
-
-      float lLength = (float) Math.sqrt(lSquaredLength);
-
-      float lInverseLengthTimesForce = (float) (pForce / lLength);
-
-      float lSignedDistanceToSphere = (lLength - pRadius);
-
-      float lForceSign = Math.signum(lSignedDistanceToSphere);
-
-      for (int d = 0; d < lDimension; d++)
-      {
-        lVelocitiesWrite[i + d] = lVelocitiesRead[i + d]
-                                  + lVector[d] * lForceSign
-                                    * lInverseLengthTimesForce;
-      }
-
-    }
-
-    mVelocities.swap();
-
+  public void applyForceField(InteractionForceFieldInterface pPairwiseForceField,
+                              int pBeginId,
+                              int pEndId)
+  {
+    pPairwiseForceField.applyForceField(getDimension(),
+                                        0,
+                                        getNumberOfParticles(),
+                                        mNeighborhood,
+                                        mPositions,
+                                        mVelocities,
+                                        mRadii);
   }
 
   /**
@@ -702,165 +572,6 @@ public class ParticleSystem
 
     mPositions.swap();
 
-  }
-
-  /**
-   * Applies the force for elastic particle-to-particle collision.
-   * 
-   * @param pForce
-   *          constant force applied during collision.
-   * @param pDrag
-   *          drag applied to slow down particles.
-   */
-  public void applyForcesForParticleCollisions(float pForce,
-                                                      float pDrag)
-  {
-    final int lDimension = mDimension;
-    final int lMaxNumberOfParticlesPerGridCell =
-                                               mMaxNumberOfParticlesPerGridCell;
-    final int lTotalNumberOfCells = mNeighborhood.getVolume();
-    final int lNumberOfParticles = mNumberOfParticles;
-    final float[] lPositionsRead = mPositions.getReadArray();
-    final float[] lVelocitiesWrite = mVelocities.getWriteArray();
-    final float[] lRadii = mRadii.getCurrentArray();
-
-    mVelocities.copyAndMult(pDrag);
-
-    int lNeighboorhoodListMaxLength = lMaxNumberOfParticlesPerGridCell
-                                      * lTotalNumberOfCells;
-    if (mNeighboorsArray == null
-        || mNeighboorsArray.length != lNeighboorhoodListMaxLength)
-    {
-      mNeighboorsArray = new int[lNeighboorhoodListMaxLength];
-      mNeighboorsTempArray = new int[lNeighboorhoodListMaxLength];
-    }
-
-    final int[] lNeighboors = mNeighboorsArray;
-    final int[] lNeighboorsTemp = mNeighboorsArray;
-    final float[] lCellCoord = new float[lDimension];
-    final int[] lCellCoordMin = new int[lDimension];
-    final int[] lCellCoordMax = new int[lDimension];
-    final int[] lCellCoordCurrent = new int[lDimension];
-    
-    for (int idu = 0; idu < lNumberOfParticles; idu++)
-    {
-      final int i = idu * lDimension;
-
-      final float ru = lRadii[idu];
-
-      int lNumberOfNeighboors =
-                              mNeighborhood.getAllNeighborsForParticle(lNeighboors,
-                                                                       lNeighboorsTemp,
-                                                                       lPositionsRead,
-                                                                       idu,
-                                                                       ru,
-                                                                       lCellCoord,
-                                                                       lCellCoordMin,
-                                                                       lCellCoordMax,
-                                                                       lCellCoordCurrent);
-
-      for (int k = 0; k < lNumberOfNeighboors; k++)
-      {
-        final int idv = lNeighboors[k];
-
-        final float rv = lRadii[idv];
-
-        // testing bounding box collision:
-        if (idu < idv && detectBoundingBoxCollision(lDimension,
-                                                    lPositionsRead,
-                                                    ru,
-                                                    rv,
-                                                    idu,
-                                                    idv)) //
-        {
-          int j = idv * lDimension;
-          /// System.out.println("BB collision");
-          float lDistance = computeDistance(lDimension,
-                                            lPositionsRead,
-                                            idu,
-                                            idv);
-          float lGap = lDistance - ru - rv;
-
-          // testing sphere collision:
-          if (lGap <= 0 && lDistance != 0)
-          {
-
-            // Collision -> apply force.
-            float lInvDistanceWithAlpha = pForce / lDistance;
-
-            for (int d = 0; d < lDimension; d++)
-            {
-              float lAxisVector = lInvDistanceWithAlpha
-                                  * (lPositionsRead[i + d]
-                                     - lPositionsRead[j + d]);
-
-              lVelocitiesWrite[i + d] += lAxisVector;
-              lVelocitiesWrite[j + d] += -lAxisVector;
-            }
-          }
-        }
-
-      }
-
-    }
-
-    mVelocities.swap();
-
-  }
-
-  private static float computeDistance(int pDimension,
-                                       float[] pPositions,
-                                       int pIdu,
-                                       int pIdv)
-  {
-    return (float) Math.sqrt(computeSquaredDistance(pDimension,
-                                                    pPositions,
-                                                    pIdu,
-                                                    pIdv));
-  }
-
-  private static float computeSquaredDistance(int pDimension,
-                                              float[] pPositions,
-                                              int pIdu,
-                                              int pIdv)
-  {
-
-    final int u = pIdu * pDimension;
-    final int v = pIdv * pDimension;
-
-    float lDistance = 0;
-
-    for (int d = 0; d < pDimension; d++)
-    {
-      float lAxisDistance = pPositions[u + d] - pPositions[v + d];
-      lDistance += lAxisDistance * lAxisDistance;
-    }
-
-    return lDistance;
-  }
-
-  private static boolean detectBoundingBoxCollision(int pDimension,
-                                                    float[] pPositions,
-                                                    float pR1,
-                                                    float pR2,
-                                                    int pIdu,
-                                                    int pIdv)
-  {
-
-    final int u = pIdu * pDimension;
-    final int v = pIdv * pDimension;
-
-    for (int d = 0; d < pDimension; d++)
-    {
-      float lAxisDistance = Math.abs(pPositions[u + d]
-                                     - pPositions[v + d]);
-      float lAxisGap = lAxisDistance - pR1 - pR2;
-
-      if (lAxisGap > 0)
-        return false;
-    }
-
-    return true;
   }
 
   /**

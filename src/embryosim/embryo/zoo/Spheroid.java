@@ -1,6 +1,7 @@
 package embryosim.embryo.zoo;
 
 import embryosim.embryo.EmbryoBase;
+import embryosim.forcefield.external.impl.SphericalForceField;
 
 public class Spheroid extends EmbryoBase
 {
@@ -8,6 +9,7 @@ public class Spheroid extends EmbryoBase
   private static final float Fpetal = 0.0001f;
   private static final float Ri = 0.25f;
   private static final float Fradius = 0.20f;
+  private SphericalForceField mSphericalForceField;
 
   public Spheroid(int pInicialNumberOfCells)
   {
@@ -25,15 +27,22 @@ public class Spheroid extends EmbryoBase
       setRadius(lId, Ri);
       setTargetRadius(lId, getRadius(lId));
     }
+
+    mSphericalForceField = new SphericalForceField(Fpetal,
+                                                   Fradius,
+                                                   0.5f,
+                                                   0.5f,
+                                                   0.5f);
   }
 
   @Override
   public void simulationSteps(int pNumberOfSteps)
   {
     for (int i = 0; i < pNumberOfSteps; i++)
-      applySpheriForce(Fpetal, Fradius, 0.5f, 0.5f, 0.5f);
-
-    super.simulationSteps(pNumberOfSteps);
+    {
+      applyForceField(mSphericalForceField);
+      super.simulationSteps(1);
+    }
   }
 
 }

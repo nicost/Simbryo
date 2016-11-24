@@ -1,5 +1,6 @@
 package embryosim.embryo;
 
+import embryosim.forcefield.interaction.impl.CollisionForceField;
 import embryosim.psystem.ParticleSystem;
 import embryosim.viewer.ParticleViewerInterface;
 import embryosim.viewer.three.ParticleViewer3D;
@@ -25,6 +26,7 @@ public abstract class EmbryoBase extends ParticleSystem
   private ParticleViewer3D mParticleViewer3D;
 
   protected volatile long mTimeStepIndex;
+  private CollisionForceField mCollisionForceField;
 
   public EmbryoBase(int pDimension,
                     int pInicialNumberOfCells,
@@ -47,6 +49,7 @@ public abstract class EmbryoBase extends ParticleSystem
 
     updateNeighborhoodCells();
 
+    mCollisionForceField = new CollisionForceField(Fc, D);
   }
 
   public void setTargetRadius(int pParticleId, float pTargetRadius)
@@ -75,7 +78,7 @@ public abstract class EmbryoBase extends ParticleSystem
     for (int i = 0; i < pNumberOfSteps; i++)
     {
       smoothToTargetRadius(Ar);
-      applyForcesForParticleCollisions(Fc, D);
+      applyForceField(mCollisionForceField);
       intergrateEuler();
       enforceBounds(Db);
       updateNeighborhoodCells();

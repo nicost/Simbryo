@@ -2,6 +2,7 @@ package embryosim.viewer.three.demo;
 
 import org.junit.Test;
 
+import embryosim.forcefield.interaction.impl.CollisionForceField;
 import embryosim.psystem.ParticleSystem;
 import embryosim.util.jfx.JavaFXUtil;
 import embryosim.util.timing.Timming;
@@ -23,6 +24,10 @@ public class ParticleViewer3DDemo
     float Db = 0.9f;
     float Fc = 0.00001f;
     float Fg = 0.000001f;
+
+    CollisionForceField lCollisionForceField =
+                                             new CollisionForceField(Fc,
+                                                                     D);
 
     ParticleSystem lParticleSystem = new ParticleSystem(3,
                                                         N,
@@ -68,7 +73,7 @@ public class ParticleViewer3DDemo
       lTimming.syncAtPeriod(3);
 
       // lParticleSystem.repelAround(lMouseX, lMouseY, 0.00001f);
-      lParticleSystem.applyForcesForParticleCollisions(Fc, D);
+      lParticleSystem.applyForceField(lCollisionForceField);
       if (Fg > 0)
         lParticleSystem.applyForce(0f, Fg, 0f);
       lParticleSystem.intergrateEuler();

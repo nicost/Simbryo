@@ -46,7 +46,7 @@ public class NeighborhoodCellGrid
     mNeighboorhoodArray = new int[getVolume() * pMaxParticlesPerCell];
 
     mStride = new int[pDimension];
-    int lStride = mMaxParticlesPerGridCell;
+    int lStride = getMaxParticlesPerGridCell();
     for (int d = 0; d < pDimension; d++)
     {
       mStride[d] = lStride;
@@ -68,11 +68,20 @@ public class NeighborhoodCellGrid
   /**
    * Return grid size along each dimension
    * 
-   * @return gris size
+   * @return grid size
    */
   public int getGridSize()
   {
     return mGridSize;
+  }
+  
+  /**
+   * Returns the maximal number of particles per grid cell.
+   * @return
+   */
+  public int getMaxParticlesPerGridCell()
+  {
+    return mMaxParticlesPerGridCell;
   }
 
   /**
@@ -94,7 +103,7 @@ public class NeighborhoodCellGrid
    */
   public int[] getCellContents(int... pCellCoordinates)
   {
-    return getCellContents(new int[mMaxParticlesPerGridCell],
+    return getCellContents(new int[getMaxParticlesPerGridCell()],
                            pCellCoordinates);
   }
 
@@ -113,14 +122,14 @@ public class NeighborhoodCellGrid
   {
     int lCellIndex = getCellIndex(mDimension,
                                   mStride,
-                                  mMaxParticlesPerGridCell,
+                                  getMaxParticlesPerGridCell(),
                                   pCellCoordinates);
 
     System.arraycopy(mNeighboorhoodArray,
                      lCellIndex,
                      pNeighboors,
                      0,
-                     mMaxParticlesPerGridCell);
+                     getMaxParticlesPerGridCell());
 
     return pNeighboors;
   }
@@ -134,7 +143,7 @@ public class NeighborhoodCellGrid
    */
   public final int[] getCellContentsAt(final float... pTestPoint)
   {
-    return getCellContentsAt(new int[mMaxParticlesPerGridCell],
+    return getCellContentsAt(new int[getMaxParticlesPerGridCell()],
                              pTestPoint);
   }
 
@@ -153,14 +162,14 @@ public class NeighborhoodCellGrid
     int lCellIndex = getCellIndexAtPoint(mDimension,
                                          mGridSize,
                                          mStride,
-                                         mMaxParticlesPerGridCell,
+                                         getMaxParticlesPerGridCell(),
                                          pTestPoint);
 
     System.arraycopy(mNeighboorhoodArray,
                      lCellIndex,
                      pNeighboors,
                      0,
-                     mMaxParticlesPerGridCell);
+                     getMaxParticlesPerGridCell());
 
     return pNeighboors;
   }
@@ -177,7 +186,7 @@ public class NeighborhoodCellGrid
 
     int lCellIndex = getCellIndex(mDimension,
                                   mStride,
-                                  mMaxParticlesPerGridCell,
+                                  getMaxParticlesPerGridCell(),
                                   pCellCoordinates);
 
     StringBuilder lStringBuilder = new StringBuilder();
@@ -272,7 +281,7 @@ public class NeighborhoodCellGrid
     final int lDimension = mDimension;
     final int lGridSideLength = mGridSize;
     final int[] lStride = mStride;
-    final int lMaxParticlesPerGridCell = mMaxParticlesPerGridCell;
+    final int lMaxParticlesPerGridCell = getMaxParticlesPerGridCell();
     final int[] lNeighboorhoodArray = mNeighboorhoodArray;
     final float[] lCellCoord = pCellCoord;
 
@@ -411,7 +420,7 @@ public class NeighborhoodCellGrid
     final int lDimension = getDimension();
     final int lGridSideLength = mGridSize;
     final int[] lStride = mStride;
-    final int lMaxParticlesPerGridCell = mMaxParticlesPerGridCell;
+    final int lMaxParticlesPerGridCell = getMaxParticlesPerGridCell();
     final int[] lNeighboorhoodArray = mNeighboorhoodArray;
 
     final float[] lCellCoord = new float[lDimension];
@@ -819,5 +828,7 @@ public class NeighborhoodCellGrid
     }
     return lIndex;
   }
+
+
 
 }
