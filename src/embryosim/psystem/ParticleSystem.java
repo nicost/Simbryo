@@ -2,7 +2,7 @@ package embryosim.psystem;
 
 import java.util.SplittableRandom;
 
-import embryosim.neighborhood.NeighborhoodCellGrid;
+import embryosim.neighborhood.NeighborhoodGrid;
 import embryosim.psystem.forcefield.external.ExternalForceFieldInterface;
 import embryosim.psystem.forcefield.interaction.InteractionForceFieldInterface;
 import embryosim.util.DoubleBufferingFloatArray;
@@ -26,7 +26,7 @@ public class ParticleSystem
   protected final DoubleBufferingFloatArray mVelocities;
   protected final DoubleBufferingFloatArray mRadii;
 
-  private final NeighborhoodCellGrid mNeighborhood;
+  private final NeighborhoodGrid mNeighborhood;
 
   private int[] mNeighboorsArray, mNeighboorsTempArray;
 
@@ -131,7 +131,7 @@ public class ParticleSystem
                                                 * mDimension);
     mRadii = new DoubleBufferingFloatArray(pMaxNumberOfParticles);
     mNeighborhood =
-                  new NeighborhoodCellGrid(mDimension,
+                  new NeighborhoodGrid(mDimension,
                                            pGridSize,
                                            pMaxNumberOfParticlesPerGridCell);
   }

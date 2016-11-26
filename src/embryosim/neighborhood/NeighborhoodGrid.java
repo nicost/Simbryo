@@ -11,7 +11,7 @@ import embryosim.util.vectorinc.VectorInc;
  *
  * @author royer
  */
-public class NeighborhoodCellGrid
+public class NeighborhoodGrid
 {
   private final static float cEpsilon = 1e-6f;
 
@@ -34,7 +34,7 @@ public class NeighborhoodCellGrid
    * @param pMaxParticlesPerCell
    *          max particles per cell
    */
-  public NeighborhoodCellGrid(int pDimension,
+  public NeighborhoodGrid(int pDimension,
                               int pGridSize,
                               int pMaxParticlesPerCell)
   {

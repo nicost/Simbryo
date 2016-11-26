@@ -2,18 +2,17 @@ package embryosim.psystem.forcefield.interaction.impl;
 
 import java.util.SplittableRandom;
 
-import embryosim.neighborhood.NeighborhoodCellGrid;
+import embryosim.neighborhood.NeighborhoodGrid;
 import embryosim.psystem.forcefield.interaction.InteractionForceFieldBase;
 import embryosim.psystem.forcefield.interaction.InteractionForceFieldInterface;
 import embryosim.util.DoubleBufferingFloatArray;
 
 /**
- * Applies the force for elastic particle-to-particle collision.
+ * This interaction force field applies a force to each particle that prevents
+ * particles influence radii from overlapping. This in effect is a way to handle
+ * particle-particle collisions.
  * 
- * @param pForce
- *          constant force applied during collision.
- * @param pDrag
- *          drag applied to slow down particles.
+ * 
  */
 public class CollisionForceField extends InteractionForceFieldBase
                                  implements
@@ -30,9 +29,19 @@ public class CollisionForceField extends InteractionForceFieldBase
 
   private int[] mNeighboorsArray, mNeighboorsTempArray;
 
-  public CollisionForceField(float pForce, float pDrag)
+  /**
+   * Constructs a collision force field given a force intensity and drag
+   * coefficient. The drag coefficient is often necessary to prevent excessive
+   * bouncing.
+   * 
+   * @param pForceIntensity
+   *          constant force applied during collision.
+   * @param pDrag
+   *          drag applied to slow down particles.
+   */
+  public CollisionForceField(float pForceIntensity, float pDrag)
   {
-    super(pForce);
+    super(pForceIntensity);
     mDrag = pDrag;
   }
 
@@ -40,7 +49,7 @@ public class CollisionForceField extends InteractionForceFieldBase
   public void applyForceField(int pDimension,
                               int pBeginId,
                               int pEndId,
-                              NeighborhoodCellGrid mNeighborhood,
+                              NeighborhoodGrid mNeighborhood,
                               final DoubleBufferingFloatArray pPositions,
                               final DoubleBufferingFloatArray pVelocities,
                               final DoubleBufferingFloatArray pRadii)
@@ -120,7 +129,8 @@ public class CollisionForceField extends InteractionForceFieldBase
 
             // Collision -> apply force.
             float lInvDistance = 1.0f / lDistance;
-            float lInvDistanceWithForce = mForce * lInvDistance;
+            float lInvDistanceWithForce = mForceIntensity
+                                          * lInvDistance;
 
             for (int d = 0; d < pDimension; d++)
             {
@@ -138,9 +148,8 @@ public class CollisionForceField extends InteractionForceFieldBase
                 float lOverlapCorrection = lInvDistance * lDelta
                                            * (cGapCorrectionFactor
                                               * -lGap);
-                float lNoise =
-                             (float) ( (mRandom.nextDouble() - 0.5f)
-                                      * cGapCorrectionNoiseFactor);
+                float lNoise = (float) ((mRandom.nextDouble() - 0.5f)
+                                        * cGapCorrectionNoiseFactor);
                 lPositionsWrite[i + d] = lPositionsRead[i + d]
                                          + lOverlapCorrection
                                          + lNoise;

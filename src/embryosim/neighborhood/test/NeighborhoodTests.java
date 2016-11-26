@@ -6,7 +6,7 @@ import java.util.Arrays;
 
 import org.junit.Test;
 
-import embryosim.neighborhood.NeighborhoodCellGrid;
+import embryosim.neighborhood.NeighborhoodGrid;
 
 public class NeighborhoodTests
 {
@@ -14,7 +14,7 @@ public class NeighborhoodTests
   @Test
   public void testNoRadius()
   {
-    NeighborhoodCellGrid lNeighborhood = new NeighborhoodCellGrid(2,
+    NeighborhoodGrid lNeighborhood = new NeighborhoodGrid(2,
                                                                   4,
                                                                   10);
 
@@ -71,7 +71,7 @@ public class NeighborhoodTests
   @Test
   public void testWithRadius()
   {
-    NeighborhoodCellGrid lNeighborhood = new NeighborhoodCellGrid(2,
+    NeighborhoodGrid lNeighborhood = new NeighborhoodGrid(2,
                                                                   4,
                                                                   10);
 
@@ -106,7 +106,7 @@ public class NeighborhoodTests
   @Test
   public void testWithRadiusQuery()
   {
-    NeighborhoodCellGrid lNeighborhood = new NeighborhoodCellGrid(2,
+    NeighborhoodGrid lNeighborhood = new NeighborhoodGrid(2,
                                                                   4,
                                                                   10);
 

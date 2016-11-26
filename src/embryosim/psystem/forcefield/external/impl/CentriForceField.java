@@ -1,32 +1,33 @@
 package embryosim.psystem.forcefield.external.impl;
 
-import embryosim.neighborhood.NeighborhoodCellGrid;
 import embryosim.psystem.forcefield.external.ExternalForceFieldBase;
 import embryosim.psystem.forcefield.external.ExternalForceFieldInterface;
 import embryosim.util.DoubleBufferingFloatArray;
 
 /**
- * Applies a centri(petal+/fugal-) force to the particles. if the the force is
- * positive then it is a centripetal force, otherwise it is a centrifugal force.
+ * This force field applies a centri(petal+/fugal-) force to the particles.
  * 
- * @param pForce
- *          force intensity
- * @param pCenter
- *          force field center
+ * @author royer
  */
 public class CentriForceField extends ExternalForceFieldBase
                               implements ExternalForceFieldInterface
 {
 
-  private volatile float mRadius;
   private float[] mCenter;
 
-  public CentriForceField(float pForce,
-                          float pRadius,
-                          float... pCenter)
+  /**
+   * Constructs a centri(petal+/fugal-) force field given a force intensity and
+   * center. if the the force intensity is positive then it is a centripetal
+   * force, otherwise it is a centrifugal force.
+   * 
+   * @param pForceIntensity
+   *          force intensity
+   * @param pCenter
+   *          force field center
+   */
+  public CentriForceField(float pForceIntensity, float... pCenter)
   {
-    super(pForce);
-    mRadius = pRadius;
+    super(pForceIntensity);
     mCenter = pCenter;
 
   }
@@ -64,7 +65,7 @@ public class CentriForceField extends ExternalForceFieldBase
       }
 
       float lInverseLengthTimesForce =
-                                     (float) (mForce
+                                     (float) (mForceIntensity
                                               / Math.sqrt(lSquaredLength));
 
       for (int d = 0; d < pDimension; d++)

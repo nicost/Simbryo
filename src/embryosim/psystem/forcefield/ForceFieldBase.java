@@ -1,24 +1,34 @@
 package embryosim.psystem.forcefield;
 
+/**
+ * Base class implementing common fields and methods of all force fields.
+ *
+ * @author royer
+ */
 public class ForceFieldBase implements ForceFieldInterface
 {
-  protected volatile float mForce;
+  protected volatile float mForceIntensity;
 
-  public ForceFieldBase(float pForce)
+  /**
+   * Constructs a force field with a given force intensity.
+   * 
+   * @param pForceIntensity
+   */
+  public ForceFieldBase(float pForceIntensity)
   {
-    mForce = pForce;
+    mForceIntensity = pForceIntensity;
   }
 
   @Override
-  public float getForce()
+  public float getForceIntensity()
   {
-    return mForce;
+    return mForceIntensity;
   }
 
   @Override
-  public void setForce(float pForce)
+  public void setForceIntensity(float pForce)
   {
-    mForce = pForce;
+    mForceIntensity = pForce;
   }
-  
+
 }

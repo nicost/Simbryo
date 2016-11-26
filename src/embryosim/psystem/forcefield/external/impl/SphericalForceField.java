@@ -5,15 +5,10 @@ import embryosim.psystem.forcefield.external.ExternalForceFieldInterface;
 import embryosim.util.DoubleBufferingFloatArray;
 
 /**
- * Applies a spheri(petal+/fugal-) force to the particles. if the the force is
- * positive then it is a spheripetal force, otherwise it is a spherifugal force.
- * 
- * @param pForce
- *          force intesnity
- * @param pRadius
- *          sphere radius
- * @param pCenter
- *          sphere center
+ * Applies a spheri(petal+/fugal-) force to the particles.
+ *
+ *
+ * @author royer
  */
 public class SphericalForceField extends ExternalForceFieldBase
                                  implements
@@ -23,11 +18,23 @@ public class SphericalForceField extends ExternalForceFieldBase
   private volatile float mRadius;
   private float[] mCenter;
 
-  public SphericalForceField(float pForce,
+  /**
+   * Constructs a spheri(petal+/fugal-) force field. If the the force is
+   * positive then it is a spheripetal force, otherwise it is a spherifugal
+   * force.
+   * 
+   * @param pForceIntensity
+   *          force intensity
+   * @param pRadius
+   *          sphere radius
+   * @param pCenter
+   *          sphere center
+   */
+  public SphericalForceField(float pForceIntensity,
                              float pRadius,
                              float... pCenter)
   {
-    super(pForce);
+    super(pForceIntensity);
     mRadius = pRadius;
     mCenter = pCenter;
 
@@ -66,7 +73,8 @@ public class SphericalForceField extends ExternalForceFieldBase
 
       float lDistance = (float) Math.sqrt(lSquaredLength);
 
-      float lInverseLengthTimesForce = (float) (mForce / lDistance);
+      float lInverseLengthTimesForce = (float) (mForceIntensity
+                                                / lDistance);
 
       float lSignedDistanceToSphere = (lDistance - mRadius);
 

@@ -5,38 +5,48 @@ import embryosim.psystem.forcefield.external.ExternalForceFieldInterface;
 import embryosim.util.DoubleBufferingFloatArray;
 
 /**
- * Applies a ellipsoi(petal+/fugal-) force to the particles. if the the force
- * is positive then it is a ellipsoipetal force, otherwise it is a
- * ellipsoifugal force.
+ * This force field applies a ellipsoi(petal+/fugal-) force to the particles.
  * 
- * For example:
- * 
- * <pre>
- *  {@code}
- *   applyCentriForceEllipsoidal(0.001, 0.5f, 0.5f, 0.5f, 1.0f, 2.0f, 4.0f)
- * </pre>
- * 
- * Sets a force with center (xc,yc,zc) = (0.5, 0.5, 0.5) and (a,b,c) = (1,2,4)
- * 
- * The equation is: ((x-xc)/a)^2+((y-yc)/b)^2+((z-zc)/c)^2 - R^2 =0
- * 
- * @param pForce
- *          force intensity
- * @param pCenterAndAxis
- *          force field center + ellipsoid axes length
+ *
+ * @author royer
  */
 public class EllipsoidalForceField extends ExternalForceFieldBase
-                                   implements ExternalForceFieldInterface
+                                   implements
+                                   ExternalForceFieldInterface
 {
 
   private volatile float mRadius;
   private float[] mCenterAndAxis;
 
-  public EllipsoidalForceField(float pForce,
+  /**
+   * Constructs an ellipsoi(petal+/fugal-) force field. If the the force is
+   * positive then it is a ellipsoipetal force, otherwise it is a ellipsoifugal
+   * force.
+   * 
+   * For example:
+   * 
+   * <pre>
+   *  {@code}
+   *   new EllipsoidalForceField(0.001, 0.5f, 0.5f, 0.5f, 1.0f, 2.0f, 4.0f)
+   * </pre>
+   * 
+   * Sets a force with center (xc,yc,zc) = (0.5, 0.5, 0.5) and (a,b,c) = (1,2,4)
+   * 
+   * The equation is: ((x-xc)/a)^2+((y-yc)/b)^2+((z-zc)/c)^2 - R^2 =0
+   * 
+   * @param pForceIntensity
+   *          force intensity
+   * @param pRadius
+   *          radius
+   * @param pCenterAndAxis
+   *          force field center + ellipsoid axes ratios
+   */
+
+  public EllipsoidalForceField(float pForceIntensity,
                                float pRadius,
                                float... pCenterAndAxis)
   {
-    super(pForce);
+    super(pForceIntensity);
     mRadius = pRadius;
     mCenterAndAxis = pCenterAndAxis;
 
@@ -76,7 +86,8 @@ public class EllipsoidalForceField extends ExternalForceFieldBase
 
       float lLength = (float) Math.sqrt(lSquaredLength);
 
-      float lInverseLengthTimesForce = (float) (mForce / lLength);
+      float lInverseLengthTimesForce = (float) (mForceIntensity
+                                                / lLength);
 
       float lSignedDistanceToSphere = (lLength - mRadius);
 
