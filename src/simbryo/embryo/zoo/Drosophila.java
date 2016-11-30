@@ -1,4 +1,4 @@
-package simbryo.embryo.zooo;
+package simbryo.embryo.zoo;
 
 import simbryo.embryo.Embryo;
 import simbryo.morphogen.Morphogen;

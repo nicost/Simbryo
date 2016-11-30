@@ -1,35 +1,36 @@
-package simbryo.embryo.zooo;
+package simbryo.embryo.zoo;
 
 import simbryo.embryo.Embryo;
-import simbryo.psystem.forcefield.external.impl.SphericalForceField;
+import simbryo.psystem.forcefield.external.impl.CentriForceField;
 
 /**
- * Cells divide 14 times and remain on a sphere.`
+ * 'Organoid' just a clum of cells dividing 14 times.
  *
  * @author royer
  */
-public class Spheroid extends Embryo
+public class Organoid extends Embryo
 {
+
   protected static final float Fc = 0.0001f;
   protected static final float D = 0.9f;
 
-  private static final float Fpetal = 0.0001f;
-  private static final float Ri = 0.35f;
-  private static final float Fradius = 0.20f;
+  private static final float Fpetal = 0.00005f;
+  private static final float Ri = 0.135f;
   
-  private static final float cRadiusShrinkageFactor  =  (float) Math.pow(0.5f, 1.0f / 2);
-
-  private SphericalForceField mSphericalForceField;
-
+  private static final float cRadiusShrinkageFactor  =  (float) Math.pow(0.5f, 1.0f / 4);
+  
+  
+  private CentriForceField mCentriForceField;
+  
   private volatile int mCellDivCount;
-  
+
+
   /**
-   * Creates a 'Spheroid'.
+   * Creates an 'Organoid'.
    */
-  public Spheroid()
+  public Organoid()
   {
     super(3, Fc, D);
-
 
     for (int i = 0; i < 1; i++)
     {
@@ -44,11 +45,9 @@ public class Spheroid extends Embryo
 
     updateNeighborhoodCells();
 
-    mSphericalForceField = new SphericalForceField(Fpetal,
-                                                   Fradius,
-                                                   0.5f,
-                                                   0.5f,
-                                                   0.5f);
+
+    mCentriForceField =
+                      new CentriForceField(Fpetal, 0.5f, 0.5f, 0.5f);
   }
 
   @Override
@@ -62,7 +61,7 @@ public class Spheroid extends Embryo
       if (getTimeStepIndex() % 500 == 499)
         triggerCellDivision();
 
-      applyForceField(mSphericalForceField);
+      applyForceField(mCentriForceField);
       super.simulationSteps(1, pDeltaTime);
     }
   }

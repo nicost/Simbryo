@@ -2,9 +2,9 @@ package simbryo.embryo.demo;
 
 import org.junit.Test;
 
-import simbryo.embryo.zooo.Drosophila;
-import simbryo.embryo.zooo.Organoid;
-import simbryo.embryo.zooo.Spheroid;
+import simbryo.embryo.zoo.Drosophila;
+import simbryo.embryo.zoo.Organoid;
+import simbryo.embryo.zoo.Spheroid;
 import simbryo.util.timing.Timming;
 
 public class EmbryoDemo
