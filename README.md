@@ -6,8 +6,6 @@ Awesome and fast embryo simulator.
 
 ### How to build the project? ###
 
-* Building Simbryo
-
 to build the project:
 
     ./gradlew build
