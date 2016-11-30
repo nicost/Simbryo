@@ -12,7 +12,8 @@ public class ParticleViewerCanvas extends Canvas
 {
 
   private CountDownLatch mCountDownLatch;
-  private volatile boolean mDisplayGrid, mDisplayElapsedTime;
+  private volatile boolean mDisplayGrid, mDisplayElapsedTime,
+      mDisplayRadius = true;
 
   private volatile long mLastUpdateTimeInNanos = System.nanoTime();
   private volatile float mElapsedTime;
@@ -30,7 +31,6 @@ public class ParticleViewerCanvas extends Canvas
     super(pWidth, pHeight);
   }
 
- 
   public void updateDisplay(ParticleSystem pParticleSystem,
                             boolean pBlocking)
   {
@@ -98,7 +98,8 @@ public class ParticleViewerCanvas extends Canvas
 
         double lScreenX = lWidth * (x - r);
         double lScreenY = lHeight * (y - r);
-        double lRadius = lMinWidthHeight * r;
+        double lRadius = mDisplayRadius ? lMinWidthHeight * r
+                                        : lMinWidthHeight * 0.005f;
 
         double lBrightness = 0.7 + 1000000 * v;
         // System.out.println(lBrightness);
@@ -119,7 +120,7 @@ public class ParticleViewerCanvas extends Canvas
                              lBrightness));
 
         gc.fillOval(lScreenX, lScreenY, 2 * lRadius, 2 * lRadius);
-        //gc.fillText(""+id, lScreenX, lScreenY);
+        // gc.fillText(""+id, lScreenX, lScreenY);
 
       }
 
@@ -182,6 +183,12 @@ public class ParticleViewerCanvas extends Canvas
   public void setDisplayElapsedTime(boolean pDisplayElapsedTime)
   {
     mDisplayElapsedTime = pDisplayElapsedTime;
+  }
+
+  public void setDisplayRadius(boolean pDisplayRadius)
+  {
+    mDisplayRadius = pDisplayRadius;
+
   }
 
 }

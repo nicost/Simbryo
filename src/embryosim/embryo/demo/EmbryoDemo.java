@@ -2,9 +2,9 @@ package embryosim.embryo.demo;
 
 import org.junit.Test;
 
-import embryosim.embryo.zoo.Drosophila;
-import embryosim.embryo.zoo.Organoid;
-import embryosim.embryo.zoo.Spheroid;
+import embryosim.embryo.zooo.Drosophila;
+import embryosim.embryo.zooo.Organoid;
+import embryosim.embryo.zooo.Spheroid;
 import embryosim.util.timing.Timming;
 
 public class EmbryoDemo
@@ -14,7 +14,7 @@ public class EmbryoDemo
   public void demoOrganoid() throws InterruptedException
   {
 
-    Organoid lOrganoid = new Organoid(1);
+    Organoid lOrganoid = new Organoid();
 
     lOrganoid.open3DViewer();
 
@@ -22,13 +22,8 @@ public class EmbryoDemo
 
     while (lOrganoid.getViewer().isShowing())
     {
-      lTimming.syncAtPeriod(10);
-
-      if (lOrganoid.getTimeStepIndex() % 500 == 0)
-        lOrganoid.triggerCellDivision();
-
-      lOrganoid.simulationSteps(1);
-
+      lTimming.syncAtPeriod(10);     
+      lOrganoid.simulationSteps(1,1);
     }
 
     lOrganoid.getViewer().waitWhileShowing();
@@ -37,7 +32,7 @@ public class EmbryoDemo
   @Test
   public void demoSpheroid() throws InterruptedException
   {
-    Spheroid lSpheroid = new Spheroid(1);
+    Spheroid lSpheroid = new Spheroid();
 
     lSpheroid.open3DViewer();
 
@@ -46,11 +41,7 @@ public class EmbryoDemo
     while (lSpheroid.getViewer().isShowing())
     {
       lTimming.syncAtPeriod(10);
-
-      if (lSpheroid.getTimeStepIndex() % 500 == 0)
-        lSpheroid.triggerCellDivision();
-
-      lSpheroid.simulationSteps(1);
+      lSpheroid.simulationSteps(1,1);
     }
 
     lSpheroid.getViewer().waitWhileShowing();
@@ -59,20 +50,18 @@ public class EmbryoDemo
   @Test
   public void demoDrosophila() throws InterruptedException
   {
-    Drosophila lDrosophila = new Drosophila(1);
+    Drosophila lDrosophila = new Drosophila();
 
     lDrosophila.open3DViewer();
+    
+    lDrosophila.getViewer().setDisplayRadius(false);
 
     Timming lTimming = new Timming();
     
     while (lDrosophila.getViewer().isShowing())
     {
       lTimming.syncAtPeriod(10);
-
-      if (lDrosophila.getTimeStepIndex() % 500 == 0)
-        lDrosophila.triggerCellDivision();
-
-      lDrosophila.simulationSteps(1);
+      lDrosophila.simulationSteps(1,1);
     }
 
     lDrosophila.getViewer().waitWhileShowing();

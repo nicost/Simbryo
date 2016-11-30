@@ -5,7 +5,7 @@ package embryosim.psystem.forcefield;
  *
  * @author royer
  */
-public class ForceFieldBase implements ForceFieldInterface
+public abstract class ForceFieldBase implements ForceFieldInterface
 {
   protected volatile float mForceIntensity;
 

@@ -19,11 +19,9 @@ public class Collider extends Application
   public float R;
   public float D = 0.99f;
   public float Db = 0.9f;
-  public float Fc = 0.00001f;
-  public float Fg = 0.0000001f;
+  public float Fc = 0.0001f;
+  public float Fg = 0.000001f;
 
-  
-  
   public int G;
 
   Thread mThread;
@@ -63,7 +61,8 @@ public class Collider extends Application
 
       CollisionForceField lCollisionForceField =
                                                new CollisionForceField(Fc,
-                                                                       D);
+                                                                       D,
+                                                                       true);
 
       ParticleSystem lParticleSystem = new ParticleSystem(2,
                                                           N,
@@ -80,12 +79,12 @@ public class Collider extends Application
 
       Runnable lRunnable = () -> {
 
-        for (int i = 0; i < N / 10; i++)
+        for (int i = 0; i < N; i++)
         {
           addParticle(lParticleSystem);
         }
 
-        // lParticleSystem.setRadius(0, 0.06f);
+        lParticleSystem.setRadius(0, 0.06f);
         // lParticleSystem.setRadius(1, 0.06f);
         // lParticleSystem.setPosition(1, 0.55f, 0.45f);
 
@@ -113,7 +112,7 @@ public class Collider extends Application
           lParticleSystem.setPosition(0, lMouseX, lMouseY);
           lParticleViewer.updateDisplay(true);
 
-          addParticle(lParticleSystem);
+          // addParticle(lParticleSystem);
         }
 
         lParticleViewer.waitWhileShowing();
@@ -135,8 +134,8 @@ public class Collider extends Application
     if (lParticleSystem.getNumberOfParticles() >= lParticleSystem.getMaxNumberOfParticles())
       return;
 
-    float x = 0.5f+ (float) ((Math.random()-0.5f)*0.001);
-    float y = 0.1f+(float) ((Math.random()-0.5f)*0.001);
+    float x = (float) ((Math.random()));
+    float y = (float) ((Math.random()));
 
     int lId = lParticleSystem.addParticle(x, y);
 

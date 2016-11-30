@@ -65,9 +65,9 @@ public class DoubleBufferingFloatArray
   }
 
   /**
-   * Returns th previous array.e previous array
+   * Returns the previous array. 
    * 
-   * @return
+   * @return previous array
    */
   public float[] getPreviousArray()
   {
@@ -75,16 +75,28 @@ public class DoubleBufferingFloatArray
   }
 
   /**
-   * Copies the values from the read array to the write array. This is usefull
-   * if you know that only a few values will be changed.
+   * Copies the values from the read array to the write array. This is useful if
+   * you know that only a few values will be changed.
    */
   public void copyDefault()
   {
+    copyDefault(0, mWriteArray.length);
+  }
+
+  /**
+   * Copies the values from the read array to the write array. This is useful if
+   * you know that only a few values will be changed.
+   * 
+   * @param pBeginIndex
+   * @param pEndIndex
+   */
+  public void copyDefault(int pBeginIndex, int pEndIndex)
+  {
     System.arraycopy(mReadArray,
-                     0,
+                     pBeginIndex,
                      mWriteArray,
-                     0,
-                     mWriteArray.length);
+                     pBeginIndex,
+                     pEndIndex - pBeginIndex);
   }
 
   /**
@@ -92,11 +104,29 @@ public class DoubleBufferingFloatArray
    * these values with a constant factor.
    * 
    * @param pValue
+   *          value
    */
   public void copyAndMult(float pValue)
   {
-    int lLength = mWriteArray.length;
-    for (int i = 0; i < lLength; i++)
+    copyAndMult(0, mWriteArray.length, pValue);
+  }
+
+  /**
+   * Copies all values from the read array to the write array after multiplying
+   * these values with a constant factor.
+   * 
+   * @param pBeginIndex
+   *          begin index
+   * @param pEndIndex
+   *          end index
+   * @param pValue
+   *          value
+   */
+  public void copyAndMult(int pBeginIndex,
+                          int pEndIndex,
+                          float pValue)
+  {
+    for (int i = pBeginIndex; i < pEndIndex; i++)
       mWriteArray[i] = pValue * mReadArray[i];
   }
 

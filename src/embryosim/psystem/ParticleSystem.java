@@ -3,8 +3,7 @@ package embryosim.psystem;
 import java.util.SplittableRandom;
 
 import embryosim.neighborhood.NeighborhoodGrid;
-import embryosim.psystem.forcefield.external.ExternalForceFieldInterface;
-import embryosim.psystem.forcefield.interaction.InteractionForceFieldInterface;
+import embryosim.psystem.forcefield.ForceFieldInterface;
 import embryosim.util.DoubleBufferingFloatArray;
 
 /**
@@ -27,8 +26,6 @@ public class ParticleSystem
   protected final DoubleBufferingFloatArray mRadii;
 
   private final NeighborhoodGrid mNeighborhood;
-
-  private int[] mNeighboorsArray, mNeighboorsTempArray;
 
   private SplittableRandom mRandom = new SplittableRandom();
 
@@ -114,13 +111,6 @@ public class ParticleSystem
   {
     super();
 
-    /*System.out.println("pDimension=" + pDimension);
-    System.out.println("pGridSize=" + pGridSize);
-    System.out.println("pMaxNumberOfParticlesPerGridCell="
-                       + pMaxNumberOfParticlesPerGridCell);
-    System.out.println("pMaxNumberOfParticles="
-                       + pMaxNumberOfParticles);/**/
-
     mMaxNumberOfParticles = pMaxNumberOfParticles;
     mMaxNumberOfParticlesPerGridCell =
                                      pMaxNumberOfParticlesPerGridCell;
@@ -132,8 +122,48 @@ public class ParticleSystem
     mRadii = new DoubleBufferingFloatArray(pMaxNumberOfParticles);
     mNeighborhood =
                   new NeighborhoodGrid(mDimension,
-                                           pGridSize,
-                                           pMaxNumberOfParticlesPerGridCell);
+                                       pGridSize,
+                                       pMaxNumberOfParticlesPerGridCell);
+  }
+
+  /**
+   * Returns the positions arrays
+   * 
+   * @return positions arrays
+   */
+  public DoubleBufferingFloatArray getPositions()
+  {
+    return mPositions;
+  }
+
+  /**
+   * Returns the velocities arrays
+   * 
+   * @return velocities arrays
+   */
+  public DoubleBufferingFloatArray getVelocities()
+  {
+    return mVelocities;
+  }
+
+  /**
+   * Returns the radii arrays
+   * 
+   * @return radii arrays
+   */
+  public DoubleBufferingFloatArray getRadii()
+  {
+    return mRadii;
+  }
+
+  /**
+   * Returns the internal neighborhood grid object.
+   * 
+   * @return neighborhood grid
+   */
+  public NeighborhoodGrid getNeighborhoodGrid()
+  {
+    return mNeighborhood;
   }
 
   /**
@@ -157,6 +187,16 @@ public class ParticleSystem
   }
 
   /**
+   * Returns the max number of particles per grid cell.
+   * 
+   * @return max number of particles per grid cell.
+   */
+  public int getMaxNumberOfParticlesPerGridCell()
+  {
+    return mMaxNumberOfParticlesPerGridCell;
+  }
+
+  /**
    * Returns dimension
    * 
    * @return dimension
@@ -173,7 +213,7 @@ public class ParticleSystem
    */
   public int getGridSize()
   {
-    return mNeighborhood.getGridSize();
+    return getNeighborhoodGrid().getGridSize();
   }
 
   /**
@@ -210,7 +250,6 @@ public class ParticleSystem
     {
       lPositionsRead[i + d] = pPosition[d];
       lPositionsWrite[i + d] = pPosition[d];
-      // lVelocities[i + d] = 0;
     }
 
     mNumberOfParticles++;
@@ -375,10 +414,12 @@ public class ParticleSystem
    */
   public void updateNeighborhoodCells()
   {
-    mNeighborhood.clear();
+    getNeighborhoodGrid().clear();
     float[] lPositions = mPositions.getCurrentArray();
     float[] lRadii = mRadii.getCurrentArray();
-    mNeighborhood.update(lPositions, lRadii, mNumberOfParticles);
+    getNeighborhoodGrid().update(lPositions,
+                                 lRadii,
+                                 mNumberOfParticles);
   }
 
   /**
@@ -426,8 +467,24 @@ public class ParticleSystem
    *
    * @param pDampening
    *          how much should velocity be dampened.
+   * 
    */
   public void enforceBounds(float pDampening)
+  {
+    enforceBounds(pDampening, 1e-6f);
+  }
+
+  /**
+   * Enforces bounds [0,1]^d by bouncing the particles elastically.
+   *
+   * @param pDampening
+   *          how much should velocity be dampened.
+   * @param pNoise
+   *          amount of noise to add to prevent perfect particle overlapp after
+   *          enforcing bounds (typically at the corners).
+   * 
+   */
+  public void enforceBounds(float pDampening, float pNoise)
   {
     final int lDimension = mDimension;
     final float[] lPositionsRead = mPositions.getReadArray();
@@ -445,12 +502,16 @@ public class ParticleSystem
 
         if (lPositionsRead[i] < lRadius)
         {
-          lPositionsWrite[i] = lRadius;
+          lPositionsWrite[i] = (float) (lRadius
+                                        + mRandom.nextDouble(-pNoise,
+                                                             pNoise));
           lVelocitiesWrite[i] = -pDampening * lVelocitiesRead[i];
         }
         else if (lPositionsRead[i] > 1 - lRadius)
         {
-          lPositionsWrite[i] = 1 - lRadius;
+          lPositionsWrite[i] = (float) (1 - lRadius
+                                        + mRandom.nextDouble(-pNoise,
+                                                             pNoise));
           lVelocitiesWrite[i] = -pDampening * lVelocitiesRead[i];
         }
         else
@@ -462,6 +523,33 @@ public class ParticleSystem
     }
 
     mPositions.swap();
+    mVelocities.swap();
+  }
+
+  /**
+   * Adds Brownian motion.
+   *
+   * @param pIntensity
+   *          intensity (force) of the brownian motion.
+   */
+  public void addBrownianMotion(float pAmount)
+  {
+    final int lDimension = mDimension;
+    final float[] lVelocitiesRead = mVelocities.getReadArray();
+    final float[] lVelocitiesWrite = mVelocities.getWriteArray();
+
+    for (int id = 0; id < mNumberOfParticles; id++)
+    {
+      for (int d = 0; d < lDimension; d++)
+      {
+        int i = id * lDimension + d;
+
+        lVelocitiesWrite[i] = (float) (lVelocitiesRead[i]
+                                       + pAmount
+                                         * mRandom.nextDouble(-1, 1));
+      }
+    }
+
     mVelocities.swap();
   }
 
@@ -502,39 +590,32 @@ public class ParticleSystem
     mVelocities.swap();
   }
 
-  public void applyForceField(ExternalForceFieldInterface pForceField)
+  /**
+   * Applies a given force field to all particles.
+   * 
+   * @param pForceField
+   *          force field
+   */
+  public void applyForceField(ForceFieldInterface pForceField)
   {
     applyForceField(pForceField, 0, getNumberOfParticles());
   }
 
-  public void applyForceField(ExternalForceFieldInterface pForceField,
+  /**
+   * Applies a given force field to a range of particle ids.
+   * 
+   * @param pForceField
+   *          force field
+   * @param pBeginId
+   *          begin id
+   * @param pEndId
+   *          end id
+   */
+  public void applyForceField(ForceFieldInterface pForceField,
                               int pBeginId,
                               int pEndId)
   {
-    pForceField.applyForceField(getDimension(),
-                                0,
-                                getNumberOfParticles(),
-                                mPositions,
-                                mVelocities,
-                                mRadii);
-  }
-
-  public void applyForceField(InteractionForceFieldInterface pPairwiseForceField)
-  {
-    applyForceField(pPairwiseForceField, 0, getNumberOfParticles());
-  }
-
-  public void applyForceField(InteractionForceFieldInterface pPairwiseForceField,
-                              int pBeginId,
-                              int pEndId)
-  {
-    pPairwiseForceField.applyForceField(getDimension(),
-                                        0,
-                                        getNumberOfParticles(),
-                                        mNeighborhood,
-                                        mPositions,
-                                        mVelocities,
-                                        mRadii);
+    pForceField.applyForceField(0, getNumberOfParticles(), this);
   }
 
   /**

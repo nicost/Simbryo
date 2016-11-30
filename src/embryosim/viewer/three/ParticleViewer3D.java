@@ -7,23 +7,13 @@ import embryosim.viewer.three.groups.CameraGroup;
 import embryosim.viewer.three.groups.ParticleViewerGroup;
 import embryosim.viewer.three.groups.WorldGroup;
 import javafx.application.Platform;
-import javafx.geometry.Point3D;
-import javafx.scene.AmbientLight;
 import javafx.scene.DepthTest;
 import javafx.scene.Group;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.PointLight;
 import javafx.scene.Scene;
-import javafx.scene.SceneAntialiasing;
-import javafx.scene.SubScene;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.PhongMaterial;
-import javafx.scene.shape.Box;
-import javafx.scene.shape.Sphere;
-import javafx.scene.transform.Rotate;
-import javafx.scene.transform.Transform;
-import javafx.scene.transform.Translate;
 import javafx.stage.Stage;
 
 /**
@@ -46,12 +36,11 @@ public class ParticleViewer3D extends Stage
   private final CameraGroup mCameraGroup = new CameraGroup();
   private final ParticleViewerGroup mParticleViewerGroup;
 
-  private double mousePosX, mousePosY, mouseOldX, mouseOldY,
+
+  private volatile double mousePosX, mousePosY, mouseOldX, mouseOldY,
       mouseDeltaX, mouseDeltaY;
-  private double mouseFactorX, mouseFactorY;
 
   private ParticleSystem mParticleSystem;
-  private SubScene mSubScene;
 
   /**
    * Opens up a particle viewer, taking care that JavaFX is initialized.
@@ -259,4 +248,10 @@ public class ParticleViewer3D extends Stage
     }
   }
 
+
+  @Override
+  public void setDisplayRadius(boolean pDisplayRadius)
+  {
+    mParticleViewerGroup.setDisplayRadius(pDisplayRadius);
+  }
 }

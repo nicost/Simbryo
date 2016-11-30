@@ -4,10 +4,8 @@ import org.junit.Test;
 
 import embryosim.psystem.ParticleSystem;
 import embryosim.psystem.forcefield.interaction.impl.CollisionForceField;
-import embryosim.util.jfx.JavaFXUtil;
 import embryosim.util.timing.Timming;
 import embryosim.viewer.three.ParticleViewer3D;
-import embryosim.viewer.two.ParticleViewer2D;
 
 public class ParticleViewer3DDemo
 {
@@ -27,7 +25,8 @@ public class ParticleViewer3DDemo
 
     CollisionForceField lCollisionForceField =
                                              new CollisionForceField(Fc,
-                                                                     D);
+                                                                     D,
+                                                                     true);
 
     ParticleSystem lParticleSystem = new ParticleSystem(3,
                                                         N,

@@ -1,8 +1,8 @@
 package embryosim.psystem.forcefield.external.impl;
 
+import embryosim.psystem.ParticleSystem;
 import embryosim.psystem.forcefield.external.ExternalForceFieldBase;
 import embryosim.psystem.forcefield.external.ExternalForceFieldInterface;
-import embryosim.util.DoubleBufferingFloatArray;
 
 /**
  * This force field applies a centri(petal+/fugal-) force to the particles.
@@ -33,28 +33,30 @@ public class CentriForceField extends ExternalForceFieldBase
   }
 
   @Override
-  public void applyForceField(int pDimension,
-                              int pBeginId,
+  public void applyForceField(int pBeginId,
                               int pEndId,
-                              final DoubleBufferingFloatArray pPositions,
-                              final DoubleBufferingFloatArray pVelocities,
-                              final DoubleBufferingFloatArray pRadii)
+                              ParticleSystem pParticleSystem)
   {
+    final int lDimension = pParticleSystem.getDimension();
 
-    final float[] lPositionsRead = pPositions.getReadArray();
-    final float[] lPositionsWrite = pPositions.getWriteArray();
-    final float[] lVelocitiesRead = pVelocities.getReadArray();
-    final float[] lVelocitiesWrite = pVelocities.getWriteArray();
+    final float[] lPositionsRead = pParticleSystem.getPositions()
+                                                  .getReadArray();
+    final float[] lPositionsWrite = pParticleSystem.getPositions()
+                                                   .getWriteArray();
+    final float[] lVelocitiesRead = pParticleSystem.getVelocities()
+                                                   .getReadArray();
+    final float[] lVelocitiesWrite = pParticleSystem.getVelocities()
+                                                    .getWriteArray();
 
-    final int lIndexStart = pBeginId * pDimension;
-    final int lIndexEnd = pEndId * pDimension;
+    final int lIndexStart = pBeginId * lDimension;
+    final int lIndexEnd = pEndId * lDimension;
 
-    final float[] lVector = new float[pDimension];
+    final float[] lVector = new float[lDimension];
 
-    for (int i = lIndexStart; i < lIndexEnd; i += pDimension)
+    for (int i = lIndexStart; i < lIndexEnd; i += lDimension)
     {
       float lSquaredLength = 0;
-      for (int d = 0; d < pDimension; d++)
+      for (int d = 0; d < lDimension; d++)
       {
         float px = lPositionsRead[i + d];
         float cx = mCenter[d];
@@ -68,7 +70,7 @@ public class CentriForceField extends ExternalForceFieldBase
                                      (float) (mForceIntensity
                                               / Math.sqrt(lSquaredLength));
 
-      for (int d = 0; d < pDimension; d++)
+      for (int d = 0; d < lDimension; d++)
       {
         lVelocitiesWrite[i + d] = lVelocitiesRead[i + d]
                                   + lVector[d]
@@ -77,7 +79,7 @@ public class CentriForceField extends ExternalForceFieldBase
 
     }
 
-    pVelocities.swap();
+    pParticleSystem.getVelocities().swap();
   }
 
 }

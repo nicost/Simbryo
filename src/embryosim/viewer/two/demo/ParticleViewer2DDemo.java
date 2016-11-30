@@ -25,7 +25,8 @@ public class ParticleViewer2DDemo
 
     CollisionForceField lCollisionForceField =
                                              new CollisionForceField(Fc,
-                                                                     D);
+                                                                     D,
+                                                                     true);
 
     ParticleSystem lParticleSystem = new ParticleSystem(2,
                                                         N,
@@ -44,7 +45,7 @@ public class ParticleViewer2DDemo
                                            * (Math.random() - 0.5f)),
                                   (float) (V
                                            * (Math.random() - 0.5f)));
-      lParticleSystem.setRadius(lId, (float) (Rm + (R)));// Math.random() *
+      lParticleSystem.setRadius(lId, Rm + (R));// Math.random() *
     }
 
     lParticleSystem.setRadius(0, 0.06f);

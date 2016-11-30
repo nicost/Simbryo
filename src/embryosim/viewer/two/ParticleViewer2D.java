@@ -110,6 +110,7 @@ public class ParticleViewer2D extends Stage
    * @param pBlocking
    *          if true, the viewer waits for the previous rendering to finish.
    */
+  @Override
   public void updateDisplay(boolean pBlocking)
   {
     mViewParticles2D.updateDisplay(mParticleSystem, pBlocking);
@@ -118,6 +119,7 @@ public class ParticleViewer2D extends Stage
   /**
    * Waits (blocking call) while window is showing.
    */
+  @Override
   public void waitWhileShowing()
   {
     while (isShowing())
@@ -186,6 +188,12 @@ public class ParticleViewer2D extends Stage
   public void setDisplayElapsedTime(boolean pDisplayElapsedTime)
   {
     mViewParticles2D.setDisplayElapsedTime(pDisplayElapsedTime);
+  }
+
+  @Override
+  public void setDisplayRadius(boolean pDisplayRadius)
+  {
+    mViewParticles2D.setDisplayRadius(pDisplayRadius);
   }
 
 }

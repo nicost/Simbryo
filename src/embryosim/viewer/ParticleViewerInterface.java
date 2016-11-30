@@ -29,4 +29,12 @@ public interface ParticleViewerInterface
    */
   boolean isShowing();
 
+  /**
+   * Sets whether the radii of the particles should be displayed.
+   * 
+   * @param pDisplayRadius
+   *          true to display radii, false otherwise
+   */
+  void setDisplayRadius(boolean pDisplayRadius);
+
 }
