@@ -1,9 +1,11 @@
 package simbryo.embryo.zoo;
 
 import simbryo.embryo.Embryo;
+import simbryo.isosurf.impl.Ellipsoid;
 import simbryo.morphogen.Morphogen;
 import simbryo.morphogen.operators.impl.StrogatzWaveOperator;
-import simbryo.psystem.forcefield.external.impl.EllipsoidalConstraintForceField;
+import simbryo.psystem.forcefield.ForceFieldInterface;
+import simbryo.psystem.forcefield.external.impl.OneSidedIsoSurfaceForceField;
 
 /**
  * Drosophila melanogster embryo (First 14 divisions).
@@ -24,8 +26,8 @@ public class Drosophila extends Embryo
 
   private static final float Ri = 0.08f;
 
-  private EllipsoidalConstraintForceField mOutsideEllipseForceField;
-  private EllipsoidalConstraintForceField mInsideEllipseForceField;
+  private ForceFieldInterface mOutsideEllipseForceField;
+  private ForceFieldInterface mInsideEllipseForceField;
 
   private Morphogen mCellCycleMorphogen;
   private StrogatzWaveOperator mStrogatzOscillator;
@@ -52,7 +54,27 @@ public class Drosophila extends Embryo
 
     updateNeighborhoodCells();
 
-    mOutsideEllipseForceField = new EllipsoidalConstraintForceField(true,
+    Ellipsoid lEllipsoid =
+                         new Ellipsoid(0.48f,
+                                       0.5f,
+                                       0.5f,
+                                       0.5f,
+                                       1f,
+                                       0.43f,
+                                       0.43f);
+
+    mOutsideEllipseForceField =
+                              new OneSidedIsoSurfaceForceField(true,
+                                                                true,
+                                                                Finside,
+                                                                lEllipsoid);
+    mInsideEllipseForceField =
+                             new OneSidedIsoSurfaceForceField(false,
+                                                               false,
+                                                               Fafc,
+                                                               lEllipsoid);
+
+    /*mOutsideEllipseForceField = new EllipsoidalConstraintForceField(true,
                                                             true,
                                                             Finside,
                                                             0.48f,
@@ -73,6 +95,7 @@ public class Drosophila extends Embryo
                                                                   1,
                                                                   0.43f,
                                                                   0.43f);
+                                                                  /**/
 
     mCellCycleMorphogen = addMorphogen();
     mStrogatzOscillator = new StrogatzWaveOperator(0.0015f,
@@ -130,11 +153,10 @@ public class Drosophila extends Embryo
 
     }
 
-    if((int)pNewMorphogenValue>mCellDivCount)
-      System.out.println("Division: "+mCellDivCount);
-    
-    mCellDivCount = Math.max(mCellDivCount, (int) pNewMorphogenValue);
+    if ((int) pNewMorphogenValue > mCellDivCount)
+      System.out.println("Division: " + mCellDivCount);
 
+    mCellDivCount = Math.max(mCellDivCount, (int) pNewMorphogenValue);
 
     return pNewMorphogenValue;
   }

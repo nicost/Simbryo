@@ -16,14 +16,14 @@ public class Organoid extends Embryo
 
   private static final float Fpetal = 0.00005f;
   private static final float Ri = 0.135f;
-  
-  private static final float cRadiusShrinkageFactor  =  (float) Math.pow(0.5f, 1.0f / 4);
-  
-  
-  private CentriForceField mCentriForceField;
-  
-  private volatile int mCellDivCount;
 
+  private static final float cRadiusShrinkageFactor =
+                                                    (float) Math.pow(0.5f,
+                                                                     1.0f / 4);
+
+  private CentriForceField mCentriForceField;
+
+  private volatile int mCellDivCount;
 
   /**
    * Creates an 'Organoid'.
@@ -45,7 +45,6 @@ public class Organoid extends Embryo
 
     updateNeighborhoodCells();
 
-
     mCentriForceField =
                       new CentriForceField(Fpetal, 0.5f, 0.5f, 0.5f);
   }
@@ -53,19 +52,15 @@ public class Organoid extends Embryo
   @Override
   public void simulationSteps(int pNumberOfSteps, float pDeltaTime)
   {
-    if (mCellDivCount >= 14)
-      return;
-
     for (int i = 0; i < pNumberOfSteps; i++)
     {
-      if (getTimeStepIndex() % 500 == 499)
+      if (mCellDivCount <= 14 && getTimeStepIndex() % 500 == 499)
         triggerCellDivision();
 
       applyForceField(mCentriForceField);
       super.simulationSteps(1, pDeltaTime);
     }
   }
-  
 
   public void triggerCellDivision()
   {
