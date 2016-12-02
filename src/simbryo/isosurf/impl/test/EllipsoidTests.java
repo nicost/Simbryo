@@ -39,12 +39,12 @@ public class EllipsoidTests
     assertEquals(-0.97f, lEllipsoid.getNormalizedGardient(1), 0.01f);
     
     lEllipsoid.clear();
-    lEllipsoid.addCoordinate(2f);
+    lEllipsoid.addCoordinate(1f);
     lEllipsoid.addCoordinate(0.5f);
     
-    System.out.println(lEllipsoid.getDistance());
-    System.out.println(lEllipsoid.getNormalizedGardient(0));
-    System.out.println(lEllipsoid.getNormalizedGardient(1));
+    //System.out.println(lEllipsoid.getDistance());
+    //System.out.println(lEllipsoid.getNormalizedGardient(0));
+    //System.out.println(lEllipsoid.getNormalizedGardient(1));
 
     assertEquals(0.0f, lEllipsoid.getDistance(), 0.01f);
     assertEquals(-1f, lEllipsoid.getNormalizedGardient(0), 0.01f);
