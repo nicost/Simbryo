@@ -1,4 +1,4 @@
-package simbryo.fluo.demo;
+package simbryo.render.fluo.demo;
 
 import java.io.IOException;
 
@@ -8,7 +8,7 @@ import clearcl.ClearCL;
 import clearcl.ClearCLDevice;
 import clearcl.backend.ClearCLBackends;
 import simbryo.embryo.zoo.Drosophila;
-import simbryo.fluo.HistoneFluo;
+import simbryo.render.fluo.HistoneFluo;
 import simbryo.util.timing.Timming;
 
 public class HistoneFluoDemo
@@ -24,18 +24,17 @@ public class HistoneFluoDemo
       ClearCLDevice lFastestGPUDevice =
                                       lClearCL.getFastestGPUDevice();
 
+      Drosophila lDrosophila = new Drosophila();
+      lDrosophila.open3DViewer();
+      lDrosophila.getViewer().setDisplayRadius(false);
+
       HistoneFluo lHistoneFluo = new HistoneFluo(lFastestGPUDevice,
+                                                 lDrosophila,
                                                  512,
                                                  512,
                                                  100);
 
       lHistoneFluo.openFluorescenceImageViewer();
-
-      Drosophila lDrosophila = new Drosophila();
-
-      lDrosophila.open3DViewer();
-
-      lDrosophila.getViewer().setDisplayRadius(false);
 
       Timming lTimming = new Timming();
 
@@ -45,7 +44,7 @@ public class HistoneFluoDemo
         lTimming.syncAtPeriod(10);
         lDrosophila.simulationSteps(1, 1);
 
-        lHistoneFluo.render(lDrosophila, 30);
+        lHistoneFluo.render((int) (i%lHistoneFluo.getDepth()));
 
         i++;
         Thread.sleep(10);

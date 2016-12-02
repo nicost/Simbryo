@@ -30,7 +30,8 @@ public class ParticleViewerGroup extends Group
   private float[] mRadiis;
 
   private Group mParticlesGroup;
-  private PhongMaterial mParticleMaterial;
+  private final PhongMaterial mParticleMaterial;
+  private final PhongMaterial mBoxMaterial;
 
   public ParticleViewerGroup(int pWidth, int pHeight, int pDepth)
   {
@@ -39,23 +40,24 @@ public class ParticleViewerGroup extends Group
     mHeight = pHeight;
     mDepth = pDepth;
 
-    // PhongMaterial lBoxMaterial = new PhongMaterial();
-    // lBoxMaterial.setDiffuseColor(Color.web("#ffffff80"));
-    // lBoxMaterial.setSpecularColor(Color.LIGHTBLUE);
+    mBoxMaterial = new PhongMaterial();
+    getBoxMaterial().setDiffuseColor(Color.LIGHTBLUE);
+    getBoxMaterial().setSpecularColor(Color.BLACK);
+    getBoxMaterial().setSpecularPower(1);
 
     Box lBoundingBox = new Box(pWidth, pHeight, pDepth);
     lBoundingBox.setTranslateX(-0.0 * pWidth);
     lBoundingBox.setTranslateY(-0.0 * pHeight);
     lBoundingBox.setTranslateZ(-0.0 * pDepth);
-    lBoundingBox.drawModeProperty().set(DrawMode.LINE);
+    //lBoundingBox.drawModeProperty().set(DrawMode.LINE);
     lBoundingBox.cullFaceProperty().set(CullFace.FRONT);
 
-    // lBoundingBox.setMaterial(lBoxMaterial);
-    // lBoundingBox.setOpacity(0.01);
+    lBoundingBox.setMaterial(getBoxMaterial());
+    lBoundingBox.setOpacity(0.01);
 
     mParticleMaterial = new PhongMaterial();
-    mParticleMaterial.setDiffuseColor(Color.WHITE);
-    mParticleMaterial.setSpecularColor(Color.LIGHTBLUE);
+    getParticleMaterial().setDiffuseColor(Color.WHITE);
+    getParticleMaterial().setSpecularColor(Color.LIGHTBLUE);
 
     // box.setMaterial(mParticleMaterial);
     mParticlesGroup = new Group();
@@ -75,8 +77,8 @@ public class ParticleViewerGroup extends Group
     mElapsedTime = (float) (0.99 * mElapsedTime
                             + 0.01 * lNewElapsedTime);
 
-    //if (lNow % 100 == 0)
-    //  System.out.format("Elapsed time: %g ms \n", mElapsedTime);
+    // if (lNow % 100 == 0)
+    // System.out.format("Elapsed time: %g ms \n", mElapsedTime);
 
     if (pBlocking)
     {
@@ -116,8 +118,8 @@ public class ParticleViewerGroup extends Group
 
       while (lParticlesSpheres.size() < pParticleSystem.getNumberOfParticles())
       {
-        Sphere lSphere = new Sphere(1, mDisplayRadius?16:6);
-        lSphere.setMaterial(mParticleMaterial);
+        Sphere lSphere = new Sphere(1, mDisplayRadius ? 16 : 6);
+        lSphere.setMaterial(getParticleMaterial());
         lSphere.setTranslateX(0);
         lSphere.setTranslateY(0);
         lSphere.setTranslateZ(0);
@@ -149,7 +151,8 @@ public class ParticleViewerGroup extends Group
         double lWorldX = mWidth * (x - 0.5f);
         double lWorldY = mHeight * (y - 0.5f);
         double lWorldZ = mDepth * (z - 0.5f);
-        double lRadius = mDisplayRadius ? mWidth * r : mWidth * 0.005f;
+        double lRadius =
+                       mDisplayRadius ? mWidth * r : mWidth * 0.005f;
 
         Sphere lSphere = (Sphere) lParticlesSpheres.get(id);
 
@@ -193,6 +196,16 @@ public class ParticleViewerGroup extends Group
   public void setDisplayRadius(boolean pDisplayRadius)
   {
     mDisplayRadius = pDisplayRadius;
+  }
+
+  public PhongMaterial getBoxMaterial()
+  {
+    return mBoxMaterial;
+  }
+
+  public PhongMaterial getParticleMaterial()
+  {
+    return mParticleMaterial;
   }
 
 }

@@ -74,32 +74,10 @@ public class Drosophila extends Embryo
                                                                Fafc,
                                                                lEllipsoid);
 
-    /*mOutsideEllipseForceField = new EllipsoidalConstraintForceField(true,
-                                                            true,
-                                                            Finside,
-                                                            0.48f,
-                                                            0.5f,
-                                                            0.5f,
-                                                            0.5f,
-                                                            1f,
-                                                            0.43f,
-                                                            0.43f);
-    mInsideEllipseForceField =
-                              new EllipsoidalConstraintForceField(false,
-                                                                  false,
-                                                                  Fafc,
-                                                                  0.48f,
-                                                                  0.5f,
-                                                                  0.5f,
-                                                                  0.5f,
-                                                                  1,
-                                                                  0.43f,
-                                                                  0.43f);
-                                                                  /**/
 
     mCellCycleMorphogen = addMorphogen();
-    mStrogatzOscillator = new StrogatzWaveOperator(0.0015f,
-                                                   0.007f,
+    mStrogatzOscillator = new StrogatzWaveOperator(0.001f,
+                                                   0.01f,
                                                    0.1f)
     {
 
