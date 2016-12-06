@@ -103,12 +103,12 @@ dependencies
 
  
     // CoreMem:
-    compile ('net.coremem:CoreMem:[0.3.0,)'){transitive= true; changing= true}
+    compile ('net.coremem:CoreMem:[0.3.1,)'){transitive= true; changing= true}
 
     // Clear*:
     compile ('net.clearvolume:clearvolume:[1.2.0,)')  {transitive= true; changing= true}
-    compile ('net.clearvolume:cleargl:[1.0.13,)') {transitive= true; changing= true}
-    compile ('net.clearvolume:clearcl:[0.3.3,)')      {transitive= true; changing= true}
+    compile ('net.clearvolume:cleargl:[1.0.13,)')     {transitive= true; changing= true}
+    compile ('net.clearvolume:clearcl:[0.3.4,)')      {transitive= true; changing= true}
     compile ('net.clearvolume:clearaudio:[1.0.0,)')   {transitive= true; changing= true}
 
 }
