@@ -1,3 +1,4 @@
+#pragma OPENCL EXTENSION cl_khr_3d_image_writes : enable
 
 // A kernel to fill an image with the beautiful XOR fractal:
 //default xorfractal dx=0i
@@ -13,40 +14,46 @@ __kernel void xorfractal  (__write_only image3d_t image,
 	int y = get_global_id(1);
 	int z = get_global_id(2);
 	
-	write_imagef (image, (int4)(x, y, z, 0), u*((x+dx)^((y+dy)+1)^(z+2)));
+	if(x==0 && y==0)
+   printf("location: (%d,%d,%d) \n", x, y, z);
+	
+	write_imagef (image, (int4)(x, y, z, 0), u*((x+dx)^((y+dy)+1)^(z+2))); 
 }
 
 
 
-// A kernel to fill an image with a uniform filled sphere:
-//default sphere cx=0i
-//default sphere cy=0i
-//default sphere cz=0i
-//default sphere r =80f
-__kernel void sphere   (__write_only image3d_t image, 
-                                        int       cx, 
-                                        int       cy,
-                                        int       cz,  
-                                        float     r 
+
+__kernel void gaussrender( __write_only    image3d_t image,
+                           __global const  float*    positions, //
+                           __global const  float*    radii,
+                                           int       num
                           )
 {
   const int width  = get_image_width(image);
   const int height = get_image_height(image);
   const int depth  = get_image_depth(image);
   
-  float4 dim = (float4){width,height,depth,1};
+  const int x = get_global_id(0); 
+  const int y = get_global_id(1);
+  const int z = get_global_id(2);
   
-  int x = get_global_id(0); 
-  int y = get_global_id(1);
-  int z = get_global_id(2);
+  const float3 dim = (float3){width,height,depth};
+  const float3 voxelpos = (float3){x,y,z};
   
-  float4 pos = (float4){x,y,z,0};
+  float value=0;
   
-  float4 cen = (float4){cx,cy,cz,0};
+  for(int i=0; i<num; i++)
+  {
+    const float3 partpos = vload3(i,positions)*dim;
+    const float d = fast_distance(voxelpos,partpos);
+    const float radius = radii[i];
+    const float sigma = 0.33*radius*width ;
+    
+    value += 1000*native_exp(-(d*d)/(2*sigma*sigma));
+  }
   
-  float d = fast_length((pos-cen)/dim);
-  
-  float value = (float)((d<r)?1:0);
+//  if(x==0 && y==0 && z==0)
+//    printf("end: (%d,%d,%d) ->  n=%d,  v=%f \n", x, y, z, num, value);
   
   write_imagef (image, (int4){x,y,z,0}, value);
 }

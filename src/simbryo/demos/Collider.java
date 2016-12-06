@@ -144,7 +144,7 @@ public class Collider extends Application
     lParticleSystem.setVelocity(lId,
                                 (float) (V * (Math.random() - 0.5f)),
                                 (float) (V * (Math.random() - 0.5f)));
-    lParticleSystem.setRadius(lId, (float) (1e-9 + (1 * R))); // Math.sqrt(Math.random())
+    lParticleSystem.setRadius(lId, (float) (1e-9 + (1 * R) + 0.01f*(Math.random()-0.5f))); // 
   }
 
   private void sleep(int pMillis)

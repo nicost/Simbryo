@@ -48,16 +48,42 @@ public class Embryo extends ParticleSystem
    * Constructs an embryo of given dimensions (2D or 3D), collision force
    * between particles, and drag.
    * 
-   * @param pDimension
-   *          dimension
    * @param pCollisionForce
    *          collision force
    * @param pDrag
    *          drag.
    */
-  public Embryo(int pDimension, float pCollisionForce, float pDrag)
+  public Embryo(float pCollisionForce, float pDrag)
   {
-    super(pDimension, cMaximumNumberOfCells, Rm, Rt);
+    this(3, 64, 24, pCollisionForce, pDrag);
+  }
+
+  /**
+   * Constructs an embryo of given dimensions (2D or 3D), dimension, grid size,
+   * max number of particle per neighborhood cell, collision force between
+   * particles, and drag.
+   * 
+   * @param pDimension
+   *          dimension
+   * @param pGridSize
+   *          grid size
+   * @param pMaxNumberOfParticlesPerGridCell
+   *          max number of particles per cell
+   * @param pCollisionForce
+   *          collision force
+   * @param pDrag
+   *          drag.
+   */
+  public Embryo(int pDimension,
+                int pGridSize,
+                int pMaxNumberOfParticlesPerGridCell,
+                float pCollisionForce,
+                float pDrag)
+  {
+    super(pDimension,
+          pGridSize,
+          pMaxNumberOfParticlesPerGridCell,
+          cMaximumNumberOfCells);
 
     mTargetRadii =
                  new DoubleBufferingFloatArray(cMaximumNumberOfCells);
@@ -211,7 +237,7 @@ public class Embryo extends ParticleSystem
    *          a list of morphogens
    */
   public void applyOperator(MorphogenOperatorInterface pOperator,
-                    Morphogen... pMorphogens)
+                            Morphogen... pMorphogens)
   {
     apply(0, getNumberOfParticles(), pOperator, pMorphogens);
   }

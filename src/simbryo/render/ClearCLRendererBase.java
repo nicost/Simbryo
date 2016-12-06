@@ -33,26 +33,40 @@ public abstract class ClearCLRendererBase extends RendererBase
     mImage = mContext.createImage(ImageChannelOrder.R,
                                   ImageChannelDataType.Float,
                                   mStackDimensions);
+    mImage.fillZero(true);
   }
 
   @Override
   public void clear()
   {
-    mImage.fillZero(true);
+    // mImage.fillZero(true);
+    super.clear();
   }
 
   @Override
-  public boolean render(int pZPLaneIndex)
+  public boolean render(int pZPlaneIndex)
   {
-    if (!mCacheTable[pZPLaneIndex])
+    if (!mPlaneAlreadyDrawnTable[pZPlaneIndex])
     {
-      mRenderKernel.setGlobalOffsets(0,0,pZPLaneIndex);
-      mRenderKernel.setGlobalSizes(getWidth(),getHeight(),1);
+      mRenderKernel.setGlobalOffsets(0, 0, pZPlaneIndex);
+      mRenderKernel.setGlobalSizes(getWidth(), getHeight(), 1);
       mRenderKernel.run(true);
       mImage.notifyListenersOfChange(mContext.getDefaultQueue());
     }
-    
-    return super.render(pZPLaneIndex);
+
+    return super.render(pZPlaneIndex);
+  }
+
+  @Override
+  public void render(int pZPlaneIndexBegin, int pZPlaneIndexEnd)
+  {
+    mRenderKernel.setGlobalOffsets(0, 0, pZPlaneIndexBegin);
+    //mRenderKernel.setLocalSizes(...);
+    mRenderKernel.setGlobalSizes(getWidth(),
+                                 getHeight(),
+                                 pZPlaneIndexEnd - pZPlaneIndexBegin);
+    mRenderKernel.run(true);
+    mImage.notifyListenersOfChange(mContext.getDefaultQueue());
   }
 
   @Override

@@ -35,8 +35,8 @@ public class NeighborhoodGrid
    *          max particles per cell
    */
   public NeighborhoodGrid(int pDimension,
-                              int pGridSize,
-                              int pMaxParticlesPerCell)
+                          int pGridSize,
+                          int pMaxParticlesPerCell)
   {
     super();
     mDimension = pDimension;
@@ -52,7 +52,74 @@ public class NeighborhoodGrid
       mStride[d] = lStride;
       lStride *= mGridSize;
     }
+  }
 
+  /**
+   * Returns maximal cell occupancy.
+   * 
+   * @return maximal cell occupancy.
+   */
+  public float getMaximalCellOccupancy()
+  {
+    return (1.0f * getMaximalEffectiveNumberOfParticlesPerGridCell())
+           / getMaxParticlesPerGridCell();
+  }
+
+  /**
+   * Returns the maximal number of particles found in a cell.
+   * 
+   * @return max number of particles found in a cell.
+   */
+  public int getMaximalEffectiveNumberOfParticlesPerGridCell()
+  {
+    int lMax = 0;
+
+    int lLength = mNeighboorhoodArray.length;
+    int lStride = mMaxParticlesPerGridCell;
+    for (int i = 0; i < lLength; i += lStride)
+      for (int j = 0; j < lStride; j++)
+        if (mNeighboorhoodArray[i+j] == -1)
+        {
+          lMax = Math.max(lMax, j);
+          break;
+        }
+
+    return lMax;
+  }
+
+  /**
+   * Returns maximal cell occupancy.
+   * 
+   * @return maximal cell occupancy.
+   */
+  public double getAverageCellOccupancy()
+  {
+    return getAverageNumberOfParticlesPerGridCell()
+           / getMaxParticlesPerGridCell();
+  }
+
+  /**
+   * Returns the maximal number of particles found in a cell.
+   * 
+   * @return max number of particles found in a cell.
+   */
+  public double getAverageNumberOfParticlesPerGridCell()
+  {
+    double lAverage = 0;
+
+    int lLength = mNeighboorhoodArray.length;
+    int lStride = mMaxParticlesPerGridCell;
+    for (int i = 0; i < lLength; i += lStride)
+      for (int j = 0; j < lStride; j++)
+        if (mNeighboorhoodArray[i+j] == -1)
+        {
+          lAverage += j;
+          break;
+        }
+
+    lAverage = lAverage / getVolume();
+
+    return lAverage;
   }
 
   /**
@@ -74,9 +141,10 @@ public class NeighborhoodGrid
   {
     return mGridSize;
   }
-  
+
   /**
    * Returns the maximal number of particles per grid cell.
+   * 
    * @return
    */
   public int getMaxParticlesPerGridCell()
@@ -828,7 +896,5 @@ public class NeighborhoodGrid
     }
     return lIndex;
   }
-
-
 
 }

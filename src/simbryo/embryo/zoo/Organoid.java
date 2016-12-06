@@ -30,7 +30,7 @@ public class Organoid extends Embryo
    */
   public Organoid()
   {
-    super(3, Fc, D);
+    super(Fc, D);
 
     for (int i = 0; i < 1; i++)
     {

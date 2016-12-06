@@ -31,7 +31,7 @@ public class Spheroid extends Embryo
    */
   public Spheroid()
   {
-    super(3, Fc, D);
+    super(Fc, D);
 
     for (int i = 0; i < 1; i++)
     {

@@ -4,7 +4,7 @@ import clearcl.viewer.ClearCLImageViewer;
 
 public interface RendererInterface
 {
-  
+
   long getWidth();
 
   long getHeight();
@@ -12,8 +12,14 @@ public interface RendererInterface
   long getDepth();
 
   void clear();
-  
-  boolean render(int pZPLaneIndex);
+
+  boolean render(int pZPlaneIndex);
+
+  void render(int pZPlaneIndexBegin, int pZPlaneIndexEnd);
+
+  int renderSmart(int pZPlaneIndexBegin, int pZPlaneIndexEnd);
+
+  void invalidate(int pZPlaneIndex);
 
   ClearCLImageViewer openFluorescenceImageViewer();
 

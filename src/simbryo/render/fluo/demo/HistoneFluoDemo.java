@@ -7,6 +7,7 @@ import org.junit.Test;
 import clearcl.ClearCL;
 import clearcl.ClearCLDevice;
 import clearcl.backend.ClearCLBackends;
+import clearcl.util.ElapsedTime;
 import simbryo.embryo.zoo.Drosophila;
 import simbryo.render.fluo.HistoneFluo;
 import simbryo.util.timing.Timming;
@@ -17,6 +18,8 @@ public class HistoneFluoDemo
   @Test
   public void demo() throws IOException, InterruptedException
   {
+    ElapsedTime.sStandardOutput = true;
+    
     try (
         ClearCL lClearCL =
                          new ClearCL(ClearCLBackends.getBestBackend()))
@@ -25,6 +28,8 @@ public class HistoneFluoDemo
                                       lClearCL.getFastestGPUDevice();
 
       Drosophila lDrosophila = new Drosophila();
+
+      System.out.println("grid size:"+lDrosophila.getGridSize());
       lDrosophila.open3DViewer();
       lDrosophila.getViewer().setDisplayRadius(false);
 
@@ -41,13 +46,35 @@ public class HistoneFluoDemo
       int i = 0;
       while (lDrosophila.getViewer().isShowing())
       {
-        lTimming.syncAtPeriod(10);
+        lTimming.syncAtPeriod(1);
         lDrosophila.simulationSteps(1, 1);
+        
+        
 
-        lHistoneFluo.render((int) (i%lHistoneFluo.getDepth()));
+        if (i % 10 == 0)
+        {
+          System.out.format("avg part per cell : %g \n",lDrosophila.getNeighborhoodGrid().getAverageNumberOfParticlesPerGridCell());
+          System.out.format("max part per cell : %d \n",lDrosophila.getNeighborhoodGrid().getMaximalEffectiveNumberOfParticlesPerGridCell());
+          System.out.format("occupancy : %g \n",lDrosophila.getNeighborhoodGrid().getAverageCellOccupancy());
+          lHistoneFluo.clear();
+          lHistoneFluo.renderSmart(0,100);
+        }
+        
+        
+ 
+        
+        // int z = (int) (i%100);
+        // lHistoneFluo.invalidate(z);
+
+        /*
+        if (i % 100 == 0)
+        {
+          lHistoneFluo.clear();
+          for (int zi = 0; zi < 100; zi++)
+            lHistoneFluo.render(zi);
+        }/**/
 
         i++;
-        Thread.sleep(10);
       }
 
       lDrosophila.getViewer().waitWhileShowing();
