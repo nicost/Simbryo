@@ -12,7 +12,7 @@ import javafx.scene.shape.Box;
 import javafx.scene.shape.CullFace;
 import javafx.scene.shape.DrawMode;
 import javafx.scene.shape.Sphere;
-import simbryo.psystem.ParticleSystem;
+import simbryo.dynamics.tissue.psystem.ParticleSystem;
 
 public class ParticleViewerGroup extends Group
 {
