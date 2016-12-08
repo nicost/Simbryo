@@ -2,7 +2,6 @@ package simbryo.phantom;
 
 import java.util.Arrays;
 
-import clearcl.viewer.ClearCLImageViewer;
 import simbryo.dynamics.tissue.TissueDynamics;
 
 public abstract class PhantomRendererBase implements PhantomRendererInterface

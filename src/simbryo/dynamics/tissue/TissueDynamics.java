@@ -4,8 +4,8 @@ import java.util.ArrayList;
 
 import simbryo.dynamics.tissue.cellprop.CellProperty;
 import simbryo.dynamics.tissue.cellprop.operators.CellPropertyOperatorInterface;
-import simbryo.dynamics.tissue.forcefield.interaction.impl.CollisionForceField;
-import simbryo.dynamics.tissue.psystem.ParticleSystem;
+import simbryo.particles.ParticleSystem;
+import simbryo.particles.forcefield.interaction.impl.CollisionForceField;
 import simbryo.util.DoubleBufferingFloatArray;
 import simbryo.util.sequence.Sequence;
 import simbryo.viewer.ParticleViewerInterface;

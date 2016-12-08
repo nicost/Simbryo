@@ -4,7 +4,7 @@ import clearcl.viewer.jfx.PanZoomScene;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import simbryo.dynamics.tissue.psystem.ParticleSystem;
+import simbryo.particles.ParticleSystem;
 import simbryo.util.jfx.JavaFXUtil;
 import simbryo.viewer.ParticleViewerInterface;
 

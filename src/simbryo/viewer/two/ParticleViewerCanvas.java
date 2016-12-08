@@ -6,7 +6,7 @@ import javafx.application.Platform;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-import simbryo.dynamics.tissue.psystem.ParticleSystem;
+import simbryo.particles.ParticleSystem;
 
 public class ParticleViewerCanvas extends Canvas
 {

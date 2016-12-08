@@ -10,9 +10,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
 import javafx.scene.shape.CullFace;
-import javafx.scene.shape.DrawMode;
 import javafx.scene.shape.Sphere;
-import simbryo.dynamics.tissue.psystem.ParticleSystem;
+import simbryo.particles.ParticleSystem;
 
 public class ParticleViewerGroup extends Group
 {

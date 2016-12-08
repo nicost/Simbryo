@@ -2,8 +2,8 @@ package simbryo.viewer.three.demo;
 
 import org.junit.Test;
 
-import simbryo.dynamics.tissue.forcefield.interaction.impl.CollisionForceField;
-import simbryo.dynamics.tissue.psystem.ParticleSystem;
+import simbryo.particles.ParticleSystem;
+import simbryo.particles.forcefield.interaction.impl.CollisionForceField;
 import simbryo.util.timing.Timming;
 import simbryo.viewer.three.ParticleViewer3D;
 

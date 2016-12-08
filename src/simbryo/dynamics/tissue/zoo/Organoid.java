@@ -1,7 +1,7 @@
 package simbryo.dynamics.tissue.zoo;
 
 import simbryo.dynamics.tissue.TissueDynamics;
-import simbryo.dynamics.tissue.forcefield.external.impl.CentriForceField;
+import simbryo.particles.forcefield.external.impl.CentriForceField;
 
 /**
  * 'Organoid' just a clum of cells dividing 14 times.

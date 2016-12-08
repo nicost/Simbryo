@@ -4,7 +4,7 @@ import simbryo.dynamics.tissue.TissueDynamics;
 import simbryo.dynamics.tissue.cellprop.CellProperty;
 import simbryo.dynamics.tissue.cellprop.operators.CellPropertyOperatorInterface;
 import simbryo.dynamics.tissue.cellprop.operators.OperatorBase;
-import simbryo.dynamics.tissue.neighborhood.NeighborhoodGrid;
+import simbryo.particles.neighborhood.NeighborhoodGrid;
 import simbryo.util.geom.GeometryUtils;
 
 /**

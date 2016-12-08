@@ -1,8 +1,8 @@
 package simbryo.dynamics.tissue.zoo;
 
 import simbryo.dynamics.tissue.TissueDynamics;
-import simbryo.dynamics.tissue.forcefield.external.impl.IsoSurfaceForceField;
-import simbryo.dynamics.tissue.isosurf.impl.Sphere;
+import simbryo.particles.forcefield.external.impl.IsoSurfaceForceField;
+import simbryo.particles.isosurf.impl.Sphere;
 
 /**
  * Cells divide 14 times and remain on a sphere.`

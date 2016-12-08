@@ -3,9 +3,9 @@ package simbryo.dynamics.tissue.zoo;
 import simbryo.dynamics.tissue.TissueDynamics;
 import simbryo.dynamics.tissue.cellprop.CellProperty;
 import simbryo.dynamics.tissue.cellprop.operators.impl.StrogatzWaveOperator;
-import simbryo.dynamics.tissue.forcefield.ForceFieldInterface;
-import simbryo.dynamics.tissue.forcefield.external.impl.OneSidedIsoSurfaceForceField;
-import simbryo.dynamics.tissue.isosurf.impl.Ellipsoid;
+import simbryo.particles.forcefield.ForceFieldInterface;
+import simbryo.particles.forcefield.external.impl.OneSidedIsoSurfaceForceField;
+import simbryo.particles.isosurf.impl.Ellipsoid;
 
 /**
  * Drosophila melanogster embryo (First 14 divisions).
