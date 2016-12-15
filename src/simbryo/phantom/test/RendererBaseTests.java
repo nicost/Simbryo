@@ -13,11 +13,11 @@ public class RendererBaseTests
   @Test
   public void testSmartness()
   {
-    Drosophila lDrosophila = new Drosophila();
+    Drosophila lDrosophila = new Drosophila(64,64,16);
     PhantomRendererBase lRenderer = new PhantomRendererBase(lDrosophila,
-                                              100,
-                                              100,
-                                              100)
+                                              512,
+                                              512,
+                                              128)
     {
       @Override
       public void render(int pZPlaneIndexBegin, int pZPlaneIndexEnd)

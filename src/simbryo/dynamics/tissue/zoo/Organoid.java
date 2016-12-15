@@ -27,10 +27,14 @@ public class Organoid extends TissueDynamics
 
   /**
    * Creates an 'Organoid'.
+
+   * @param pMaxNumberOfParticlesPerGridCell
+   * @param pGridDimensions
    */
-  public Organoid()
+  public Organoid(int pMaxNumberOfParticlesPerGridCell,
+                  int... pGridDimensions)
   {
-    super(Fc, D);
+    super(Fc, D, pMaxNumberOfParticlesPerGridCell, pGridDimensions);
 
     for (int i = 0; i < 1; i++)
     {

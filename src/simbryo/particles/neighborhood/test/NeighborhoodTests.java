@@ -14,9 +14,7 @@ public class NeighborhoodTests
   @Test
   public void testNoRadius()
   {
-    NeighborhoodGrid lNeighborhood = new NeighborhoodGrid(2,
-                                                                  4,
-                                                                  10);
+    NeighborhoodGrid lNeighborhood = new NeighborhoodGrid(10, 4, 4);
 
     lNeighborhood.clear();
 
@@ -71,9 +69,7 @@ public class NeighborhoodTests
   @Test
   public void testWithRadius()
   {
-    NeighborhoodGrid lNeighborhood = new NeighborhoodGrid(2,
-                                                                  4,
-                                                                  10);
+    NeighborhoodGrid lNeighborhood = new NeighborhoodGrid(10,4,4);
 
     lNeighborhood.clear();
 
@@ -106,9 +102,7 @@ public class NeighborhoodTests
   @Test
   public void testWithRadiusQuery()
   {
-    NeighborhoodGrid lNeighborhood = new NeighborhoodGrid(2,
-                                                                  4,
-                                                                  10);
+    NeighborhoodGrid lNeighborhood = new NeighborhoodGrid(10,4,4);
 
     lNeighborhood.clear();
 

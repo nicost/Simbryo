@@ -36,10 +36,14 @@ public class Drosophila extends TissueDynamics
 
   /**
    * Creates a Drosophila embryo.
+
+   * @param pMaxNumberOfParticlesPerGridCell
+   * @param pGridDimensions
    */
-  public Drosophila()
+  public Drosophila(int pMaxNumberOfParticlesPerGridCell,
+                    int... pGridDimensions)
   {
-    super(Fc, D);
+    super(Fc, D, pMaxNumberOfParticlesPerGridCell, pGridDimensions);
 
     for (int i = 0; i < 1; i++)
     {
@@ -65,34 +69,34 @@ public class Drosophila extends TissueDynamics
 
     mOutsideEllipseForceField =
                               new OneSidedIsoSurfaceForceField(true,
-                                                                true,
-                                                                Finside,
-                                                                lEllipsoid);
+                                                               true,
+                                                               Finside,
+                                                               lEllipsoid);
     mInsideEllipseForceField =
                              new OneSidedIsoSurfaceForceField(false,
-                                                               false,
-                                                               Fafc,
-                                                               lEllipsoid);
-
+                                                              false,
+                                                              Fafc,
+                                                              lEllipsoid);
 
     mCellCycleMorphogen = addMorphogen();
-    mStrogatzOscillator = new StrogatzWaveOperator(0.001f,
-                                                   0.01f,
-                                                   0.1f)
-    {
+    mStrogatzOscillator =
+                        new StrogatzWaveOperator(0.001f, 0.01f, 0.1f)
+                        {
 
-      @Override
-      public float eventHook(boolean pEvent,
-                             int pId,
-                             float[] pPositions,
-                             float[] pVelocities,
-                             float[] pRadii,
-                             float pNewMorphogenValue)
-      {
-        return cellDivisionHook(pEvent, pId, pNewMorphogenValue);
-      }
+                          @Override
+                          public float eventHook(boolean pEvent,
+                                                 int pId,
+                                                 float[] pPositions,
+                                                 float[] pVelocities,
+                                                 float[] pRadii,
+                                                 float pNewMorphogenValue)
+                          {
+                            return cellDivisionHook(pEvent,
+                                                    pId,
+                                                    pNewMorphogenValue);
+                          }
 
-    };
+                        };
 
   }
 

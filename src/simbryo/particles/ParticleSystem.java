@@ -47,26 +47,31 @@ public class ParticleSystem
                         float pMinRradius,
                         float pTypicalRadius)
   {
-    this(pDimension,
-         getOptimalGridSize(pDimension,
-                            pMaxNumberOfParticles,
-                            pTypicalRadius),
+    this(
          32 + getOptimalMaxNumberOfParticlesPerGridCell(pDimension,
                                                         pMaxNumberOfParticles,
                                                         pMinRradius,
                                                         pTypicalRadius),
-         pMaxNumberOfParticles);
+         pMaxNumberOfParticles,
+         getOptimalGridDimensions(pDimension,
+                            pMaxNumberOfParticles,
+                            pTypicalRadius));
   }
 
-  private static int getOptimalGridSize(int pDimension,
+  private static int[] getOptimalGridDimensions(int pDimension,
                                         int pMaxNumberOfParticles,
                                         float pTypicalRadius)
   {
     int lOptimalGridSize =
                          (int) Math.max(4,
                                         1 / (2 * 2 * pTypicalRadius));
+    
+    int[] lGridDimensions = new int[pDimension];
+    
+    for(int d=0; d<pDimension; d++)
+      lGridDimensions[d]=lOptimalGridSize;
 
-    return lOptimalGridSize;
+    return lGridDimensions;
   }
 
   private static int getOptimalMaxNumberOfParticlesPerGridCell(int pDimension,
@@ -74,11 +79,13 @@ public class ParticleSystem
                                                                float pMinRradius,
                                                                float pTypicalRadius)
   {
-    int lOptimalGridSize = getOptimalGridSize(pDimension,
+    int[] lOptimalGridDimensions = getOptimalGridDimensions(pDimension,
                                               pMaxNumberOfParticles,
                                               pTypicalRadius);
 
-    int lVolume = (int) Math.pow(lOptimalGridSize, pDimension);
+    int lVolume = 1;
+    for(int d=0; d<pDimension; d++)
+      lVolume *= lOptimalGridDimensions[d];
 
     float lCellVolume = 1.0f / lVolume;
     float lTypicalParticleVolume = (float) Math.pow(2 * pMinRradius,
@@ -104,26 +111,24 @@ public class ParticleSystem
    * @param pMaxNumberOfParticles
    *          max number of particles
    */
-  public ParticleSystem(int pDimension,
-                        int pGridSize,
-                        int pMaxNumberOfParticlesPerGridCell,
-                        int pMaxNumberOfParticles)
+  public ParticleSystem(int pMaxNumberOfParticlesPerGridCell,
+                        int pMaxNumberOfParticles,
+                        int... pGridDimensions)
   {
     super();
 
     mMaxNumberOfParticles = pMaxNumberOfParticles;
     mMaxNumberOfParticlesPerGridCell =
                                      pMaxNumberOfParticlesPerGridCell;
-    mDimension = pDimension;
+    mDimension = pGridDimensions.length;
     mPositions = new DoubleBufferingFloatArray(pMaxNumberOfParticles
                                                * mDimension);
     mVelocities = new DoubleBufferingFloatArray(pMaxNumberOfParticles
                                                 * mDimension);
     mRadii = new DoubleBufferingFloatArray(pMaxNumberOfParticles);
     mNeighborhood =
-                  new NeighborhoodGrid(mDimension,
-                                       pGridSize,
-                                       pMaxNumberOfParticlesPerGridCell);
+                  new NeighborhoodGrid(pMaxNumberOfParticlesPerGridCell,
+                                       pGridDimensions);
   }
 
   /**
@@ -207,13 +212,13 @@ public class ParticleSystem
   }
 
   /**
-   * Returns grid size
+   * Returns grid dimensions
    * 
-   * @return grid size
+   * @return grid dimensions
    */
-  public int getGridSize()
+  public int[] getGridDimensions()
   {
-    return getNeighborhoodGrid().getGridSize();
+    return getNeighborhoodGrid().getGridDimensions();
   }
 
   /**

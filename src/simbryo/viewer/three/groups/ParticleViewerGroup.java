@@ -10,6 +10,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
 import javafx.scene.shape.CullFace;
+import javafx.scene.shape.DrawMode;
 import javafx.scene.shape.Sphere;
 import simbryo.particles.ParticleSystem;
 
@@ -48,7 +49,7 @@ public class ParticleViewerGroup extends Group
     lBoundingBox.setTranslateX(-0.0 * pWidth);
     lBoundingBox.setTranslateY(-0.0 * pHeight);
     lBoundingBox.setTranslateZ(-0.0 * pDepth);
-    //lBoundingBox.drawModeProperty().set(DrawMode.LINE);
+    lBoundingBox.drawModeProperty().set(DrawMode.LINE);
     lBoundingBox.cullFaceProperty().set(CullFace.FRONT);
 
     lBoundingBox.setMaterial(getBoxMaterial());

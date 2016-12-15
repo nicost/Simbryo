@@ -1,15 +1,18 @@
 package simbryo.phantom.fluo.demo;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.junit.Test;
 
 import clearcl.ClearCL;
 import clearcl.ClearCLDevice;
+import clearcl.backend.ClearCLBackendInterface;
 import clearcl.backend.ClearCLBackends;
 import clearcl.util.ElapsedTime;
 import simbryo.dynamics.tissue.zoo.Drosophila;
-import simbryo.phantom.fluo.HistoneFluo;
+import simbryo.phantom.ClearCLPhantomRendererUtils;
+import simbryo.phantom.fluo.HistoneFluorescence;
 import simbryo.util.timing.Timming;
 
 public class HistoneFluoDemo
@@ -18,26 +21,42 @@ public class HistoneFluoDemo
   @Test
   public void demo() throws IOException, InterruptedException
   {
+    int lWidth = 512;
+    int lHeight = 512;
+    int lDepth = 128;
+
     ElapsedTime.sStandardOutput = true;
-    
-    try (
-        ClearCL lClearCL =
-                         new ClearCL(ClearCLBackends.getBestBackend()))
+
+    ClearCLBackendInterface lBestBackend =
+                                         ClearCLBackends.getBestBackend();
+    System.out.println("lBestBackend=" + lBestBackend);
+    try (ClearCL lClearCL = new ClearCL(lBestBackend))
     {
       ClearCLDevice lFastestGPUDevice =
-                                      lClearCL.getFastestGPUDevice();
+                                      lClearCL.getFastestGPUDeviceForImages();
 
-      Drosophila lDrosophila = new Drosophila();
+      int[] lGridDimensions =
+                            ClearCLPhantomRendererUtils.getOptimalGridDimensions(lFastestGPUDevice,
+                                                                                 lWidth,
+                                                                                 lHeight,
+                                                                                 lDepth);
 
-      System.out.println("grid size:"+lDrosophila.getGridSize());
+      System.out.println("lGridDimensions="
+                         + Arrays.toString(lGridDimensions));
+
+      Drosophila lDrosophila = new Drosophila(16, lGridDimensions);
+
+      System.out.println("grid size:"
+                         + lDrosophila.getGridDimensions());
       lDrosophila.open3DViewer();
       lDrosophila.getViewer().setDisplayRadius(false);
 
-      HistoneFluo lHistoneFluo = new HistoneFluo(lFastestGPUDevice,
-                                                 lDrosophila,
-                                                 512,
-                                                 512,
-                                                 100);
+      HistoneFluorescence lHistoneFluo =
+                                       new HistoneFluorescence(lFastestGPUDevice,
+                                                               lDrosophila,
+                                                               lWidth,
+                                                               lHeight,
+                                                               lDepth);
 
       lHistoneFluo.openViewer();
 
@@ -48,21 +67,22 @@ public class HistoneFluoDemo
       {
         lTimming.syncAtPeriod(1);
         lDrosophila.simulationSteps(1, 1);
-        
-        
 
         if (i % 10 == 0)
         {
-          System.out.format("avg part per cell : %g \n",lDrosophila.getNeighborhoodGrid().getAverageNumberOfParticlesPerGridCell());
-          System.out.format("max part per cell : %d \n",lDrosophila.getNeighborhoodGrid().getMaximalEffectiveNumberOfParticlesPerGridCell());
-          System.out.format("occupancy : %g \n",lDrosophila.getNeighborhoodGrid().getAverageCellOccupancy());
+          System.out.format("avg part per cell : %g \n",
+                            lDrosophila.getNeighborhoodGrid()
+                                       .getAverageNumberOfParticlesPerGridCell());
+          System.out.format("max part per cell : %d \n",
+                            lDrosophila.getNeighborhoodGrid()
+                                       .getMaximalEffectiveNumberOfParticlesPerGridCell());
+          System.out.format("occupancy : %g \n",
+                            lDrosophila.getNeighborhoodGrid()
+                                       .getAverageCellOccupancy());
           lHistoneFluo.clear();
-          lHistoneFluo.renderSmart(0,100);
+          lHistoneFluo.renderSmart(0, (int) lHistoneFluo.getDepth());
         }
-        
-        
- 
-        
+
         // int z = (int) (i%100);
         // lHistoneFluo.invalidate(z);
 

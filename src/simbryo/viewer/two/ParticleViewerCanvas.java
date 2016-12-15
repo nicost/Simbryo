@@ -126,10 +126,10 @@ public class ParticleViewerCanvas extends Canvas
 
       if (isDisplayGrid())
       {
-        int lGridSize = pParticleSystem.getGridSize();
+        int[] lGridSize = pParticleSystem.getGridDimensions();
 
-        final int lGridWidth = lGridSize;
-        final int lGridHeight = lGridSize;
+        final int lGridWidth = lGridSize[0];
+        final int lGridHeight = lGridSize[1];
 
         for (int x = 0; x < lGridWidth; x++)
         {

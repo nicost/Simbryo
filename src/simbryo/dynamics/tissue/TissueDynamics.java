@@ -37,27 +37,15 @@ public class TissueDynamics extends ParticleSystem
 
   protected final CollisionForceField mCollisionForceField;
 
-  protected ArrayList<CellProperty> mMorphogenList = new ArrayList<>();
+  protected ArrayList<CellProperty> mMorphogenList =
+                                                   new ArrayList<>();
 
   protected volatile long mTimeStepIndex = 0;
   protected final Sequence mSequence = new Sequence();
 
   private ParticleViewer3D mParticleViewer3D;
 
-  /**
-   * Constructs an embryo of given dimensions (2D or 3D), collision force
-   * between particles, and drag.
-   * 
-   * @param pCollisionForce
-   *          collision force
-   * @param pDrag
-   *          drag.
-   */
-  public TissueDynamics(float pCollisionForce, float pDrag)
-  {
-    this(3, 64, 24, pCollisionForce, pDrag);
-  }
-
+  
   /**
    * Constructs an embryo of given dimensions (2D or 3D), dimension, grid size,
    * max number of particle per neighborhood cell, collision force between
@@ -74,16 +62,14 @@ public class TissueDynamics extends ParticleSystem
    * @param pDrag
    *          drag.
    */
-  public TissueDynamics(int pDimension,
-                int pGridSize,
-                int pMaxNumberOfParticlesPerGridCell,
-                float pCollisionForce,
-                float pDrag)
+  public TissueDynamics(float pCollisionForce,
+                        float pDrag,
+                        int pMaxNumberOfParticlesPerGridCell,
+                        int... pGridDimensions)
   {
-    super(pDimension,
-          pGridSize,
-          pMaxNumberOfParticlesPerGridCell,
-          cMaximumNumberOfCells);
+    super(pMaxNumberOfParticlesPerGridCell,
+          cMaximumNumberOfCells,
+          pGridDimensions);
 
     mTargetRadii =
                  new DoubleBufferingFloatArray(cMaximumNumberOfCells);

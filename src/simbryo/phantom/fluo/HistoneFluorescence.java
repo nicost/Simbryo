@@ -9,33 +9,49 @@ import clearcl.enums.HostAccessType;
 import clearcl.enums.KernelAccessType;
 import coremem.enums.NativeTypeEnum;
 import coremem.offheap.OffHeapMemory;
+import coremem.util.Size;
 import simbryo.dynamics.tissue.TissueDynamics;
 import simbryo.phantom.ClearCLPhantomRendererBase;
 import simbryo.phantom.PhantomRendererInterface;
 
-public class HistoneFluo extends ClearCLPhantomRendererBase
-                         implements PhantomRendererInterface
+public class HistoneFluorescence extends ClearCLPhantomRendererBase
+                                 implements PhantomRendererInterface
 {
-  private ClearCLBuffer mPositionsBuffer;
-  private ClearCLBuffer mRadiiBuffer;
-  private OffHeapMemory mPositionsMemory;
-  private OffHeapMemory mRadiiMemory;
+  private ClearCLBuffer mNeighboorsBuffer, mPositionsBuffer,
+      mRadiiBuffer;
+  private OffHeapMemory mNeighboorsMemory, mPositionsMemory,
+      mRadiiMemory;
 
-  public HistoneFluo(ClearCLDevice pDevice,
-                     TissueDynamics pEmbryo,
-                     long... pStackDimensions) throws IOException
+  public HistoneFluorescence(ClearCLDevice pDevice,
+                             TissueDynamics pEmbryo,
+                             long... pStackDimensions) throws IOException
   {
     super(pDevice, pEmbryo, pStackDimensions);
 
-    
     ClearCLProgram lProgram =
                             mContext.createProgram(this.getClass(),
                                                    "kernel/HistoneFluoRender.cl");
+
+    final int lMaxParticlesPerGridCell =
+                                       pEmbryo.getNeighborhoodGrid()
+                                              .getMaxParticlesPerGridCell();
+
+    lProgram.addDefine("MAXNEI", "" + lMaxParticlesPerGridCell);
     lProgram.buildAndLog();
 
     mRenderKernel = lProgram.createKernel("gaussrender");
 
     final int lDimension = mEmbryo.getDimension();
+
+    final int lNeighboorsArrayLength = pEmbryo.getNeighborhoodGrid()
+                                              .getVolume()
+                                       * lMaxParticlesPerGridCell;
+
+    mNeighboorsBuffer =
+                      mContext.createBuffer(HostAccessType.WriteOnly,
+                                            KernelAccessType.ReadOnly,
+                                            NativeTypeEnum.Int,
+                                            lNeighboorsArrayLength);
 
     mPositionsBuffer =
                      mContext.createBuffer(HostAccessType.WriteOnly,
@@ -49,6 +65,9 @@ public class HistoneFluo extends ClearCLPhantomRendererBase
                                        NativeTypeEnum.Float,
                                        pEmbryo.getMaxNumberOfParticles());
 
+    mNeighboorsMemory =
+                      OffHeapMemory.allocateInts(lNeighboorsArrayLength);
+
     mPositionsMemory =
                      OffHeapMemory.allocateFloats(lDimension
                                                   * pEmbryo.getMaxNumberOfParticles());
@@ -56,24 +75,40 @@ public class HistoneFluo extends ClearCLPhantomRendererBase
                  OffHeapMemory.allocateFloats(pEmbryo.getMaxNumberOfParticles());
 
     mRenderKernel.setArgument("image", mImage);
+    mRenderKernel.setArgument("neighboors", mNeighboorsBuffer);
     mRenderKernel.setArgument("positions", mPositionsBuffer);
     mRenderKernel.setArgument("radii", mRadiiBuffer);
+    //mRenderKernel.setLocalMemoryArgument("localneighboorsP", NativeTypeEnum.Int, lMaxParticlesPerGridCell);
 
   }
-  
+
   private void updateBuffers()
   {
     final int lDimension = mEmbryo.getDimension();
     final int lNumberOfCells = mEmbryo.getMaxNumberOfParticles();
+    final int lMaximalNumberOfNeighboorsPerCell =
+                                                mEmbryo.getMaxNumberOfParticlesPerGridCell();
+    final int lGridVolume = mEmbryo.getNeighborhoodGrid().getVolume();
+
+    mNeighboorsMemory.copyFrom(mEmbryo.getNeighborhoodGrid()
+                                      .getArray());
+
+    mRadiiMemory.copyFrom(mEmbryo.getRadii().getCurrentArray(),
+                          0,
+                          0,
+                          lNumberOfCells);
+
     mPositionsMemory.copyFrom(mEmbryo.getPositions()
                                      .getCurrentArray(),
                               0,
                               0,
                               lDimension * lNumberOfCells);
-    mRadiiMemory.copyFrom(mEmbryo.getRadii().getCurrentArray(),
-                          0,
-                          0,
-                          lNumberOfCells);
+
+    mNeighboorsBuffer.readFrom(mNeighboorsMemory,
+                               0,
+                               lGridVolume
+                                  * lMaximalNumberOfNeighboorsPerCell,
+                               false);
 
     mPositionsBuffer.readFrom(mPositionsMemory,
                               0,
@@ -102,7 +137,5 @@ public class HistoneFluo extends ClearCLPhantomRendererBase
     mRenderKernel.setArgument("num", mEmbryo.getNumberOfParticles());
     super.render(pZPlaneIndexBegin, pZPlaneIndexEnd);
   }
-
-
 
 }

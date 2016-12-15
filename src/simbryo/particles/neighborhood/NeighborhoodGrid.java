@@ -16,7 +16,7 @@ public class NeighborhoodGrid
   private final static float cEpsilon = 1e-6f;
 
   private final int mDimension;
-  private final int mGridSize;
+  private final int[] mGridDimensions;
   private final int mMaxParticlesPerGridCell;
 
   private final int[] mStride;
@@ -29,28 +29,29 @@ public class NeighborhoodGrid
    * 
    * @param pDimension
    *          dimension
-   * @param pGridSize
-   *          grid size along each dimension
    * @param pMaxParticlesPerCell
    *          max particles per cell
+   * 
+   * @param pGridDimensions
+   *          grid dimensions
+   * 
    */
-  public NeighborhoodGrid(int pDimension,
-                          int pGridSize,
-                          int pMaxParticlesPerCell)
+  public NeighborhoodGrid(int pMaxParticlesPerCell,
+                          int... pGridDimensions)
   {
     super();
-    mDimension = pDimension;
-    mGridSize = pGridSize;
+    mDimension = pGridDimensions.length;
+    mGridDimensions = pGridDimensions;
     mMaxParticlesPerGridCell = pMaxParticlesPerCell;
 
     mNeighboorhoodArray = new int[getVolume() * pMaxParticlesPerCell];
 
-    mStride = new int[pDimension];
+    mStride = new int[mDimension];
     int lStride = getMaxParticlesPerGridCell();
-    for (int d = 0; d < pDimension; d++)
+    for (int d = 0; d < mDimension; d++)
     {
       mStride[d] = lStride;
-      lStride *= mGridSize;
+      lStride *= mGridDimensions[d];
     }
   }
 
@@ -78,7 +79,7 @@ public class NeighborhoodGrid
     int lStride = mMaxParticlesPerGridCell;
     for (int i = 0; i < lLength; i += lStride)
       for (int j = 0; j < lStride; j++)
-        if (mNeighboorhoodArray[i+j] == -1)
+        if (mNeighboorhoodArray[i + j] == -1)
         {
           lMax = Math.max(lMax, j);
           break;
@@ -111,7 +112,7 @@ public class NeighborhoodGrid
     int lStride = mMaxParticlesPerGridCell;
     for (int i = 0; i < lLength; i += lStride)
       for (int j = 0; j < lStride; j++)
-        if (mNeighboorhoodArray[i+j] == -1)
+        if (mNeighboorhoodArray[i + j] == -1)
         {
           lAverage += j;
           break;
@@ -137,9 +138,9 @@ public class NeighborhoodGrid
    * 
    * @return grid size
    */
-  public int getGridSize()
+  public int[] getGridDimensions()
   {
-    return mGridSize;
+    return mGridDimensions;
   }
 
   /**
@@ -159,7 +160,15 @@ public class NeighborhoodGrid
    */
   public int getVolume()
   {
-    return (int) Math.pow(mGridSize, mDimension);
+    int lVolume = 1;
+    for (int d = 0; d < getDimension(); d++)
+      lVolume *= mGridDimensions[d];
+    return lVolume;
+  }
+
+  public int[] getArray()
+  {
+    return mNeighboorhoodArray;
   }
 
   /**
@@ -228,7 +237,7 @@ public class NeighborhoodGrid
                                        final float... pTestPoint)
   {
     int lCellIndex = getCellIndexAtPoint(mDimension,
-                                         mGridSize,
+                                         mGridDimensions,
                                          mStride,
                                          getMaxParticlesPerGridCell(),
                                          pTestPoint);
@@ -347,7 +356,7 @@ public class NeighborhoodGrid
     int lNeighboorCounter = 0;
 
     final int lDimension = mDimension;
-    final int lGridSideLength = mGridSize;
+    final int[] lGridDimensions = mGridDimensions;
     final int[] lStride = mStride;
     final int lMaxParticlesPerGridCell = getMaxParticlesPerGridCell();
     final int[] lNeighboorhoodArray = mNeighboorhoodArray;
@@ -358,7 +367,7 @@ public class NeighborhoodGrid
     for (int d = 0; d < lDimension; d++)
     {
       float lValue = getCellCoordForParticle(lDimension,
-                                             lGridSideLength,
+                                             lGridDimensions,
                                              pPositions,
                                              pParticleId,
                                              d);
@@ -366,7 +375,7 @@ public class NeighborhoodGrid
       lCellCoord[d] = lValue;
 
       float lInCellCoord = (float) (lValue - Math.floor(lValue));
-      float lScaledRadius = pRadius * lGridSideLength;
+      float lScaledRadius = pRadius * lGridDimensions[d];
 
       lFullyContainedInCell &= (lInCellCoord - lScaledRadius >= 0)
                                && (lInCellCoord + lScaledRadius <= 1);
@@ -386,7 +395,7 @@ public class NeighborhoodGrid
     else
     {
       initCellEnumeration(lDimension,
-                          lGridSideLength,
+                          lGridDimensions,
                           lCellCoord,
                           pRadius,
                           pCellCoordMin,
@@ -486,7 +495,7 @@ public class NeighborhoodGrid
                            int pNumberOfParticles)
   {
     final int lDimension = getDimension();
-    final int lGridSideLength = mGridSize;
+    final int[] lGridDimensions = mGridDimensions;
     final int[] lStride = mStride;
     final int lMaxParticlesPerGridCell = getMaxParticlesPerGridCell();
     final int[] lNeighboorhoodArray = mNeighboorhoodArray;
@@ -500,7 +509,7 @@ public class NeighborhoodGrid
     {
       addParticleToCells(lNeighboorhoodArray,
                          lDimension,
-                         lGridSideLength,
+                         lGridDimensions,
                          lStride,
                          lMaxParticlesPerGridCell,
                          pPositions,
@@ -519,7 +528,7 @@ public class NeighborhoodGrid
    * @param pNeighboorhoodArray
    * @param pDimension
    *          dimension
-   * @param pGridSize
+   * @param pGridDimensions
    *          grid size
    * @param pStride
    *          precomputed strides
@@ -542,7 +551,7 @@ public class NeighborhoodGrid
    */
   private static final void addParticleToCells(int[] pNeighboorhoodArray,
                                                int pDimension,
-                                               int pGridSize,
+                                               int[] pGridDimensions,
                                                int[] pStride,
                                                int pMaxParticlesPerGridCell,
                                                float[] pPositions,
@@ -562,7 +571,7 @@ public class NeighborhoodGrid
     for (int d = 0; d < pDimension; d++)
     {
       float lValue = getCellCoordForParticle(pDimension,
-                                             pGridSize,
+                                             pGridDimensions,
                                              pPositions,
                                              pParticleId,
                                              d);
@@ -570,7 +579,7 @@ public class NeighborhoodGrid
       lCellCoord[d] = lValue;
 
       float lInCellCoord = (float) (lValue - Math.floor(lValue));
-      float lScaledRadius = lRadius * pGridSize;
+      float lScaledRadius = lRadius * pGridDimensions[d];
 
       lFullyContainedInCell &= (lInCellCoord - lScaledRadius >= 0)
                                && (lInCellCoord
@@ -581,7 +590,7 @@ public class NeighborhoodGrid
     if (lFullyContainedInCell)
     {
       int lNeighboorListIndex = getCellIndexForParticle(pDimension,
-                                                        pGridSize,
+                                                        pGridDimensions,
                                                         pStride,
                                                         pPositions,
                                                         pParticleId);
@@ -594,7 +603,7 @@ public class NeighborhoodGrid
     {
 
       initCellEnumeration(pDimension,
-                          pGridSize,
+                          pGridDimensions,
                           lCellCoord,
                           lRadius,
                           pCellCoordMin,
@@ -624,8 +633,8 @@ public class NeighborhoodGrid
    * 
    * @param pDimension
    *          dimension
-   * @param pGridSize
-   *          grid size
+   * @param pGridDimensions
+   *          grid dimensions
    * @param pCellCoord
    *          cell coordinates
    * @param pRadius
@@ -638,7 +647,7 @@ public class NeighborhoodGrid
    *          working array, length must be dimension
    */
   private static final void initCellEnumeration(int pDimension,
-                                                int pGridSize,
+                                                int[] pGridDimensions,
                                                 float[] pCellCoord,
                                                 final float pRadius,
                                                 int[] pCellCoordMin,
@@ -648,17 +657,17 @@ public class NeighborhoodGrid
 
     for (int d = 0; d < pDimension; d++)
     {
-      float lInfluenceRadius = pRadius * pGridSize;
+      float lInfluenceRadius = pRadius * pGridDimensions[d];
       pCellCoordMin[d] =
                        (int) Math.max(0,
-                                      Math.min(pGridSize - 1,
+                                      Math.min(pGridDimensions[d] - 1,
                                                (pCellCoord[d]
                                                 - lInfluenceRadius)));
-      pCellCoordMax[d] =
-                       1 + (int) Math.max(0,
-                                          Math.min(pGridSize - 1,
-                                                   (pCellCoord[d]
-                                                    + lInfluenceRadius)));
+      pCellCoordMax[d] = 1 + (int) Math.max(0,
+                                            Math.min(pGridDimensions[d]
+                                                     - 1,
+                                                     (pCellCoord[d]
+                                                      + lInfluenceRadius)));
       pCellCoordCurrent[d] = pCellCoordMin[d];
     }
   }
@@ -697,8 +706,8 @@ public class NeighborhoodGrid
    * 
    * @param pDimension
    *          dimensions
-   * @param pGridSize
-   *          grid size
+   * @param pGridDimensions
+   *          grid dimensions
    * @param pPositions
    *          postions array
    * @param pParticleID
@@ -708,14 +717,14 @@ public class NeighborhoodGrid
    * @return particle coordinate in cell space.
    */
   private static final float getCellCoordForParticle(int pDimension,
-                                                     int pGridSize,
+                                                     int[] pGridDimensions,
                                                      float[] pPositions,
                                                      int pParticleID,
                                                      int pDimensionIndex)
   {
     final int i = pParticleID * pDimension + pDimensionIndex;
     final float lParticleCoordinate = pPositions[i];
-    return getParticleCoordinateInCell(pGridSize,
+    return getParticleCoordinateInCell(pGridDimensions,
                                        pDimensionIndex,
                                        lParticleCoordinate);
   }
@@ -723,20 +732,21 @@ public class NeighborhoodGrid
   /**
    * Converts cell coordinate from particle space to cell space.
    * 
-   * @param pGridSize
-   *          grid size
+   * @param pGridDimensions
+   *          grid dimensions
    * @param pDimensionIndex
    *          dimension index
    * @param pParticleCoordinate
    * @return particle coordinate in cell space.
    */
-  private static final float getParticleCoordinateInCell(final int pGridSize,
+  private static final float getParticleCoordinateInCell(final int[] pGridDimensions,
                                                          final int pDimensionIndex,
                                                          final float pParticleCoordinate)
   {
     // cEpsilon is to make sure that we never see the value pGridSize as
     // coordinate...
-    return pParticleCoordinate * (1.0f * pGridSize - cEpsilon);
+    return pParticleCoordinate
+           * (1.0f * pGridDimensions[pDimensionIndex] - cEpsilon);
   }
 
   /**
@@ -810,8 +820,8 @@ public class NeighborhoodGrid
    * 
    * @param pDimension
    *          dimension
-   * @param pGridSize
-   *          grid size
+   * @param pGridDimensions
+   *          grid dimensions
    * @param pStride
    *          precomputed strides
    * @param pPositions
@@ -821,7 +831,7 @@ public class NeighborhoodGrid
    * @return cell index
    */
   private static final int getCellIndexForParticle(int pDimension,
-                                                   int pGridSize,
+                                                   int[] pGridDimensions,
                                                    int[] pStride,
                                                    final float[] pPositions,
                                                    int pParticleId)
@@ -831,7 +841,7 @@ public class NeighborhoodGrid
     for (int d = 0; d < pDimension; d++)
     {
       int lComponent = (int) getCellCoordForParticle(pDimension,
-                                                     pGridSize,
+                                                     pGridDimensions,
                                                      pPositions,
                                                      pParticleId,
                                                      d);
@@ -869,8 +879,8 @@ public class NeighborhoodGrid
   /**
    * @param pDimension
    *          dimesion
-   * @param pGridSize
-   *          grid size
+   * @param pGridDimensions
+   *          grid dimensions
    * @param pStride
    *          precomputd strides
    * @param pMaxParticlesPerGridCell
@@ -880,7 +890,7 @@ public class NeighborhoodGrid
    * @return
    */
   private static final int getCellIndexAtPoint(int pDimension,
-                                               int pGridSize,
+                                               int[] pGridDimensions,
                                                int[] pStride,
                                                int pMaxParticlesPerGridCell,
                                                final float[] pCellCoordinate)
@@ -890,7 +900,7 @@ public class NeighborhoodGrid
     for (int d = 0; d < pDimension; d++)
     {
       lIndex += pStride[d]
-                * (int) (getParticleCoordinateInCell(pGridSize,
+                * (int) (getParticleCoordinateInCell(pGridDimensions,
                                                      d,
                                                      pCellCoordinate[d]));
     }

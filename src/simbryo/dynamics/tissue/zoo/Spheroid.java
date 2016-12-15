@@ -28,10 +28,14 @@ public class Spheroid extends TissueDynamics
 
   /**
    * Creates a 'Spheroid'.
+
+   * @param pMaxNumberOfParticlesPerGridCell
+   * @param pGridDimensions
    */
-  public Spheroid()
+  public Spheroid(int pMaxNumberOfParticlesPerGridCell,
+                  int... pGridDimensions)
   {
-    super(Fc, D);
+    super(Fc, D, pMaxNumberOfParticlesPerGridCell, pGridDimensions);
 
     for (int i = 0; i < 1; i++)
     {

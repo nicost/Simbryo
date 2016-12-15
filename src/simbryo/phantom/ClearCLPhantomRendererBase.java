@@ -21,6 +21,8 @@ public abstract class ClearCLPhantomRendererBase extends PhantomRendererBase
 
   protected ClearCLKernel mRenderKernel;
 
+  private long mLocalSizeX,mLocalSizeY,mLocalSizeZ;
+
   public ClearCLPhantomRendererBase(ClearCLDevice pDevice,
                              TissueDynamics pEmbryo,
                              long... pStackDimensions) throws IOException
@@ -33,6 +35,17 @@ public abstract class ClearCLPhantomRendererBase extends PhantomRendererBase
     mImage = mContext.createImage(ImageChannelOrder.R,
                                   ImageChannelDataType.Float,
                                   mStackDimensions);
+    
+    int[] lGridDimensions = pEmbryo.getGridDimensions();
+    
+    mLocalSizeX = mStackDimensions[0]/lGridDimensions[0];
+    mLocalSizeY = mStackDimensions[1]/lGridDimensions[1];
+    mLocalSizeZ = mStackDimensions[2]/lGridDimensions[2];
+    
+    mStackDimensions[0] = mLocalSizeX*lGridDimensions[0];
+    mStackDimensions[1] = mLocalSizeY*lGridDimensions[1];
+    mStackDimensions[2] = mLocalSizeZ*lGridDimensions[2];
+    
     mImage.fillZero(true);
   }
 
@@ -48,8 +61,10 @@ public abstract class ClearCLPhantomRendererBase extends PhantomRendererBase
   {
     if (!mPlaneAlreadyDrawnTable[pZPlaneIndex])
     {
+      System.out.println("render slice");
       mRenderKernel.setGlobalOffsets(0, 0, pZPlaneIndex);
       mRenderKernel.setGlobalSizes(getWidth(), getHeight(), 1);
+      mRenderKernel.setLocalSizes(mLocalSizeX, mLocalSizeY, mLocalSizeZ);
       mRenderKernel.run(true);
       mImage.notifyListenersOfChange(mContext.getDefaultQueue());
     }
@@ -60,8 +75,9 @@ public abstract class ClearCLPhantomRendererBase extends PhantomRendererBase
   @Override
   public void render(int pZPlaneIndexBegin, int pZPlaneIndexEnd)
   {
+    System.out.println("render block");
     mRenderKernel.setGlobalOffsets(0, 0, pZPlaneIndexBegin);
-    //mRenderKernel.setLocalSizes(...);
+    mRenderKernel.setLocalSizes(mLocalSizeX, mLocalSizeY, mLocalSizeZ);
     mRenderKernel.setGlobalSizes(getWidth(),
                                  getHeight(),
                                  pZPlaneIndexEnd - pZPlaneIndexBegin);

@@ -85,12 +85,12 @@ dependencies
 {
 
     // CoreMem:
-    compile ('net.coremem:CoreMem:[0.3.2,)'){transitive= true; changing= true}
+    compile ('net.coremem:CoreMem:[0.3.2,)')          {transitive= true; changing= true}
 
     // Clear*:
     compile ('net.clearvolume:clearvolume:[1.2.0,)')  {transitive= true; changing= true}
     compile ('net.clearvolume:cleargl:[1.0.16,)')     {transitive= true; changing= true}
-    compile ('net.clearvolume:clearcl:[0.3.5,)')      {transitive= true; changing= true}
+    compile ('net.clearvolume:clearcl:[0.3.20,)')     {transitive= true; changing= true}
     compile ('net.clearvolume:clearaudio:[1.0.0,)')   {transitive= true; changing= true}
 
     // JUnit:
