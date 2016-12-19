@@ -6,13 +6,17 @@ import simbryo.dynamics.tissue.TissueDynamics;
 
 public abstract class PhantomRendererBase implements PhantomRendererInterface
 {
-  protected TissueDynamics mEmbryo;
+  protected TissueDynamics mTissue;
   protected long[] mStackDimensions;
   protected boolean[] mPlaneAlreadyDrawnTable;
+  
+  private float mIntensity = 1;
 
-  public PhantomRendererBase(TissueDynamics pEmbryo, long... pStackDimensions)
+  
+
+  public PhantomRendererBase(TissueDynamics pTissue, long... pStackDimensions)
   {
-    mEmbryo = pEmbryo;
+    mTissue = pTissue;
     mStackDimensions = pStackDimensions;
     mPlaneAlreadyDrawnTable =
                             new boolean[Math.toIntExact(getDepth())];
@@ -86,6 +90,18 @@ public abstract class PhantomRendererBase implements PhantomRendererInterface
   public void clear()
   {
     Arrays.fill(mPlaneAlreadyDrawnTable, false);
+  }
+
+  @Override
+  public float getIntensity()
+  {
+    return mIntensity;
+  }
+
+  @Override
+  public void setIntensity(float pIntensity)
+  {
+    mIntensity = pIntensity;
   }
 
 }

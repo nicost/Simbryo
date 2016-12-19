@@ -10,6 +10,7 @@ import clearcl.ClearCLDevice;
 import clearcl.backend.ClearCLBackendInterface;
 import clearcl.backend.ClearCLBackends;
 import clearcl.util.ElapsedTime;
+import clearcl.viewer.ClearCLImageViewer;
 import simbryo.dynamics.tissue.zoo.Drosophila;
 import simbryo.phantom.ClearCLPhantomRendererUtils;
 import simbryo.phantom.fluo.HistoneFluorescence;
@@ -47,9 +48,9 @@ public class HistoneFluoDemo
       Drosophila lDrosophila = new Drosophila(16, lGridDimensions);
 
       System.out.println("grid size:"
-                         + lDrosophila.getGridDimensions());
-      lDrosophila.open3DViewer();
-      lDrosophila.getViewer().setDisplayRadius(false);
+                         + Arrays.toString(lDrosophila.getGridDimensions()));
+      // lDrosophila.open3DViewer();
+      // lDrosophila.getViewer().setDisplayRadius(false);
 
       HistoneFluorescence lHistoneFluo =
                                        new HistoneFluorescence(lFastestGPUDevice,
@@ -58,19 +59,24 @@ public class HistoneFluoDemo
                                                                lHeight,
                                                                lDepth);
 
-      lHistoneFluo.openViewer();
+      ClearCLImageViewer lOpenViewer = lHistoneFluo.openViewer();
 
       Timming lTimming = new Timming();
 
       int i = 0;
-      while (lDrosophila.getViewer().isShowing())
+      while (lOpenViewer.isShowing())
       {
+        System.out.println("i=" + i);
         lTimming.syncAtPeriod(1);
-        lDrosophila.simulationSteps(1, 1);
 
-        if (i % 10 == 0)
+        ElapsedTime.measure(i % 10 == 0,
+                            "dynamics",
+                            () -> lDrosophila.simulationSteps(1, 1));
+
+        if (i % 5 == 0)
         {
-          System.out.format("avg part per cell : %g \n",
+
+          /*System.out.format("avg part per cell : %g \n",
                             lDrosophila.getNeighborhoodGrid()
                                        .getAverageNumberOfParticlesPerGridCell());
           System.out.format("max part per cell : %d \n",
@@ -78,9 +84,10 @@ public class HistoneFluoDemo
                                        .getMaximalEffectiveNumberOfParticlesPerGridCell());
           System.out.format("occupancy : %g \n",
                             lDrosophila.getNeighborhoodGrid()
-                                       .getAverageCellOccupancy());
+                                       .getAverageCellOccupancy());/**/
           lHistoneFluo.clear();
           lHistoneFluo.renderSmart(0, (int) lHistoneFluo.getDepth());
+          // Thread.sleep(5000);
         }
 
         // int z = (int) (i%100);
@@ -97,7 +104,7 @@ public class HistoneFluoDemo
         i++;
       }
 
-      lDrosophila.getViewer().waitWhileShowing();
+      // lDrosophila.getViewer().waitWhileShowing();
 
     }
 

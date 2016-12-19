@@ -7,12 +7,14 @@ import clearcl.ClearCLDevice;
 import clearcl.ClearCLProgram;
 import clearcl.enums.HostAccessType;
 import clearcl.enums.KernelAccessType;
+import clearcl.util.ElapsedTime;
 import coremem.enums.NativeTypeEnum;
 import coremem.offheap.OffHeapMemory;
 import coremem.util.Size;
 import simbryo.dynamics.tissue.TissueDynamics;
 import simbryo.phantom.ClearCLPhantomRendererBase;
 import simbryo.phantom.PhantomRendererInterface;
+import simbryo.util.timing.Timming;
 
 public class HistoneFluorescence extends ClearCLPhantomRendererBase
                                  implements PhantomRendererInterface
@@ -41,7 +43,7 @@ public class HistoneFluorescence extends ClearCLPhantomRendererBase
 
     mRenderKernel = lProgram.createKernel("gaussrender");
 
-    final int lDimension = mEmbryo.getDimension();
+    final int lDimension = mTissue.getDimension();
 
     final int lNeighboorsArrayLength = pEmbryo.getNeighborhoodGrid()
                                               .getVolume()
@@ -78,43 +80,53 @@ public class HistoneFluorescence extends ClearCLPhantomRendererBase
     mRenderKernel.setArgument("neighboors", mNeighboorsBuffer);
     mRenderKernel.setArgument("positions", mPositionsBuffer);
     mRenderKernel.setArgument("radii", mRadiiBuffer);
-    //mRenderKernel.setLocalMemoryArgument("localneighboorsP", NativeTypeEnum.Int, lMaxParticlesPerGridCell);
+    // mRenderKernel.setLocalMemoryArgument("localneighboorsP",
+    // NativeTypeEnum.Int, lMaxParticlesPerGridCell);
 
   }
 
   private void updateBuffers()
   {
-    final int lDimension = mEmbryo.getDimension();
-    final int lNumberOfCells = mEmbryo.getMaxNumberOfParticles();
+    final int lDimension = mTissue.getDimension();
+    final int lNumberOfCells = mTissue.getMaxNumberOfParticles();
     final int lMaximalNumberOfNeighboorsPerCell =
-                                                mEmbryo.getMaxNumberOfParticlesPerGridCell();
-    final int lGridVolume = mEmbryo.getNeighborhoodGrid().getVolume();
+                                                mTissue.getMaxNumberOfParticlesPerGridCell();
+    final int lGridVolume = mTissue.getNeighborhoodGrid().getVolume();
 
-    mNeighboorsMemory.copyFrom(mEmbryo.getNeighborhoodGrid()
+    ElapsedTime.measure("data copy", ()->{
+    
+    mNeighboorsMemory.copyFrom(mTissue.getNeighborhoodGrid()
                                       .getArray());
 
-    mRadiiMemory.copyFrom(mEmbryo.getRadii().getCurrentArray(),
+    mRadiiMemory.copyFrom(mTissue.getRadii().getCurrentArray(),
                           0,
                           0,
                           lNumberOfCells);
 
-    mPositionsMemory.copyFrom(mEmbryo.getPositions()
+    mPositionsMemory.copyFrom(mTissue.getPositions()
                                      .getCurrentArray(),
                               0,
                               0,
                               lDimension * lNumberOfCells);
 
-    mNeighboorsBuffer.readFrom(mNeighboorsMemory,
-                               0,
-                               lGridVolume
-                                  * lMaximalNumberOfNeighboorsPerCell,
-                               false);
+    mNeighboorsBuffer.readFrom(mNeighboorsMemory, false);
 
-    mPositionsBuffer.readFrom(mPositionsMemory,
+    mRadiiBuffer.readFrom(mRadiiMemory.subRegion(0,
+                                                 lNumberOfCells
+                                                    * Size.FLOAT),
+                          0,
+                          lNumberOfCells,
+                          false);
+
+    mPositionsBuffer.readFrom(mPositionsMemory.subRegion(0,
+                                                         lNumberOfCells
+                                                            * 3
+                                                            * Size.FLOAT),
                               0,
                               lDimension * lNumberOfCells,
-                              false);
-    mRadiiBuffer.readFrom(mRadiiMemory, 0, lNumberOfCells, true);
+                              true);
+    });
+
   }
 
   @Override
@@ -127,14 +139,13 @@ public class HistoneFluorescence extends ClearCLPhantomRendererBase
   @Override
   public boolean render(int pZPlaneIndex)
   {
-    mRenderKernel.setArgument("num", mEmbryo.getNumberOfParticles());
+    mRenderKernel.setArgument("num", mTissue.getNumberOfParticles());
     return super.render(pZPlaneIndex);
   }
 
   @Override
   public void render(int pZPlaneIndexBegin, int pZPlaneIndexEnd)
   {
-    mRenderKernel.setArgument("num", mEmbryo.getNumberOfParticles());
     super.render(pZPlaneIndexBegin, pZPlaneIndexEnd);
   }
 

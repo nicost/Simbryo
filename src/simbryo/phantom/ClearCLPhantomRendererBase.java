@@ -11,8 +11,10 @@ import clearcl.enums.ImageChannelOrder;
 import clearcl.viewer.ClearCLImageViewer;
 import simbryo.dynamics.tissue.TissueDynamics;
 
-public abstract class ClearCLPhantomRendererBase extends PhantomRendererBase
-                                          implements PhantomRendererInterface
+public abstract class ClearCLPhantomRendererBase extends
+                                                 PhantomRendererBase
+                                                 implements
+                                                 PhantomRendererInterface
 {
 
   protected ClearCLContext mContext;
@@ -21,11 +23,11 @@ public abstract class ClearCLPhantomRendererBase extends PhantomRendererBase
 
   protected ClearCLKernel mRenderKernel;
 
-  private long mLocalSizeX,mLocalSizeY,mLocalSizeZ;
+  private long mLocalSizeX, mLocalSizeY, mLocalSizeZ;
 
   public ClearCLPhantomRendererBase(ClearCLDevice pDevice,
-                             TissueDynamics pEmbryo,
-                             long... pStackDimensions) throws IOException
+                                    TissueDynamics pEmbryo,
+                                    long... pStackDimensions) throws IOException
   {
     super(pEmbryo, pStackDimensions);
     mStackDimensions = pStackDimensions;
@@ -35,17 +37,17 @@ public abstract class ClearCLPhantomRendererBase extends PhantomRendererBase
     mImage = mContext.createImage(ImageChannelOrder.R,
                                   ImageChannelDataType.Float,
                                   mStackDimensions);
-    
+
     int[] lGridDimensions = pEmbryo.getGridDimensions();
-    
-    mLocalSizeX = mStackDimensions[0]/lGridDimensions[0];
-    mLocalSizeY = mStackDimensions[1]/lGridDimensions[1];
-    mLocalSizeZ = mStackDimensions[2]/lGridDimensions[2];
-    
-    mStackDimensions[0] = mLocalSizeX*lGridDimensions[0];
-    mStackDimensions[1] = mLocalSizeY*lGridDimensions[1];
-    mStackDimensions[2] = mLocalSizeZ*lGridDimensions[2];
-    
+
+    mLocalSizeX = mStackDimensions[0] / lGridDimensions[0];
+    mLocalSizeY = mStackDimensions[1] / lGridDimensions[1];
+    mLocalSizeZ = mStackDimensions[2] / lGridDimensions[2];
+
+    mStackDimensions[0] = mLocalSizeX * lGridDimensions[0];
+    mStackDimensions[1] = mLocalSizeY * lGridDimensions[1];
+    mStackDimensions[2] = mLocalSizeZ * lGridDimensions[2];
+
     mImage.fillZero(true);
   }
 
@@ -62,11 +64,7 @@ public abstract class ClearCLPhantomRendererBase extends PhantomRendererBase
     if (!mPlaneAlreadyDrawnTable[pZPlaneIndex])
     {
       System.out.println("render slice");
-      mRenderKernel.setGlobalOffsets(0, 0, pZPlaneIndex);
-      mRenderKernel.setGlobalSizes(getWidth(), getHeight(), 1);
-      mRenderKernel.setLocalSizes(mLocalSizeX, mLocalSizeY, mLocalSizeZ);
-      mRenderKernel.run(true);
-      mImage.notifyListenersOfChange(mContext.getDefaultQueue());
+      renderInternal(pZPlaneIndex, pZPlaneIndex + 1);
     }
 
     return super.render(pZPlaneIndex);
@@ -75,13 +73,32 @@ public abstract class ClearCLPhantomRendererBase extends PhantomRendererBase
   @Override
   public void render(int pZPlaneIndexBegin, int pZPlaneIndexEnd)
   {
-    System.out.println("render block");
+    pZPlaneIndexBegin =
+                      (int) (Math.floor(pZPlaneIndexBegin
+                                        / mLocalSizeZ)
+                             * mLocalSizeZ);
+    pZPlaneIndexEnd = (int) (Math.ceil(pZPlaneIndexEnd / mLocalSizeZ)
+                             * mLocalSizeZ);
+
+    renderInternal(pZPlaneIndexBegin, pZPlaneIndexEnd);
+  }
+
+  private void renderInternal(int pZPlaneIndexBegin,
+                              int pZPlaneIndexEnd)
+  {
     mRenderKernel.setGlobalOffsets(0, 0, pZPlaneIndexBegin);
-    mRenderKernel.setLocalSizes(mLocalSizeX, mLocalSizeY, mLocalSizeZ);
     mRenderKernel.setGlobalSizes(getWidth(),
                                  getHeight(),
                                  pZPlaneIndexEnd - pZPlaneIndexBegin);
+    mRenderKernel.setLocalSizes(mLocalSizeX,
+                                mLocalSizeY,
+                                mLocalSizeZ);
+    mRenderKernel.setOptionalArgument("intensity", getIntensity());
+    mRenderKernel.setOptionalArgument("timeindex",
+                                      mTissue.getTimeStepIndex());
     mRenderKernel.run(true);
+    for (int z = pZPlaneIndexBegin; z < pZPlaneIndexEnd; z++)
+      mPlaneAlreadyDrawnTable[z] = true;
     mImage.notifyListenersOfChange(mContext.getDefaultQueue());
   }
 
