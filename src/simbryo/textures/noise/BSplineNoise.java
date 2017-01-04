@@ -25,12 +25,11 @@ import simbryo.textures.TextureGeneratorInterface;
 public class BSplineNoise extends TextureGeneratorBase
                           implements TextureGeneratorInterface
 {
-  private static final float mMasterScale = 3f;
+  private static final float mCorrectionScale = 3f;
   private static final long BITS = 62;
   private static final long BIT_MASK = (1L << BITS) - 1L;
   private static final double NORMALIZER = 1. / (1L << (BITS - 1));
-  
-  
+
   private long mSeed;
 
   /**
@@ -54,34 +53,34 @@ public class BSplineNoise extends TextureGeneratorBase
   {
     if (getDimension() == 1)
     {
-      float lValue = (float) cubic(pCoordinate[0] * mMasterScale
+      float lValue = (float) cubic(pCoordinate[0] * mCorrectionScale
                                    * getScale(0),
                                    0);
       return lValue;
     }
     else if (getDimension() == 2)
     {
-      float lValue = (float) cubic(pCoordinate[0] * mMasterScale
+      float lValue = (float) cubic(pCoordinate[0] * mCorrectionScale
                                    * getScale(0),
-                                   pCoordinate[1] * mMasterScale
+                                   pCoordinate[1] * mCorrectionScale
                                                   * getScale(1));
       return lValue;
     }
     else if (getDimension() == 3)
     {
       float lValue = (float) (cubic(pCoordinate[0]
-                                    * mMasterScale
+                                    * mCorrectionScale
                                     * getScale(0),
-                                    pCoordinate[1] * mMasterScale
+                                    pCoordinate[1] * mCorrectionScale
                                                    * getScale(1))
-                              + cubic(pCoordinate[1] * mMasterScale
+                              + cubic(pCoordinate[1] * mCorrectionScale
                                       * getScale(1),
-                                      pCoordinate[2] * mMasterScale
+                                      pCoordinate[2] * mCorrectionScale
                                                      * getScale(2))
-                              + cubic(pCoordinate[0] * mMasterScale
+                              + cubic(pCoordinate[2] * mCorrectionScale
                                       * getScale(0),
-                                      pCoordinate[2] * mMasterScale
-                                                     * getScale(2)));
+                                      pCoordinate[0] * mCorrectionScale
+                                                     * getScale(3)));
       return lValue;
     }
 

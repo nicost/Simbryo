@@ -11,10 +11,17 @@ import clearcl.enums.ImageChannelOrder;
 import clearcl.viewer.ClearCLImageViewer;
 import simbryo.dynamics.tissue.TissueDynamics;
 
+/**
+ * Base class providing common fields and methods for all classes implementing
+ * the phantom renderer interface using OpenCL rendering. 
+ *
+ * @author royer
+ */
 public abstract class ClearCLPhantomRendererBase extends
                                                  PhantomRendererBase
                                                  implements
-                                                 PhantomRendererInterface
+                                                 PhantomRendererInterface,
+                                                 AutoCloseable
 {
 
   protected ClearCLContext mContext;
@@ -25,11 +32,19 @@ public abstract class ClearCLPhantomRendererBase extends
 
   private long mLocalSizeX, mLocalSizeY, mLocalSizeZ;
 
+  /**
+   * Instantiates a Phantom renderer for a given OpenCL device, tissue dynamics, and stack
+   * dimensions.
+   * 
+   * @param pDevice OpenCL device to use.
+   * @param pTissueDynamics tissue dynamics object
+   * @param pStackDimensions stack dimensions
+   */
   public ClearCLPhantomRendererBase(ClearCLDevice pDevice,
-                                    TissueDynamics pEmbryo,
-                                    long... pStackDimensions) throws IOException
+                                    TissueDynamics pTissueDynamics,
+                                    long... pStackDimensions)
   {
-    super(pEmbryo, pStackDimensions);
+    super(pTissueDynamics, pStackDimensions);
     mStackDimensions = pStackDimensions;
 
     mContext = pDevice.createContext();
@@ -38,7 +53,7 @@ public abstract class ClearCLPhantomRendererBase extends
                                   ImageChannelDataType.Float,
                                   mStackDimensions);
 
-    int[] lGridDimensions = pEmbryo.getGridDimensions();
+    int[] lGridDimensions = pTissueDynamics.getGridDimensions();
 
     mLocalSizeX = mStackDimensions[0] / lGridDimensions[0];
     mLocalSizeY = mStackDimensions[1] / lGridDimensions[1];
@@ -73,6 +88,7 @@ public abstract class ClearCLPhantomRendererBase extends
   @Override
   public void render(int pZPlaneIndexBegin, int pZPlaneIndexEnd)
   {
+    // First we snap the rendering z bounds to the grid cell boundaries:
     pZPlaneIndexBegin =
                       (int) (Math.floor(pZPlaneIndexBegin
                                         / mLocalSizeZ)
@@ -80,9 +96,10 @@ public abstract class ClearCLPhantomRendererBase extends
     pZPlaneIndexEnd = (int) (Math.ceil(pZPlaneIndexEnd / mLocalSizeZ)
                              * mLocalSizeZ);
 
+    // Now we can render a possibly slightly larger chunck of the stack:
     renderInternal(pZPlaneIndexBegin, pZPlaneIndexEnd);
   }
-
+  
   private void renderInternal(int pZPlaneIndexBegin,
                               int pZPlaneIndexEnd)
   {
@@ -93,10 +110,12 @@ public abstract class ClearCLPhantomRendererBase extends
     mRenderKernel.setLocalSizes(mLocalSizeX,
                                 mLocalSizeY,
                                 mLocalSizeZ);
-    mRenderKernel.setOptionalArgument("intensity", getIntensity());
+    mRenderKernel.setOptionalArgument("intensity", getSignalIntensity());
     mRenderKernel.setOptionalArgument("timeindex",
                                       mTissue.getTimeStepIndex());
+    System.out.println("before mRenderKernel.run(true);");
     mRenderKernel.run(true);
+    System.out.println("after mRenderKernel.run(true);");
     for (int z = pZPlaneIndexBegin; z < pZPlaneIndexEnd; z++)
       mPlaneAlreadyDrawnTable[z] = true;
     mImage.notifyListenersOfChange(mContext.getDefaultQueue());
@@ -106,6 +125,11 @@ public abstract class ClearCLPhantomRendererBase extends
   {
     ClearCLImageViewer lViewImage = ClearCLImageViewer.view(mImage);
     return lViewImage;
+  }
+  
+  public void close()
+  {
+    mImage.close();
   }
 
 }

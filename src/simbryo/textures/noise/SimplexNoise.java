@@ -76,6 +76,9 @@ public class SimplexNoise extends TextureGeneratorBase
   @Override
   public float sampleTexture(int... pCoordinate)
   {
+    if(getDimension()!=pCoordinate.length)
+      throw new IllegalArgumentException("Incompatible dimensions!");
+    
     if (getDimension() == 1)
     {
       float lValue = (float) noise(pCoordinate[0] * getScale(0), 0);
@@ -90,8 +93,8 @@ public class SimplexNoise extends TextureGeneratorBase
     else if (getDimension() == 3)
     {
       float lValue = (float) noise(pCoordinate[0] * getScale(0),
-                                   pCoordinate[1] * getScale(1),
-                                   pCoordinate[2] * getScale(2));
+                                   pCoordinate[2] * getScale(2),
+                                   pCoordinate[1] * getScale(1)) ;
       return lValue;
     }
 

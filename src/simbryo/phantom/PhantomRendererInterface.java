@@ -59,17 +59,31 @@ public interface PhantomRendererInterface
   void invalidate(int pZPlaneIndex);
 
   /**
-   * Return intensity
+   * Return phantom signal intensity
    * 
    * @return
    */
-  float getIntensity();
+  float getSignalIntensity();
 
   /**
-   * Sets the phantom intensity
+   * Sets the phantom signal intensity
    * 
-   * @param pIntensity
+   * @param pSignalIntensity
    */
-  void setIntensity(float pIntensity);
+  void setSignalIntensity(float pSignalIntensity);
+
+  /**
+   * Return phantom noise intensity
+   * 
+   * @return
+   */
+  float getNoiseOverSignalRatio();
+
+  /**
+   * Sets the phantom noise intensity
+   * 
+   * @param pNoiseIntensity
+   */
+  void setNoiseOverSignalRatio(float pNoiseIntensity);
 
 }

@@ -10,6 +10,9 @@ import simbryo.phantom.PhantomRendererBase;
 public class RendererBaseTests
 {
 
+  /**
+   * Basic test checking the smart cache-aware rendering.
+   */
   @Test
   public void testSmartness()
   {

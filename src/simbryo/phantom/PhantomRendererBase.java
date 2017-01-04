@@ -4,17 +4,30 @@ import java.util.Arrays;
 
 import simbryo.dynamics.tissue.TissueDynamics;
 
-public abstract class PhantomRendererBase implements PhantomRendererInterface
+/**
+ * Base class providing common fields and methods for all classes implementing
+ * the phantom renderer interface
+ *
+ * @author royer
+ */
+public abstract class PhantomRendererBase implements
+                                          PhantomRendererInterface
 {
   protected TissueDynamics mTissue;
   protected long[] mStackDimensions;
   protected boolean[] mPlaneAlreadyDrawnTable;
-  
-  private float mIntensity = 1;
 
-  
+  private float mSignalIntensity = 1, mNoiseOverSignalRatio = 0f;
 
-  public PhantomRendererBase(TissueDynamics pTissue, long... pStackDimensions)
+  /**
+   * Instantiates a Phantom renderer for a given tissue dynamics and stack
+   * dimensions.
+   * 
+   * @param pTissue tissue dynamics
+   * @param pStackDimensions stack dimensions
+   */
+  public PhantomRendererBase(TissueDynamics pTissue,
+                             long... pStackDimensions)
   {
     mTissue = pTissue;
     mStackDimensions = pStackDimensions;
@@ -82,7 +95,7 @@ public abstract class PhantomRendererBase implements PhantomRendererInterface
       }
       zi = zj;
     }
-    
+
     return lCounter;
   }
 
@@ -93,15 +106,27 @@ public abstract class PhantomRendererBase implements PhantomRendererInterface
   }
 
   @Override
-  public float getIntensity()
+  public float getSignalIntensity()
   {
-    return mIntensity;
+    return mSignalIntensity;
   }
 
   @Override
-  public void setIntensity(float pIntensity)
+  public void setSignalIntensity(float pSignalIntensity)
   {
-    mIntensity = pIntensity;
+    mSignalIntensity = pSignalIntensity;
+  }
+
+  @Override
+  public float getNoiseOverSignalRatio()
+  {
+    return mNoiseOverSignalRatio;
+  }
+
+  @Override
+  public void setNoiseOverSignalRatio(float pNoiseOverSignalRatio)
+  {
+    mNoiseOverSignalRatio = pNoiseOverSignalRatio;
   }
 
 }

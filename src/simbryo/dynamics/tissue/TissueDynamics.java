@@ -31,7 +31,7 @@ public class TissueDynamics extends ParticleSystem
   protected static final float Fg = 0.000001f;
 
   protected static final float Ar = 0.05f;
-  protected static final float Fb = 0.0001f;
+  protected static final float Fb = 0.00001f;
 
   private final DoubleBufferingFloatArray mTargetRadii;
 

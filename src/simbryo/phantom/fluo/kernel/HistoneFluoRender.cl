@@ -1,36 +1,23 @@
 #pragma OPENCL EXTENSION cl_khr_3d_image_writes : enable
 
 
-// Wang Hash based RNG
-//  Has at least 20 separate cycles, shortest cycle is < 7500 long.  
-//  But it yields random looking 2D noise when fed OpenCL work item IDs, 
-//  and that short cycle should only be hit for one work item in about 500K.
-unsigned int parallelRNG( unsigned int x )
-{
-  unsigned int value = x;
+#include [OCLlib] "noise/noise.cl"
 
-  value = (value ^ 61) ^ (value>>16);
-  value *= 9;
-  value ^= value << 4;
-  value *= 0x27d4eb2d;
-  value ^= value >> 15;
-
-  return value;
-}
-
-
-
-__kernel void gaussrender( __write_only    image3d_t image,
-                           __global const  int*      neighboors,
-                           __global const  float*    positions, //
-                           __global const  float*    radii,
-                                           float     intensity,
-                                           int       timeindex            
+                                    
+__kernel void hisrender(   __write_only    image3d_t  image,
+                           __global const  int*       neighboors,
+                           __global const  float*     positions, //
+                           __global const  float*     radii,
+                                    const  float      intensity,
+                                    const  int        timeindex,
+                           __read_only     image3d_t  perlin                            
                           )
 {
+  const sampler_t sampler = CLK_NORMALIZED_COORDS_TRUE | CLK_ADDRESS_MIRRORED_REPEAT | CLK_FILTER_NEAREST;
+ 
+
   __local int localneighboors[MAXNEI];
   __local float localpositions[3*MAXNEI];
-  __local float localradii[3*MAXNEI];
   
   const uint width  = get_image_width(image);
   const uint height = get_image_height(image);
@@ -66,12 +53,6 @@ __kernel void gaussrender( __write_only    image3d_t image,
   const uint gi = gx+gy*ngx+gz*ngx*ngy;
   const uint li = lx+ly*lsx+lz*lsx*lsy;
   
-  if(x==256 && y==256 && z==64)
-  {
-    printf("gx=%d, gy=%d, gz=%d \n", gx, gy, gz);
-    printf("lx=%d, ly=%d, lz=%d \n", lx, ly, lz);
-  }
-  
   if(li<MAXNEI)
   {
     const int nei = neighboors[gi*MAXNEI+li];
@@ -81,8 +62,6 @@ __kernel void gaussrender( __write_only    image3d_t image,
     {
       const float3 partpos = vload3(nei,positions)*dim;
       vstore3(partpos,li,localpositions);
-      const float radius = radii[nei];
-      localradii[li] = radius; 
     }
     
   }
@@ -91,20 +70,38 @@ __kernel void gaussrender( __write_only    image3d_t image,
  
   float value=0; 
   
+  value += NOISERATIO*rngfloat3(x+timeindex,y+timeindex,z+timeindex);    
+  
   if(localneighboors[0]!=-1)
+  {
+    const float invnoisedim = 1.0f/NOISEDIM;
+    const float nucleiradiusvoxels = NUCLEIRADIUS*width ;
+    
     for(int k=0; k<MAXNEI; k++)
-      if(localneighboors[k]!=-1)
+    {
+      const uint nei = localneighboors[k]; 
+      if(nei!=-1)
       {
         const float3 partpos = vload3(k,localpositions);
-        const float d = fast_distance(voxelpos,partpos);
-        const float radius = localradii[k];
-        const float sigma = 0.33f*radius*width ;
+        const float3 relvoxpos  = voxelpos-partpos;
         
-        value += 1000.0f*native_exp(-(d*d)/(2.0f*sigma*sigma));
+        const int npnx = (int) rnguint1((2654435789*1)^nei) & (NOISEDIM-1);
+        const int npny = (int) rnguint1((2654435789*2)^nei) & (NOISEDIM-1);
+        const int npnz = (int) rnguint1((2654435789*3)^nei) & (NOISEDIM-1);
+        
+        const float4 noisepos   =   ((float4){relvoxpos+(float3){npnx, npny, npnz},0}-NOISEDIM/2)*invnoisedim;
+        const float  levelnoise =   read_imagef(perlin, sampler, noisepos).x;
+        
+        const float d = fast_length(relvoxpos); 
+        const float noisyd = d + NUCLEIROUGHNESS*(2*levelnoise-1);
+        
+        const float  level      =  1/(1+native_exp(NUCLEISHARPNESS*(noisyd-nucleiradiusvoxels)));
+        const float  noisylevel =  levelnoise*level;
+         
+        value += noisylevel;
       }
-      
-  value += 0.00000001f*parallelRNG(x+17*z+997*timeindex); //y+293*    
-  value += 0.0000000001f*parallelRNG(y+997*timeindex);
+    }
+  }
        
   write_imagef (image, (int4){x,y,z,0}, intensity*value);
 

@@ -39,7 +39,7 @@ public interface TextureGeneratorInterface
    * 
    * @param pScale
    */
-  void setScales(float pScale);
+  void setAllScales(float pScale);
 
   /**
    * generates texture as an array of floats.

@@ -12,41 +12,61 @@ import simbryo.textures.TextureGeneratorInterface;
 public class FractalNoise extends TextureGeneratorBase
                           implements TextureGeneratorInterface
 {
+  private TextureGeneratorInterface mTextureGenerator;
+  private float[] mFractalScales;
 
+  
   private TextureGeneratorInterface[] mTextureGenerators;
-  private float[] mScales;
+
+
 
   /**
    * 
    * @param pTextureGenerator
    *          texture generator to be used for each scale
-   * @param pScales
-   *          scales to use for each 'octave' of noise.
+   * @param pFractalScales
+   *          scales to use for each 'octave' of the fractal noise.
    */
   public FractalNoise(TextureGeneratorInterface pTextureGenerator,
-                      float... pScales)
+                      float... pFractalScales)
   {
     super(pTextureGenerator.getDimension());
-    mScales = pScales;
-    int lNumberOfScales = mScales.length;
+    mTextureGenerator = pTextureGenerator;
+    mFractalScales = pFractalScales;
+
+    int lNumberOfScales = pFractalScales.length;
     mTextureGenerators =
                        new TextureGeneratorInterface[lNumberOfScales];
-    for (int i = 0; i < lNumberOfScales; i++)
-      mTextureGenerators[i] = pTextureGenerator.clone();
-    for (int i = 0; i < lNumberOfScales; i++)
-      mTextureGenerators[i].setScales(mScales[i]);
+    reset();
+  }
+
+  private void reset()
+  {
+    for (int i = 0; i < mFractalScales.length; i++)
+      mTextureGenerators[i] = mTextureGenerator.clone();
+    for (int i = 0; i < mFractalScales.length; i++)
+      for (int d = 0; d < getDimension(); d++)
+        mTextureGenerators[i].setScale(d, getScale(d) * mFractalScales[i]);
   }
 
   @Override
   public TextureGeneratorInterface clone()
   {
-    return new SimplexNoise(getDimension());
+    return new FractalNoise(mTextureGenerator, mFractalScales);
   }
+
+  @Override
+  public void setAllScales(float pScale)
+  {
+    super.setAllScales(pScale);
+    reset();
+  }
+
 
   @Override
   public float sampleTexture(int... pCoordinate)
   {
-    int lNumberOfScales = mScales.length;
+    int lNumberOfScales = mFractalScales.length;
     float lValue = 0;
     for (int i = 0; i < lNumberOfScales; i++)
     {
