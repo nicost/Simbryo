@@ -1,7 +1,9 @@
-package simbryo.dynamics.tissue.zoo;
+package simbryo.dynamics.tissue.embryo.zoo;
 
 import simbryo.dynamics.tissue.TissueDynamics;
+import simbryo.dynamics.tissue.embryo.EmbryoDynamics;
 import simbryo.particles.forcefield.external.impl.IsoSurfaceForceField;
+import simbryo.particles.isosurf.IsoSurfaceInterface;
 import simbryo.particles.isosurf.impl.Sphere;
 
 /**
@@ -9,7 +11,7 @@ import simbryo.particles.isosurf.impl.Sphere;
  *
  * @author royer
  */
-public class Spheroid extends TissueDynamics
+public class Spheroid extends EmbryoDynamics
 {
   protected static final float Fc = 0.0001f;
   protected static final float D = 0.9f;
@@ -28,15 +30,15 @@ public class Spheroid extends TissueDynamics
 
   /**
    * Creates a 'Spheroid'.
-
-   * @param pMaxNumberOfParticlesPerGridCell
+   *
    * @param pGridDimensions
    */
-  public Spheroid(int pMaxNumberOfParticlesPerGridCell,
-                  int... pGridDimensions)
+  public Spheroid(int... pGridDimensions)
   {
-    super(Fc, D, pMaxNumberOfParticlesPerGridCell, pGridDimensions);
+    super(Fc, D, 32, pGridDimensions);
 
+    setSurface(new Sphere(Fradius, 0.5f, 0.5f, 0.5f));
+    
     for (int i = 0; i < 1; i++)
     {
       float x = (float) (0.5f + 0.0001f * (Math.random() - 0.5f));
@@ -50,8 +52,8 @@ public class Spheroid extends TissueDynamics
 
     updateNeighborhoodCells();
 
-    Sphere lSphere = new Sphere(Fradius, 0.5f, 0.5f, 0.5f);
-    mForceField = new IsoSurfaceForceField(Fpetal, lSphere);
+    
+    mForceField = new IsoSurfaceForceField(Fpetal, getSurface());
   }
 
   @Override

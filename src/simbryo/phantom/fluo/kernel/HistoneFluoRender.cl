@@ -1,7 +1,47 @@
 #pragma OPENCL EXTENSION cl_khr_3d_image_writes : enable
 
-
 #include [OCLlib] "noise/noise.cl"
+
+
+#define AUTOSHARPNESS 10.0f
+#define AUTOBACKGROUND 1.0f
+#define AUTOYOLK 0.7f 
+//0.30f
+
+inline float renderauto(float3 dim, float3 voxelpos, sampler_t sampler, __read_only image3d_t  perlin, int timeindex )
+{
+  const float3 normpos = voxelpos/dim;
+  const float3 centnormpos = normpos - 0.5f;
+  const float3 axis = (float3){1.0f, 0.43f, 0.43f};
+  const float3 scaledcentnormpos = centnormpos/axis;
+  const float distance = fast_length(scaledcentnormpos)-(0.48f+2*NUCLEIRADIUS);
+  
+  const float insdistance = fmax(0.0f,-distance);
+  
+  const float insmask = native_recip(1.0f+native_exp2(100.0f*(-insdistance)))-0.5f ;
+
+  const float npnx = rngfloat1((2654435789*1)^timeindex);
+  const float npny = rngfloat1((2654435789*2)^timeindex);
+  const float npnz = rngfloat1((2654435789*3)^timeindex);
+  const float4 npn = (float4){npnx,npny,npnz,0.0f};
+
+  const float4 noisepos       = (float4){5.0f*normpos.x+7.0f*normpos.y-3.0f*normpos.z*npnx,
+                                         5.0f*normpos.y-7.0f*normpos.z+3.0f*normpos.x*npny,
+                                         5.0f*normpos.z+7.0f*normpos.x-3.0f*normpos.y*npnz, 0.0f};
+  const float noiseval        = read_imagef(perlin, sampler, noisepos).x;
+
+  const float autoyolk1       = native_recip(1.0f+native_exp2(100.0f*(0.09f-insdistance)));
+  const float autoyolk2       = native_recip(1.0f+fabs(pown(25.0f*(insdistance-0.15f),3)));
+  const float autoyolk        = autoyolk1+autoyolk2;
+  
+  const float autofluo = insmask * (AUTOBACKGROUND*(1.0f+0.3f*noiseval) + AUTOYOLK*autoyolk);
+
+  return autofluo;
+}
+
+
+
+
 
 #define INOISEDIM 1.0f/NOISEDIM
                                     
@@ -24,8 +64,7 @@ __kernel void hisrender(   __write_only    image3d_t  image,
   const uint height = get_image_height(image);
   const uint depth  = get_image_depth(image);
   const float3 dim = (float3){(float)width,(float)height,(float)depth};
-  const float3 aspectr = dim/width;
-  const float3 iaspectr = 1.0f/aspectr;
+  const float3 iaspectr = (float3){(float)width,(float)width,(float)width}/dim;
   
   const uint x = get_global_id(0); 
   const uint y = get_global_id(1);
@@ -73,6 +112,7 @@ __kernel void hisrender(   __write_only    image3d_t  image,
  
   float value=0; 
  
+  value += renderauto(dim, voxelpos, sampler, perlin, timeindex);
   value += NOISERATIO*rngfloat3(x+timeindex,y+timeindex,z+timeindex);    
   
   if(localneighboors[0]==-1)
@@ -104,7 +144,7 @@ __kernel void hisrender(   __write_only    image3d_t  image,
       const float d      = fast_length(relvoxposac); 
       const float noisyd = d + NUCLEIROUGHNESS*levelnoise;
       
-      const float  level      =  native_powr(1.0f+native_exp(NUCLEISHARPNESS*(noisyd-nucleiradiusvoxels)),-1);
+      const float  level      =  native_recip(1.0f+native_exp2(NUCLEISHARPNESS*(noisyd-nucleiradiusvoxels)));
       const float  noisylevel =  (1.0f+NUCLEITEXTURECONTRAST*levelnoise)*level;
        
       value += noisylevel;

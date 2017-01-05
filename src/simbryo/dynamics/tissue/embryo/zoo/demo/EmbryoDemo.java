@@ -1,10 +1,10 @@
-package simbryo.dynamics.tissue.zoo.demo;
+package simbryo.dynamics.tissue.embryo.zoo.demo;
 
 import org.junit.Test;
 
-import simbryo.dynamics.tissue.zoo.Drosophila;
-import simbryo.dynamics.tissue.zoo.Organoid;
-import simbryo.dynamics.tissue.zoo.Spheroid;
+import simbryo.dynamics.tissue.embryo.zoo.Drosophila;
+import simbryo.dynamics.tissue.embryo.zoo.Organoid;
+import simbryo.dynamics.tissue.embryo.zoo.Spheroid;
 import simbryo.util.timing.Timming;
 
 public class EmbryoDemo
@@ -14,7 +14,7 @@ public class EmbryoDemo
   public void demoOrganoid() throws InterruptedException
   {
 
-    Organoid lOrganoid = new Organoid(32, 16, 16, 16);
+    Organoid lOrganoid = new Organoid(16, 16, 16);
 
     lOrganoid.open3DViewer();
 
@@ -32,7 +32,7 @@ public class EmbryoDemo
   @Test
   public void demoSpheroid() throws InterruptedException
   {
-    Spheroid lSpheroid = new Spheroid(32, 16, 16, 16);
+    Spheroid lSpheroid = new Spheroid(16, 16, 16);
 
     lSpheroid.open3DViewer();
 
@@ -50,7 +50,7 @@ public class EmbryoDemo
   @Test
   public void demoDrosophila() throws InterruptedException
   {
-    Drosophila lDrosophila = new Drosophila(32, 16, 16, 16);
+    Drosophila lDrosophila = new Drosophila(16, 16, 16);
 
     lDrosophila.open3DViewer();
 

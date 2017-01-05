@@ -18,6 +18,8 @@ import coremem.enums.NativeTypeEnum;
 import coremem.offheap.OffHeapMemory;
 import coremem.util.Size;
 import simbryo.dynamics.tissue.TissueDynamics;
+import simbryo.dynamics.tissue.TissueDynamicsInterface;
+import simbryo.dynamics.tissue.embryo.HasSurface;
 import simbryo.phantom.ClearCLPhantomRendererBase;
 import simbryo.phantom.PhantomRendererInterface;
 import simbryo.textures.noise.FractalNoise;
@@ -41,6 +43,8 @@ public class HistoneFluorescence extends ClearCLPhantomRendererBase
 
   private float mNucleiRadius, mNucleiSharpness, mNucleiRoughness,
       mNucleiTextureContrast;
+  
+  private boolean mRenderAutofluorescence;
 
   /**
    * Instantiates a histone fluorescence renderer for a given OpenCL device,
@@ -90,7 +94,7 @@ public class HistoneFluorescence extends ClearCLPhantomRendererBase
    */
 
   public HistoneFluorescence(ClearCLDevice pDevice,
-                             TissueDynamics pTissueDynamics,
+                             TissueDynamicsInterface pTissueDynamics,
                              float pNucleiRadius,
                              float pNucleiSharpness,
                              float pNucleiRoughness,
@@ -105,6 +109,8 @@ public class HistoneFluorescence extends ClearCLPhantomRendererBase
     mNucleiRoughness = pNucleiRoughness;
     mNucleiTextureContrast = pNucleiTextureContrast;
     setNoiseOverSignalRatio(pNoiseOverSignalRatio);
+    
+    mRenderAutofluorescence = pTissueDynamics instanceof HasSurface;
 
     final int lMaxParticlesPerGridCell =
                                        pTissueDynamics.getNeighborhoodGrid()
@@ -125,7 +131,7 @@ public class HistoneFluorescence extends ClearCLPhantomRendererBase
 
   }
 
-  private void setupBuffersAndImages(TissueDynamics pTissueDynamics,
+  private void setupBuffersAndImages(TissueDynamicsInterface pTissueDynamics,
                                      final int lMaxParticlesPerGridCell)
   {
     final int lDimension = mTissue.getDimension();
@@ -163,13 +169,13 @@ public class HistoneFluorescence extends ClearCLPhantomRendererBase
                  OffHeapMemory.allocateFloats(pTissueDynamics.getMaxNumberOfParticles());
   }
 
-  private void setupProgramAndKernel(final int lMaxParticlesPerGridCell) throws IOException
+  private void setupProgramAndKernel(final int pMaxParticlesPerGridCell) throws IOException
   {
     ClearCLProgram lProgram =
                             mContext.createProgram(this.getClass(),
                                                    "kernel/HistoneFluoRender.cl");
 
-    lProgram.addDefine("MAXNEI", lMaxParticlesPerGridCell);
+    lProgram.addDefine("MAXNEI", pMaxParticlesPerGridCell);
     lProgram.addDefine("NOISEDIM", cNoiseDim);
 
     lProgram.addDefine("NOISERATIO", getNoiseOverSignalRatio());
@@ -180,7 +186,7 @@ public class HistoneFluorescence extends ClearCLPhantomRendererBase
                        getNucleiTextureContrast());
 
     lProgram.buildAndLog();
-    System.out.println(lProgram.getSourceCode());
+    //System.out.println(lProgram.getSourceCode());
 
     mRenderKernel = lProgram.createKernel("hisrender");
 
@@ -361,6 +367,7 @@ public class HistoneFluorescence extends ClearCLPhantomRendererBase
     mPositionsBuffer.close();
     mRadiiBuffer.close();
     mPerlinNoiseImage.close();
+    mRenderKernel.close();
   }
 
 }

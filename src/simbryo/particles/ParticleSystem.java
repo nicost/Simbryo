@@ -14,7 +14,7 @@ import simbryo.util.DoubleBufferingFloatArray;
  *
  * @author royer
  */
-public class ParticleSystem
+public class ParticleSystem implements ParticleSystemInterface
 {
   private final int mDimension;
   private final int mMaxNumberOfParticles;
@@ -131,115 +131,78 @@ public class ParticleSystem
                                        pGridDimensions);
   }
 
-  /**
-   * Returns the positions arrays
-   * 
-   * @return positions arrays
-   */
+
+  @Override
   public DoubleBufferingFloatArray getPositions()
   {
     return mPositions;
   }
 
-  /**
-   * Returns the velocities arrays
-   * 
-   * @return velocities arrays
-   */
+
+  @Override
   public DoubleBufferingFloatArray getVelocities()
   {
     return mVelocities;
   }
 
-  /**
-   * Returns the radii arrays
-   * 
-   * @return radii arrays
-   */
+
+  @Override
   public DoubleBufferingFloatArray getRadii()
   {
     return mRadii;
   }
 
-  /**
-   * Returns the internal neighborhood grid object.
-   * 
-   * @return neighborhood grid
-   */
+
+  @Override
   public NeighborhoodGrid getNeighborhoodGrid()
   {
     return mNeighborhood;
   }
 
-  /**
-   * Returns current number of particles.
-   * 
-   * @return number of particles
-   */
+
+  @Override
   public int getNumberOfParticles()
   {
     return mNumberOfParticles;
   }
 
-  /**
-   * Returns max number of particles.
-   * 
-   * @return max number of particles
-   */
+
+  @Override
   public int getMaxNumberOfParticles()
   {
     return mMaxNumberOfParticles;
   }
 
-  /**
-   * Returns the max number of particles per grid cell.
-   * 
-   * @return max number of particles per grid cell.
-   */
+
+  @Override
   public int getMaxNumberOfParticlesPerGridCell()
   {
     return mMaxNumberOfParticlesPerGridCell;
   }
 
-  /**
-   * Returns dimension
-   * 
-   * @return dimension
-   */
+
+  @Override
   public int getDimension()
   {
     return mDimension;
   }
 
-  /**
-   * Returns grid dimensions
-   * 
-   * @return grid dimensions
-   */
+
+  @Override
   public int[] getGridDimensions()
   {
     return getNeighborhoodGrid().getGridDimensions();
   }
 
-  /**
-   * Returns a particle radius.
-   * 
-   * @param pParticleId
-   *          particle id.
-   * @return radius
-   */
+
+  @Override
   public float getRadius(int pParticleId)
   {
     return mRadii.getCurrentArray()[pParticleId];
   }
 
-  /**
-   * Adds a particle to this particle system at a given position. The particle
-   * id is returned.
-   * 
-   * @param pPosition
-   * @return particle id.
-   */
+
+  @Override
   public int addParticle(float... pPosition)
   {
     if (mNumberOfParticles >= mMaxNumberOfParticles)
@@ -262,12 +225,8 @@ public class ParticleSystem
     return lParticleId;
   }
 
-  /**
-   * Removes a particle to this particle system.
-   * 
-   * @param pPosition
-   * @return particle id.
-   */
+
+  @Override
   public void removeParticle(int pParticleId)
   {
     final int lLastParticleId = mNumberOfParticles - 1;
@@ -275,14 +234,8 @@ public class ParticleSystem
     mNumberOfParticles--;
   }
 
-  /**
-   * Copies a source particle parameters to a destination particle parameters.
-   * 
-   * @param pSourceParticleId
-   *          source id
-   * @param pDestinationParticleId
-   *          destination id
-   */
+
+  @Override
   public void copyParticle(int pSourceParticleId,
                            int pDestinationParticleId)
   {
@@ -306,15 +259,8 @@ public class ParticleSystem
     lRadii[pDestinationParticleId] = lRadii[pSourceParticleId];
   }
 
-  /**
-   * Clones a particle and adds some noise to its position.
-   * 
-   * @param pSourceParticleId
-   *          source id
-   * @param pNoiseFactor
-   *          noise factorf
-   * @return new particle id.
-   */
+
+  @Override
   public int cloneParticle(int pSourceParticleId, float pNoiseFactor)
   {
     int lNewParticleId = addParticle();
@@ -325,16 +271,8 @@ public class ParticleSystem
     return lNewParticleId;
   }
 
-  /**
-   * Adds noise to a particle position, velocity, and radius.
-   * 
-   * @param pParticleId
-   *          particle id
-   * @param pPositionNoise
-   *          position noise
-   * @param pVelocityNoise
-   *          velocity noise
-   */
+
+  @Override
   public void addNoiseToParticle(int pParticleId,
                                  float pPositionNoise,
                                  float pVelocityNoise,
@@ -363,14 +301,8 @@ public class ParticleSystem
     lRadii[pParticleId] += lRadiusNoiseValue;
   }
 
-  /**
-   * Sets the position of a particle
-   * 
-   * @param pParticleId
-   *          particle id
-   * @param pParticlePosition
-   *          particle new position.
-   */
+
+  @Override
   public void setPosition(int pParticleId, float... pParticlePosition)
   {
     final float[] lPositions = mPositions.getCurrentArray();
@@ -381,14 +313,8 @@ public class ParticleSystem
     }
   }
 
-  /**
-   * Sets the velocity of a particle
-   * 
-   * @param pParticleId
-   *          particle id
-   * @param pVelocity
-   *          new velocity
-   */
+
+  @Override
   public void setVelocity(int pParticleId, float... pVelocity)
   {
     final float[] lVelocities = mVelocities.getCurrentArray();
@@ -399,24 +325,16 @@ public class ParticleSystem
     }
   }
 
-  /**
-   * Sets the radius of a particle
-   * 
-   * @param pParticleId
-   *          particle id
-   * @param pRadius
-   *          new radius
-   */
+
+  @Override
   public void setRadius(int pParticleId, float pRadius)
   {
     float[] lRadii = mRadii.getCurrentArray();
     lRadii[pParticleId] = pRadius;
   }
 
-  /**
-   * Updates neighborhood cells. Important: make sure that the particles are
-   * entirely contained within [0,1]^d.
-   */
+
+  @Override
   public void updateNeighborhoodCells()
   {
     getNeighborhoodGrid().clear();
@@ -427,16 +345,8 @@ public class ParticleSystem
                                  mNumberOfParticles);
   }
 
-  /**
-   * Apply a centrifugal force around a point (X,Y)
-   * 
-   * @param pCenterX
-   *          center x coordinate
-   * @param pCenterY
-   *          center y coordinate
-   * @param pFactor
-   *          force factor.
-   */
+
+  @Override
   public void repelAround(float pFactor,
                           float pCenterX,
                           float pCenterY)
@@ -467,28 +377,15 @@ public class ParticleSystem
 
   }
 
-  /**
-   * Enforces bounds [0,1]^d by bouncing the particles elastically.
-   *
-   * @param pDampening
-   *          how much should velocity be dampened.
-   * 
-   */
+
+  @Override
   public void enforceBounds(float pDampening)
   {
     enforceBounds(pDampening, 1e-6f);
   }
 
-  /**
-   * Enforces bounds [0,1]^d by bouncing the particles elastically.
-   *
-   * @param pDampening
-   *          how much should velocity be dampened.
-   * @param pNoise
-   *          amount of noise to add to prevent perfect particle overlapp after
-   *          enforcing bounds (typically at the corners).
-   * 
-   */
+
+  @Override
   public void enforceBounds(float pDampening, float pNoise)
   {
     final int lDimension = mDimension;
@@ -531,12 +428,8 @@ public class ParticleSystem
     mVelocities.swap();
   }
 
-  /**
-   * Adds Brownian motion.
-   *
-   * @param pIntensity
-   *          intensity (force) of the brownian motion.
-   */
+
+  @Override
   public void addBrownianMotion(float pAmount)
   {
     final int lDimension = mDimension;
@@ -558,25 +451,15 @@ public class ParticleSystem
     mVelocities.swap();
   }
 
-  /**
-   * Applies a spatially invariant force to all particles.
-   * 
-   * @param pForce
-   *          force.
-   */
+
+  @Override
   public void applyForce(float... pForce)
   {
     applyForce(0, getNumberOfParticles(), pForce);
   }
 
-  /**
-   * Applies a spatially invariant force to a range of particles.
-   * 
-   * @param pBeginId
-   * @param pEndId
-   * @param pForce
-   *          force.
-   */
+
+  @Override
   public void applyForce(int pBeginId, int pEndId, float... pForce)
   {
     final int lDimension = mDimension;
@@ -595,27 +478,15 @@ public class ParticleSystem
     mVelocities.swap();
   }
 
-  /**
-   * Applies a given force field to all particles.
-   * 
-   * @param pForceField
-   *          force field
-   */
+
+  @Override
   public void applyForceField(ForceFieldInterface pForceField)
   {
     applyForceField(pForceField, 0, getNumberOfParticles());
   }
 
-  /**
-   * Applies a given force field to a range of particle ids.
-   * 
-   * @param pForceField
-   *          force field
-   * @param pBeginId
-   *          begin id
-   * @param pEndId
-   *          end id
-   */
+
+  @Override
   public void applyForceField(ForceFieldInterface pForceField,
                               int pBeginId,
                               int pEndId)
@@ -623,9 +494,8 @@ public class ParticleSystem
     pForceField.applyForceField(0, getNumberOfParticles(), this);
   }
 
-  /**
-   * Euler integration
-   */
+
+  @Override
   public void intergrateEuler()
   {
     final int lDimension = mDimension;
@@ -645,9 +515,8 @@ public class ParticleSystem
 
   }
 
-  /**
-   * Trapezoidal integration
-   */
+
+  @Override
   public void intergrateTrapezoidal()
   {
     final int lDimension = mDimension;
@@ -671,13 +540,8 @@ public class ParticleSystem
 
   }
 
-  /**
-   * Copies the positions to this array.
-   * 
-   * @param pPositionsCopy
-   *          array to copy positions to
-   * @return number of particles copied.
-   */
+
+  @Override
   public int copyPositions(float[] pPositionsCopy)
   {
     mPositions.copyCurrentArrayTo(pPositionsCopy,
@@ -685,13 +549,8 @@ public class ParticleSystem
     return mNumberOfParticles;
   }
 
-  /**
-   * Copies the velocities to this array.
-   * 
-   * @param pVelocitiesCopy
-   *          array to copy velocities to
-   * @return number of particles copied.
-   */
+
+  @Override
   public int copyVelocities(float[] pVelocitiesCopy)
   {
     mVelocities.copyCurrentArrayTo(pVelocitiesCopy,
@@ -699,12 +558,8 @@ public class ParticleSystem
     return mNumberOfParticles;
   }
 
-  /**
-   * Copies the radii to this array.
-   * 
-   * @param pRadiiCopy
-   * @return number of particles copied.
-   */
+
+  @Override
   public int copyRadii(float[] pRadiiCopy)
   {
     mRadii.copyCurrentArrayTo(pRadiiCopy, mNumberOfParticles);

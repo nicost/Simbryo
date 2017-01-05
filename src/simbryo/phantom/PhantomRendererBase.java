@@ -3,6 +3,7 @@ package simbryo.phantom;
 import java.util.Arrays;
 
 import simbryo.dynamics.tissue.TissueDynamics;
+import simbryo.dynamics.tissue.TissueDynamicsInterface;
 
 /**
  * Base class providing common fields and methods for all classes implementing
@@ -13,7 +14,7 @@ import simbryo.dynamics.tissue.TissueDynamics;
 public abstract class PhantomRendererBase implements
                                           PhantomRendererInterface
 {
-  protected TissueDynamics mTissue;
+  protected TissueDynamicsInterface mTissue;
   protected long[] mStackDimensions;
   protected boolean[] mPlaneAlreadyDrawnTable;
 
@@ -26,7 +27,7 @@ public abstract class PhantomRendererBase implements
    * @param pTissue tissue dynamics
    * @param pStackDimensions stack dimensions
    */
-  public PhantomRendererBase(TissueDynamics pTissue,
+  public PhantomRendererBase(TissueDynamicsInterface pTissue,
                              long... pStackDimensions)
   {
     mTissue = pTissue;

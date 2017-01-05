@@ -1,6 +1,7 @@
-package simbryo.dynamics.tissue.zoo;
+package simbryo.dynamics.tissue.embryo.zoo;
 
 import simbryo.dynamics.tissue.TissueDynamics;
+import simbryo.dynamics.tissue.embryo.EmbryoDynamics;
 import simbryo.particles.forcefield.external.impl.CentriForceField;
 
 /**
@@ -8,7 +9,7 @@ import simbryo.particles.forcefield.external.impl.CentriForceField;
  *
  * @author royer
  */
-public class Organoid extends TissueDynamics
+public class Organoid extends EmbryoDynamics
 {
 
   protected static final float Fc = 0.0001f;
@@ -27,14 +28,12 @@ public class Organoid extends TissueDynamics
 
   /**
    * Creates an 'Organoid'.
-
-   * @param pMaxNumberOfParticlesPerGridCell
+   *
    * @param pGridDimensions
    */
-  public Organoid(int pMaxNumberOfParticlesPerGridCell,
-                  int... pGridDimensions)
+  public Organoid(int... pGridDimensions)
   {
-    super(Fc, D, pMaxNumberOfParticlesPerGridCell, pGridDimensions);
+    super(Fc, D, 32, pGridDimensions);
 
     for (int i = 0; i < 1; i++)
     {

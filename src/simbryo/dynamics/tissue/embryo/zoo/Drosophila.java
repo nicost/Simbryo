@@ -1,10 +1,12 @@
-package simbryo.dynamics.tissue.zoo;
+package simbryo.dynamics.tissue.embryo.zoo;
 
 import simbryo.dynamics.tissue.TissueDynamics;
 import simbryo.dynamics.tissue.cellprop.CellProperty;
 import simbryo.dynamics.tissue.cellprop.operators.impl.StrogatzWaveOperator;
+import simbryo.dynamics.tissue.embryo.EmbryoDynamics;
 import simbryo.particles.forcefield.ForceFieldInterface;
 import simbryo.particles.forcefield.external.impl.OneSidedIsoSurfaceForceField;
+import simbryo.particles.isosurf.IsoSurfaceInterface;
 import simbryo.particles.isosurf.impl.Ellipsoid;
 
 /**
@@ -12,7 +14,7 @@ import simbryo.particles.isosurf.impl.Ellipsoid;
  *
  * @author royer
  */
-public class Drosophila extends TissueDynamics
+public class Drosophila extends EmbryoDynamics
 {
 
   private static final float cCellDivisionRadiusShrinkage =
@@ -25,6 +27,7 @@ public class Drosophila extends TissueDynamics
   private static final float Fafc = 0.00005f;
 
   private static final float Ri = 0.08f;
+  private static final int cMaxNumberOfParticlesPerGridCell = 16;
 
   private ForceFieldInterface mOutsideEllipseForceField;
   private ForceFieldInterface mInsideEllipseForceField;
@@ -36,15 +39,21 @@ public class Drosophila extends TissueDynamics
 
   /**
    * Creates a Drosophila embryo.
-
-   * @param pMaxNumberOfParticlesPerGridCell
+   *
    * @param pGridDimensions
    */
-  public Drosophila(int pMaxNumberOfParticlesPerGridCell,
-                    int... pGridDimensions)
+  public Drosophila(int... pGridDimensions)
   {
-    super(Fc, D, pMaxNumberOfParticlesPerGridCell, pGridDimensions);
+    super(Fc, D, cMaxNumberOfParticlesPerGridCell, pGridDimensions);
 
+    setSurface(new Ellipsoid(0.48f,
+                                   0.5f,
+                                   0.5f,
+                                   0.5f,
+                                   1f,
+                                   0.43f,
+                                   0.43f));
+    
     for (int i = 0; i < 1; i++)
     {
       float x = (float) (Ri - 0.02 * Math.random());
@@ -58,25 +67,18 @@ public class Drosophila extends TissueDynamics
 
     updateNeighborhoodCells();
 
-    Ellipsoid lEllipsoid =
-                         new Ellipsoid(0.48f,
-                                       0.5f,
-                                       0.5f,
-                                       0.5f,
-                                       1f,
-                                       0.43f,
-                                       0.43f);
+
 
     mOutsideEllipseForceField =
                               new OneSidedIsoSurfaceForceField(true,
                                                                true,
                                                                Finside,
-                                                               lEllipsoid);
+                                                               getSurface());
     mInsideEllipseForceField =
                              new OneSidedIsoSurfaceForceField(false,
                                                               false,
                                                               Fafc,
-                                                              lEllipsoid);
+                                                              getSurface());
 
     mCellCycleMorphogen = addMorphogen();
     mStrogatzOscillator =

@@ -10,6 +10,7 @@ import clearcl.enums.ImageChannelDataType;
 import clearcl.enums.ImageChannelOrder;
 import clearcl.viewer.ClearCLImageViewer;
 import simbryo.dynamics.tissue.TissueDynamics;
+import simbryo.dynamics.tissue.TissueDynamicsInterface;
 
 /**
  * Base class providing common fields and methods for all classes implementing
@@ -41,7 +42,7 @@ public abstract class ClearCLPhantomRendererBase extends
    * @param pStackDimensions stack dimensions
    */
   public ClearCLPhantomRendererBase(ClearCLDevice pDevice,
-                                    TissueDynamics pTissueDynamics,
+                                    TissueDynamicsInterface pTissueDynamics,
                                     long... pStackDimensions)
   {
     super(pTissueDynamics, pStackDimensions);

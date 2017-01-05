@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import simbryo.dynamics.tissue.zoo.Drosophila;
+import simbryo.dynamics.tissue.embryo.zoo.Drosophila;
 import simbryo.phantom.PhantomRendererBase;
 
 public class RendererBaseTests

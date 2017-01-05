@@ -12,13 +12,13 @@ import simbryo.viewer.ParticleViewerInterface;
 import simbryo.viewer.three.ParticleViewer3D;
 
 /**
- * Embryos extend from a particle system with standard dynamics appropriate for
+ * Tissue dynamics extend from a particle system with standard dynamics appropriate for
  * simulating the motion of cells, as well as features such as morphogens and
  * target radii.
  *
  * @author royer
  */
-public class TissueDynamics extends ParticleSystem
+public class TissueDynamics extends ParticleSystem implements TissueDynamicsInterface
 {
 
   protected static final int cMaximumNumberOfCells = 100000;
@@ -47,7 +47,7 @@ public class TissueDynamics extends ParticleSystem
 
   
   /**
-   * Constructs an embryo of given dimensions (2D or 3D), dimension, grid size,
+   * Constructs a tissue of given dimensions (2D or 3D), dimension, grid size,
    * max number of particle per neighborhood cell, collision force between
    * particles, and drag.
    * 
@@ -128,7 +128,7 @@ public class TissueDynamics extends ParticleSystem
   }
 
   /**
-   * Adds a new morphogen to this embryo.
+   * Adds a new morphogen to this tissue.
    * 
    * @return the new morphogen.
    */
@@ -140,7 +140,7 @@ public class TissueDynamics extends ParticleSystem
   }
 
   /**
-   * Applies a number of simulationsteps to the embryo.
+   * Applies a number of simulationsteps to the tissue.
    * 
    * @param pNumberOfSteps
    *          number of simulation steps.
@@ -189,7 +189,7 @@ public class TissueDynamics extends ParticleSystem
   }
 
   /**
-   * opens the 3D viewer for this embryo.
+   * opens the 3D viewer for this tissue.
    * 
    * @return 3D viewer.
    */
