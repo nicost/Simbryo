@@ -63,17 +63,19 @@ public class HistoneFluoDemo
 
       Timming lTimming = new Timming();
 
+      int lPeriod = 100;
+      
       int i = 0;
       while (lOpenViewer.isShowing())
       {
         System.out.println("i=" + i);
         lTimming.syncAtPeriod(1);
 
-        ElapsedTime.measure(i % 50 == 0,
+        ElapsedTime.measure(i % lPeriod == 0,
                             "dynamics",
                             () -> lDrosophila.simulationSteps(1, 1));
 
-        if (i % 50 == 0)
+        if (i % lPeriod == 0)
         {
           lHistoneFluo.clear();
           lHistoneFluo.renderSmart(0, (int) lHistoneFluo.getDepth());

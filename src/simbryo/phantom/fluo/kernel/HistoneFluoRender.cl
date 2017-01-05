@@ -3,6 +3,7 @@
 
 #include [OCLlib] "noise/noise.cl"
 
+#define INOISEDIM 1.0f/NOISEDIM
                                     
 __kernel void hisrender(   __write_only    image3d_t  image,
                            __global const  int*       neighboors,
@@ -15,14 +16,16 @@ __kernel void hisrender(   __write_only    image3d_t  image,
 {
   const sampler_t sampler = CLK_NORMALIZED_COORDS_TRUE | CLK_ADDRESS_MIRRORED_REPEAT | CLK_FILTER_NEAREST;
  
-
+  __local int first;
   __local int localneighboors[MAXNEI];
   __local float localpositions[3*MAXNEI];
   
   const uint width  = get_image_width(image);
   const uint height = get_image_height(image);
   const uint depth  = get_image_depth(image);
-  const float3 dim = (float3){width,height,depth};
+  const float3 dim = (float3){(float)width,(float)height,(float)depth};
+  const float3 aspectr = dim/width;
+  const float3 iaspectr = 1.0f/aspectr;
   
   const uint x = get_global_id(0); 
   const uint y = get_global_id(1);
@@ -32,7 +35,7 @@ __kernel void hisrender(   __write_only    image3d_t  image,
   const uint oy = get_global_offset(1);
   const uint oz = get_global_offset(2);
   
-  const float3 voxelpos = (float3){x,y,z};
+  const float3 voxelpos = (float3){(float)x,(float)y,(float)z};
   
   const uint ngx = get_num_groups(0);
   const uint ngy = get_num_groups(1);
@@ -52,7 +55,7 @@ __kernel void hisrender(   __write_only    image3d_t  image,
   
   const uint gi = gx+gy*ngx+gz*ngx*ngy;
   const uint li = lx+ly*lsx+lz*lsx*lsy;
-  
+ 
   if(li<MAXNEI)
   {
     const int nei = neighboors[gi*MAXNEI+li];
@@ -69,41 +72,46 @@ __kernel void hisrender(   __write_only    image3d_t  image,
   barrier(CLK_LOCAL_MEM_FENCE);
  
   float value=0; 
-  
+ 
   value += NOISERATIO*rngfloat3(x+timeindex,y+timeindex,z+timeindex);    
   
-  if(localneighboors[0]!=-1)
+  if(localneighboors[0]==-1)
   {
-    const float invnoisedim = 1.0f/NOISEDIM;
-    const float nucleiradiusvoxels = NUCLEIRADIUS*width ;
-    
-    for(int k=0; k<MAXNEI; k++)
+    write_imagef (image, (int4){x,y,z,0.0f}, intensity*value);
+    return;
+  }
+  
+  const float nucleiradiusvoxels = NUCLEIRADIUS*width ;
+  
+  for(int k=0; k<MAXNEI; k++)
+  {
+    const uint nei = localneighboors[k]; 
+    if(nei!=-1)
     {
-      const uint nei = localneighboors[k]; 
-      if(nei!=-1)
-      {
-        const float3 partpos = vload3(k,localpositions);
-        const float3 relvoxpos  = voxelpos-partpos;
-        
-        const int npnx = (int) rnguint1((2654435789*1)^nei) & (NOISEDIM-1);
-        const int npny = (int) rnguint1((2654435789*2)^nei) & (NOISEDIM-1);
-        const int npnz = (int) rnguint1((2654435789*3)^nei) & (NOISEDIM-1);
-        
-        const float4 noisepos   =   ((float4){relvoxpos+(float3){npnx, npny, npnz},0}-NOISEDIM/2)*invnoisedim;
-        const float  levelnoise =   read_imagef(perlin, sampler, noisepos).x;
-        
-        const float d = fast_length(relvoxpos); 
-        const float noisyd = d + NUCLEIROUGHNESS*(2*levelnoise-1);
-        
-        const float  level      =  1/(1+native_exp(NUCLEISHARPNESS*(noisyd-nucleiradiusvoxels)));
-        const float  noisylevel =  levelnoise*level;
-         
-        value += noisylevel;
-      }
+      const float3 partpos     = vload3(k,localpositions);
+      const float3 relvoxpos   = voxelpos-partpos;
+      const float3 relvoxposac = relvoxpos*iaspectr;
+      
+      const float npnx = rngfloat1((2654435789*1)^nei);
+      const float npny = rngfloat1((2654435789*2)^nei);
+      const float npnz = rngfloat1((2654435789*3)^nei);
+      const float4 npn = (float4){npnx,npny,npnz,0.0f};
+      
+      const float4 normrelvoxposac  = (float4){(relvoxposac*INOISEDIM).xyz,0.0f};
+      const float4 noisepos         =   0.5f+normrelvoxposac+npn;
+      const float  levelnoise       =   2.0f*read_imagef(perlin, sampler, noisepos).x-1.0f;
+      
+      const float d      = fast_length(relvoxposac); 
+      const float noisyd = d + NUCLEIROUGHNESS*levelnoise;
+      
+      const float  level      =  native_powr(1.0f+native_exp(NUCLEISHARPNESS*(noisyd-nucleiradiusvoxels)),-1);
+      const float  noisylevel =  (1.0f+NUCLEITEXTURECONTRAST*levelnoise)*level;
+       
+      value += noisylevel;
     }
   }
-       
-  write_imagef (image, (int4){x,y,z,0}, intensity*value);
+    
+  write_imagef (image, (int4){x,y,z,0.0f}, intensity*value);
 
 }
 

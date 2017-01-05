@@ -32,14 +32,15 @@ import simbryo.util.timing.Timming;
 public class HistoneFluorescence extends ClearCLPhantomRendererBase
                                  implements PhantomRendererInterface
 {
-  private static final int cNoiseDim = 16;
+  private static final int cNoiseDim = 32;
   private ClearCLBuffer mNeighboorsBuffer, mPositionsBuffer,
       mRadiiBuffer;
   private OffHeapMemory mNeighboorsMemory, mPositionsMemory,
       mRadiiMemory;
   private ClearCLImage mPerlinNoiseImage;
 
-  private float mNucleiRadius, mNucleiSharpness, mNucleiRoughness;
+  private float mNucleiRadius, mNucleiSharpness, mNucleiRoughness,
+      mNucleiTextureContrast;
 
   /**
    * Instantiates a histone fluorescence renderer for a given OpenCL device,
@@ -63,6 +64,7 @@ public class HistoneFluorescence extends ClearCLPhantomRendererBase
          0.004f,
          10f,
          0.8f,
+         0.75f,
          1e-6f,
          pStackDimensions);
   }
@@ -92,6 +94,7 @@ public class HistoneFluorescence extends ClearCLPhantomRendererBase
                              float pNucleiRadius,
                              float pNucleiSharpness,
                              float pNucleiRoughness,
+                             float pNucleiTextureContrast,
                              float pNoiseOverSignalRatio,
                              long... pStackDimensions) throws IOException
   {
@@ -100,6 +103,7 @@ public class HistoneFluorescence extends ClearCLPhantomRendererBase
     mNucleiRadius = pNucleiRadius;
     mNucleiSharpness = pNucleiSharpness;
     mNucleiRoughness = pNucleiRoughness;
+    mNucleiTextureContrast = pNucleiTextureContrast;
     setNoiseOverSignalRatio(pNoiseOverSignalRatio);
 
     final int lMaxParticlesPerGridCell =
@@ -172,8 +176,11 @@ public class HistoneFluorescence extends ClearCLPhantomRendererBase
     lProgram.addDefine("NUCLEIRADIUS", getNucleiRadius());
     lProgram.addDefine("NUCLEISHARPNESS", getNucleiSharpness());
     lProgram.addDefine("NUCLEIROUGHNESS", getNucleiRoughness());
+    lProgram.addDefine("NUCLEITEXTURECONTRAST",
+                       getNucleiTextureContrast());
 
     lProgram.buildAndLog();
+    System.out.println(lProgram.getSourceCode());
 
     mRenderKernel = lProgram.createKernel("hisrender");
 
@@ -325,14 +332,35 @@ public class HistoneFluorescence extends ClearCLPhantomRendererBase
     mNucleiRoughness = pNucleiRoughness;
   }
 
+  /**
+   * Return contrast of nuclei texture: min:0 max:1
+   * 
+   * @return contrast of nuclei texture
+   */
+  public float getNucleiTextureContrast()
+  {
+    return mNucleiTextureContrast;
+  }
+
+  /**
+   * Sets contrast of nuclei texture: min:0 max:1
+   * 
+   * @param pNucleiTextureContrast
+   *          new contrast of nuclei texture
+   */
+  public void setNucleiTextureContrast(float pNucleiTextureContrast)
+  {
+    mNucleiTextureContrast = pNucleiTextureContrast;
+  }
+
   @Override
-  public void close() 
+  public void close()
   {
     super.close();
     mNeighboorsBuffer.close();
     mPositionsBuffer.close();
     mRadiiBuffer.close();
-    mPerlinNoiseImage.close(); 
+    mPerlinNoiseImage.close();
   }
 
 }
