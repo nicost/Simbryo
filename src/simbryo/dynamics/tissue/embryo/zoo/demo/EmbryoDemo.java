@@ -50,17 +50,17 @@ public class EmbryoDemo
   @Test
   public void demoDrosophila() throws InterruptedException
   {
-    Drosophila lDrosophila = new Drosophila(16, 16, 16);
+    Drosophila lDrosophila = new Drosophila(64, 16, 16, 16);
 
     lDrosophila.open3DViewer();
 
-    lDrosophila.getViewer().setDisplayRadius(false);
+    lDrosophila.getViewer().setDisplayRadius(true);
 
     Timming lTimming = new Timming();
 
     while (lDrosophila.getViewer().isShowing())
     {
-      lTimming.syncAtPeriod(10);
+      lTimming.syncAtPeriod(1);
       lDrosophila.simulationSteps(1, 1);
     }
 

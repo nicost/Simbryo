@@ -6,10 +6,10 @@ import simbryo.dynamics.tissue.cellprop.CellProperty;
 import simbryo.dynamics.tissue.cellprop.operators.CellPropertyOperatorInterface;
 import simbryo.particles.ParticleSystem;
 import simbryo.particles.forcefield.interaction.impl.CollisionForceField;
+import simbryo.particles.viewer.ParticleViewerInterface;
+import simbryo.particles.viewer.three.ParticleViewer3D;
 import simbryo.util.DoubleBufferingFloatArray;
 import simbryo.util.sequence.Sequence;
-import simbryo.viewer.ParticleViewerInterface;
-import simbryo.viewer.three.ParticleViewer3D;
 
 /**
  * Tissue dynamics extend from a particle system with standard dynamics appropriate for

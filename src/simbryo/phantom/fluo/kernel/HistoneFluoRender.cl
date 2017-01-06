@@ -4,8 +4,8 @@
 
 
 #define AUTOSHARPNESS 10.0f
-#define AUTOBACKGROUND 1.0f
-#define AUTOYOLK 0.7f 
+#define AUTOBACKGROUND 0.5f
+#define AUTOYOLK 0.25f 
 //0.30f
 
 inline float renderauto(float3 dim, float3 voxelpos, sampler_t sampler, __read_only image3d_t  perlin, int timeindex )
@@ -30,8 +30,8 @@ inline float renderauto(float3 dim, float3 voxelpos, sampler_t sampler, __read_o
                                          5.0f*normpos.z+7.0f*normpos.x-3.0f*normpos.y*npnz, 0.0f};
   const float noiseval        = read_imagef(perlin, sampler, noisepos).x;
 
-  const float autoyolk1       = native_recip(1.0f+native_exp2(100.0f*(0.09f-insdistance)));
-  const float autoyolk2       = native_recip(1.0f+fabs(pown(25.0f*(insdistance-0.15f),3)));
+  const float autoyolk1       = native_recip(1.0f+native_exp2(100.0f*(0.1f-insdistance)));
+  const float autoyolk2       = native_recip(1.0f+fabs(pown(25.0f*(insdistance-0.12f),3)));
   const float autoyolk        = autoyolk1+autoyolk2;
   
   const float autofluo = insmask * (AUTOBACKGROUND*(1.0f+0.3f*noiseval) + AUTOYOLK*autoyolk);

@@ -24,7 +24,7 @@ public class HistoneFluoDemo
   {
     int lWidth = 512;
     int lHeight = 512;
-    int lDepth = 128;
+    int lDepth = 512;
 
     ElapsedTime.sStandardOutput = true;
 
@@ -45,7 +45,7 @@ public class HistoneFluoDemo
       System.out.println("lGridDimensions="
                          + Arrays.toString(lGridDimensions));
 
-      Drosophila lDrosophila = new Drosophila(lGridDimensions);
+      Drosophila lDrosophila = new Drosophila(16,lGridDimensions);
 
       System.out.println("grid size:"
                          + Arrays.toString(lDrosophila.getGridDimensions()));
@@ -61,7 +61,7 @@ public class HistoneFluoDemo
 
       ClearCLImageViewer lOpenViewer = lHistoneFluo.openViewer();
 
-      lDrosophila.simulationSteps(12000, 1);
+      lDrosophila.simulationSteps(4000, 1);
 
       Timming lTimming = new Timming();
 

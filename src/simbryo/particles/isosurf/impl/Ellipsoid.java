@@ -25,10 +25,11 @@ public class Ellipsoid extends IsoSurfaceBase
                        implements IsoSurfaceInterface
 {
 
-  private float mRadius;
-  private float[] mCenterAndAxis;
+  protected float mRadius;
+  protected float[] mCenterAndAxis;
 
-  private float mAccumulatorDistance, mAccumulatorGradientLength;
+  protected float mAccumulatorDistance;
+  protected float mAccumulatorGradientLength;
 
   public Ellipsoid(float pRadius, float... pCenterAndAxis)
   {

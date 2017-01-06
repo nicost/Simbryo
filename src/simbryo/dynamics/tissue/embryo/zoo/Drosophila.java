@@ -8,6 +8,7 @@ import simbryo.particles.forcefield.ForceFieldInterface;
 import simbryo.particles.forcefield.external.impl.OneSidedIsoSurfaceForceField;
 import simbryo.particles.isosurf.IsoSurfaceInterface;
 import simbryo.particles.isosurf.impl.Ellipsoid;
+import simbryo.particles.isosurf.impl.RiceGrain;
 
 /**
  * Drosophila melanogster embryo (First 14 divisions).
@@ -27,7 +28,7 @@ public class Drosophila extends EmbryoDynamics
   private static final float Fafc = 0.00005f;
 
   private static final float Ri = 0.08f;
-  private static final int cMaxNumberOfParticlesPerGridCell = 16;
+  private static final int cMaxNumberOfParticlesPerGridCell = 32;
 
   private ForceFieldInterface mOutsideEllipseForceField;
   private ForceFieldInterface mInsideEllipseForceField;
@@ -37,23 +38,26 @@ public class Drosophila extends EmbryoDynamics
 
   private volatile int mCellDivCount;
 
+
+  
   /**
    * Creates a Drosophila embryo.
    *
+   * @param pMaxNumberOfParticlesPerGridCell
    * @param pGridDimensions
    */
-  public Drosophila(int... pGridDimensions)
+  public Drosophila(int pMaxNumberOfParticlesPerGridCell, int... pGridDimensions)
   {
-    super(Fc, D, cMaxNumberOfParticlesPerGridCell, pGridDimensions);
+    super(Fc, D, pMaxNumberOfParticlesPerGridCell, pGridDimensions);
 
     setSurface(new Ellipsoid(0.48f,
-                                   0.5f,
-                                   0.5f,
-                                   0.5f,
-                                   1f,
-                                   0.43f,
-                                   0.43f));
-    
+                             0.5f,
+                             0.5f,
+                             0.5f,
+                             1f,
+                             0.43f,
+                             0.43f));
+
     for (int i = 0; i < 1; i++)
     {
       float x = (float) (Ri - 0.02 * Math.random());
@@ -66,8 +70,6 @@ public class Drosophila extends EmbryoDynamics
     }
 
     updateNeighborhoodCells();
-
-
 
     mOutsideEllipseForceField =
                               new OneSidedIsoSurfaceForceField(true,

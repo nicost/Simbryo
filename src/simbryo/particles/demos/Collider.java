@@ -7,8 +7,8 @@ import javafx.scene.control.TextInputDialog;
 import javafx.stage.Stage;
 import simbryo.particles.ParticleSystem;
 import simbryo.particles.forcefield.interaction.impl.CollisionForceField;
+import simbryo.particles.viewer.two.ParticleViewer2D;
 import simbryo.util.timing.Timming;
-import simbryo.viewer.two.ParticleViewer2D;
 
 public class Collider extends Application
 {
@@ -16,13 +16,13 @@ public class Collider extends Application
   public int N = 20;
   public float V = 0.0000001f;
 
-  public float R;
+  public float R = (float) (0.395 / Math.sqrt(N));
   public float D = 0.99f;
   public float Db = 0.9f;
   public float Fc = 0.0001f;
   public float Fg = 0.000001f;
 
-  public int G;
+  public int G = (int) (1/R);
 
   Thread mThread;
 
@@ -43,6 +43,7 @@ public class Collider extends Application
       // Traditional way to get the response value.
       Optional<String> result = dialog.showAndWait();
 
+      
       result.ifPresent(name -> {
         try
         {
