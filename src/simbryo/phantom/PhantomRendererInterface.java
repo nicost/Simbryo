@@ -1,5 +1,7 @@
 package simbryo.phantom;
 
+import simbryo.dynamics.tissue.TissueDynamicsInterface;
+
 /**
  * Phantom Renderers implement this interface
  *
@@ -8,6 +10,12 @@ package simbryo.phantom;
 public interface PhantomRendererInterface
 {
 
+  /**
+   * Returns the tissue dynamics for this renderer.
+   * @return
+   */
+  TissueDynamicsInterface getTissue();
+  
   /**
    * Returns the rendered stack width
    * 
@@ -85,5 +93,7 @@ public interface PhantomRendererInterface
    * @param pNoiseIntensity
    */
   void setNoiseOverSignalRatio(float pNoiseIntensity);
+
+
 
 }

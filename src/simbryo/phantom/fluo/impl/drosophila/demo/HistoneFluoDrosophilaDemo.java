@@ -1,4 +1,4 @@
-package simbryo.phantom.fluo.demo;
+package simbryo.phantom.fluo.impl.drosophila.demo;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -14,9 +14,10 @@ import clearcl.viewer.ClearCLImageViewer;
 import simbryo.dynamics.tissue.embryo.zoo.Drosophila;
 import simbryo.phantom.ClearCLPhantomRendererUtils;
 import simbryo.phantom.fluo.HistoneFluorescence;
+import simbryo.phantom.fluo.impl.drosophila.DrosophilaHistoneFluorescence;
 import simbryo.util.timing.Timming;
 
-public class HistoneFluoDemo
+public class HistoneFluoDrosophilaDemo
 {
 
   @Test
@@ -52,14 +53,15 @@ public class HistoneFluoDemo
       // lDrosophila.open3DViewer();
       // lDrosophila.getViewer().setDisplayRadius(false);
 
-      HistoneFluorescence lHistoneFluo =
-                                       new HistoneFluorescence(lFastestGPUDevice,
+      DrosophilaHistoneFluorescence lDrosoFluo =
+                                       new DrosophilaHistoneFluorescence(lFastestGPUDevice,
                                                                lDrosophila,
                                                                lWidth,
                                                                lHeight,
                                                                lDepth);
-
-      ClearCLImageViewer lOpenViewer = lHistoneFluo.openViewer();
+      
+      
+      ClearCLImageViewer lOpenViewer = lDrosoFluo.openViewer();
 
       lDrosophila.simulationSteps(4000, 1);
 
@@ -80,8 +82,8 @@ public class HistoneFluoDemo
 
         if (i % lPeriod == 0)
         {
-          lHistoneFluo.clear();
-          lHistoneFluo.renderSmart(0, (int) lHistoneFluo.getDepth());
+          lDrosoFluo.clear();
+          lDrosoFluo.renderSmart(0, (int) lDrosoFluo.getDepth());
 
           float lMaximalCellOccupancy =
                                       lDrosophila.getNeighborhoodGrid()
@@ -101,7 +103,7 @@ public class HistoneFluoDemo
         i++;
       }
 
-      lHistoneFluo.close();
+      lDrosoFluo.close();
 
     }
 

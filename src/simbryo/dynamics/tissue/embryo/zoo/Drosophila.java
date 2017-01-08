@@ -38,15 +38,17 @@ public class Drosophila extends EmbryoDynamics
 
   private volatile int mCellDivCount;
 
+  public float mEllipsoidA = 1.0f, mEllipsoidB = 0.43f,
+      mEllipsoidC = 0.43f, mEllipsoidR = 0.48f;
 
-  
   /**
    * Creates a Drosophila embryo.
    *
    * @param pMaxNumberOfParticlesPerGridCell
    * @param pGridDimensions
    */
-  public Drosophila(int pMaxNumberOfParticlesPerGridCell, int... pGridDimensions)
+  public Drosophila(int pMaxNumberOfParticlesPerGridCell,
+                    int... pGridDimensions)
   {
     super(Fc, D, pMaxNumberOfParticlesPerGridCell, pGridDimensions);
 

@@ -31,8 +31,10 @@ import simbryo.util.timing.Timming;
  *
  * @author royer
  */
-public class HistoneFluorescence extends ClearCLPhantomRendererBase
-                                 implements PhantomRendererInterface
+public abstract class HistoneFluorescence extends
+                                          ClearCLPhantomRendererBase
+                                          implements
+                                          PhantomRendererInterface
 {
   private static final int cNoiseDim = 32;
   private ClearCLBuffer mNeighboorsBuffer, mPositionsBuffer,
@@ -43,8 +45,6 @@ public class HistoneFluorescence extends ClearCLPhantomRendererBase
 
   private float mNucleiRadius, mNucleiSharpness, mNucleiRoughness,
       mNucleiTextureContrast;
-  
-  private boolean mRenderAutofluorescence;
 
   /**
    * Instantiates a histone fluorescence renderer for a given OpenCL device,
@@ -109,8 +109,6 @@ public class HistoneFluorescence extends ClearCLPhantomRendererBase
     mNucleiRoughness = pNucleiRoughness;
     mNucleiTextureContrast = pNucleiTextureContrast;
     setNoiseOverSignalRatio(pNoiseOverSignalRatio);
-    
-    mRenderAutofluorescence = pTissueDynamics instanceof HasSurface;
 
     final int lMaxParticlesPerGridCell =
                                        pTissueDynamics.getNeighborhoodGrid()
@@ -118,7 +116,8 @@ public class HistoneFluorescence extends ClearCLPhantomRendererBase
 
     setupNoiseBuffers(mContext);
 
-    setupProgramAndKernel(lMaxParticlesPerGridCell);
+    ClearCLProgram lProgram = setupProgram(lMaxParticlesPerGridCell);
+    setupKernel(lProgram, lMaxParticlesPerGridCell);
 
     setupBuffersAndImages(pTissueDynamics, lMaxParticlesPerGridCell);
 
@@ -134,7 +133,7 @@ public class HistoneFluorescence extends ClearCLPhantomRendererBase
   private void setupBuffersAndImages(TissueDynamicsInterface pTissueDynamics,
                                      final int lMaxParticlesPerGridCell)
   {
-    final int lDimension = mTissue.getDimension();
+    final int lDimension = getTissue().getDimension();
 
     final int lNeighboorsArrayLength =
                                      pTissueDynamics.getNeighborhoodGrid()
@@ -169,11 +168,13 @@ public class HistoneFluorescence extends ClearCLPhantomRendererBase
                  OffHeapMemory.allocateFloats(pTissueDynamics.getMaxNumberOfParticles());
   }
 
-  private void setupProgramAndKernel(final int pMaxParticlesPerGridCell) throws IOException
+  protected ClearCLProgram setupProgram(final int pMaxParticlesPerGridCell) throws IOException
   {
-    ClearCLProgram lProgram =
-                            mContext.createProgram(this.getClass(),
-                                                   "kernel/HistoneFluoRender.cl");
+    ClearCLProgram lProgram = mContext.createProgram();
+
+    addAutoFluoFunctionSourceCode(lProgram);
+    lProgram.addSource(HistoneFluorescence.class,
+                       "kernel/HistoneFluoRender.cl");
 
     lProgram.addDefine("MAXNEI", pMaxParticlesPerGridCell);
     lProgram.addDefine("NOISEDIM", cNoiseDim);
@@ -186,10 +187,25 @@ public class HistoneFluorescence extends ClearCLPhantomRendererBase
                        getNucleiTextureContrast());
 
     lProgram.buildAndLog();
-    //System.out.println(lProgram.getSourceCode());
+    // System.out.println(lProgram.getSourceCode());
+    return lProgram;
+  }
 
-    mRenderKernel = lProgram.createKernel("hisrender");
+  /**
+   * This function must be implemented by derived classes. It adds the souce
+   * code to the autofluo function to the rendering kernel. this functions is
+   * responsible for rendering the background fluorescence.
+   * 
+   * @param pClearCLProgram
+   *          program to add source to.
+   * @throws IOException 
+   */
+  public abstract void addAutoFluoFunctionSourceCode(ClearCLProgram pClearCLProgram) throws IOException;
 
+  protected void setupKernel(ClearCLProgram pClearCLProgram,
+                             final int pMaxParticlesPerGridCell) throws IOException
+  {
+    mRenderKernel = pClearCLProgram.createKernel("hisrender");
   }
 
   private void setupNoiseBuffers(ClearCLContext pContext) throws IOException
@@ -219,20 +235,20 @@ public class HistoneFluorescence extends ClearCLPhantomRendererBase
   private void updateBuffers()
   {
 
-    final int lDimension = mTissue.getDimension();
-    final int lNumberOfCells = mTissue.getMaxNumberOfParticles();
+    final int lDimension = getTissue().getDimension();
+    final int lNumberOfCells = getTissue().getMaxNumberOfParticles();
 
     ElapsedTime.measure("data copy", () -> {
 
-      mNeighboorsMemory.copyFrom(mTissue.getNeighborhoodGrid()
+      mNeighboorsMemory.copyFrom(getTissue().getNeighborhoodGrid()
                                         .getArray());
 
-      mRadiiMemory.copyFrom(mTissue.getRadii().getCurrentArray(),
+      mRadiiMemory.copyFrom(getTissue().getRadii().getCurrentArray(),
                             0,
                             0,
                             lNumberOfCells);
 
-      mPositionsMemory.copyFrom(mTissue.getPositions()
+      mPositionsMemory.copyFrom(getTissue().getPositions()
                                        .getCurrentArray(),
                                 0,
                                 0,
@@ -266,7 +282,7 @@ public class HistoneFluorescence extends ClearCLPhantomRendererBase
   @Override
   public boolean render(int pZPlaneIndex)
   {
-    mRenderKernel.setArgument("num", mTissue.getNumberOfParticles());
+    mRenderKernel.setArgument("num", getTissue().getNumberOfParticles());
     return super.render(pZPlaneIndex);
   }
 

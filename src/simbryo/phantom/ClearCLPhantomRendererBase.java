@@ -113,7 +113,7 @@ public abstract class ClearCLPhantomRendererBase extends
                                 mLocalSizeZ);
     mRenderKernel.setOptionalArgument("intensity", getSignalIntensity());
     mRenderKernel.setOptionalArgument("timeindex",
-                                      mTissue.getTimeStepIndex());
+                                      getTissue().getTimeStepIndex());
     System.out.println("before mRenderKernel.run(true);");
     mRenderKernel.run(true);
     System.out.println("after mRenderKernel.run(true);");

@@ -14,7 +14,7 @@ import simbryo.dynamics.tissue.TissueDynamicsInterface;
 public abstract class PhantomRendererBase implements
                                           PhantomRendererInterface
 {
-  protected TissueDynamicsInterface mTissue;
+  private final TissueDynamicsInterface mTissue;
   protected long[] mStackDimensions;
   protected boolean[] mPlaneAlreadyDrawnTable;
 
@@ -34,6 +34,12 @@ public abstract class PhantomRendererBase implements
     mStackDimensions = pStackDimensions;
     mPlaneAlreadyDrawnTable =
                             new boolean[Math.toIntExact(getDepth())];
+  }
+  
+  @Override
+  public TissueDynamicsInterface getTissue()
+  {
+    return mTissue;
   }
 
   @Override
@@ -129,5 +135,7 @@ public abstract class PhantomRendererBase implements
   {
     mNoiseOverSignalRatio = pNoiseOverSignalRatio;
   }
+
+
 
 }
