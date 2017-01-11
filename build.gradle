@@ -92,6 +92,12 @@ dependencies
     compile ('net.clearvolume:cleargl:[1.0.16,)')     {transitive= true; changing= true}
     compile ('net.clearvolume:clearcl:[0.3.23,)')     {transitive= true; changing= true}
     compile ('net.clearvolume:clearaudio:[1.0.0,)')   {transitive= true; changing= true}
+    
+    // SCIFIO:
+    compile ('io.scif:scifio:0.30.0')                 {transitive= true; changing= true}
+    
+    // BioFormats
+    compile ('ome:bioformats_package:5.3.0')
 
     // JUnit:
     compile group: 'junit', name: 'junit', version: '4.11'
@@ -114,6 +120,12 @@ repositories
     
     //Sqeazy:
     maven {url  "http://dl.bintray.com/psteinb/maven" }
+    
+    // ImageJ repo:
+    maven {url  "http://maven.imagej.net/content/repositories/releases/"}
+    
+    // Bioformats:
+    maven {url "http://artifacts.openmicroscopy.org/artifactory/maven"}
 
 }
 

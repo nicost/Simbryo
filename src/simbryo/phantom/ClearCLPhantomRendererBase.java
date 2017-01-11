@@ -8,13 +8,15 @@ import clearcl.ClearCLImage;
 import clearcl.ClearCLKernel;
 import clearcl.enums.ImageChannelDataType;
 import clearcl.enums.ImageChannelOrder;
+import clearcl.util.Region3;
 import clearcl.viewer.ClearCLImageViewer;
+import coremem.ContiguousMemoryInterface;
 import simbryo.dynamics.tissue.TissueDynamics;
 import simbryo.dynamics.tissue.TissueDynamicsInterface;
 
 /**
  * Base class providing common fields and methods for all classes implementing
- * the phantom renderer interface using OpenCL rendering. 
+ * the phantom renderer interface using OpenCL rendering.
  *
  * @author royer
  */
@@ -34,12 +36,15 @@ public abstract class ClearCLPhantomRendererBase extends
   private long mLocalSizeX, mLocalSizeY, mLocalSizeZ;
 
   /**
-   * Instantiates a Phantom renderer for a given OpenCL device, tissue dynamics, and stack
-   * dimensions.
+   * Instantiates a Phantom renderer for a given OpenCL device, tissue dynamics,
+   * and stack dimensions.
    * 
-   * @param pDevice OpenCL device to use.
-   * @param pTissueDynamics tissue dynamics object
-   * @param pStackDimensions stack dimensions
+   * @param pDevice
+   *          OpenCL device to use.
+   * @param pTissueDynamics
+   *          tissue dynamics object
+   * @param pStackDimensions
+   *          stack dimensions
    */
   public ClearCLPhantomRendererBase(ClearCLDevice pDevice,
                                     TissueDynamicsInterface pTissueDynamics,
@@ -75,6 +80,12 @@ public abstract class ClearCLPhantomRendererBase extends
   }
 
   @Override
+  public void render()
+  {
+    render(0, (int) (getDepth() - 1));
+  }
+
+  @Override
   public boolean render(int pZPlaneIndex)
   {
     if (!mPlaneAlreadyDrawnTable[pZPlaneIndex])
@@ -100,7 +111,7 @@ public abstract class ClearCLPhantomRendererBase extends
     // Now we can render a possibly slightly larger chunck of the stack:
     renderInternal(pZPlaneIndexBegin, pZPlaneIndexEnd);
   }
-  
+
   private void renderInternal(int pZPlaneIndexBegin,
                               int pZPlaneIndexEnd)
   {
@@ -111,7 +122,8 @@ public abstract class ClearCLPhantomRendererBase extends
     mRenderKernel.setLocalSizes(mLocalSizeX,
                                 mLocalSizeY,
                                 mLocalSizeZ);
-    mRenderKernel.setOptionalArgument("intensity", getSignalIntensity());
+    mRenderKernel.setOptionalArgument("intensity",
+                                      getSignalIntensity());
     mRenderKernel.setOptionalArgument("timeindex",
                                       getTissue().getTimeStepIndex());
     System.out.println("before mRenderKernel.run(true);");
@@ -122,12 +134,24 @@ public abstract class ClearCLPhantomRendererBase extends
     mImage.notifyListenersOfChange(mContext.getDefaultQueue());
   }
 
+  @Override
+  public void copyTo(ContiguousMemoryInterface pMemory,
+                     boolean pBlocking)
+  {
+    mImage.writeTo(pMemory,
+                   Region3.originZero(),
+                   Region3.region(getWidth(),
+                                  getHeight(),
+                                  getDepth()),
+                   pBlocking);
+  }
+
   public ClearCLImageViewer openViewer()
   {
     ClearCLImageViewer lViewImage = ClearCLImageViewer.view(mImage);
     return lViewImage;
   }
-  
+
   public void close()
   {
     mImage.close();

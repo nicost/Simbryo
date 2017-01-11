@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
+import coremem.ContiguousMemoryInterface;
 import simbryo.dynamics.tissue.embryo.zoo.Drosophila;
 import simbryo.phantom.PhantomRendererBase;
 
@@ -26,6 +27,21 @@ public class RendererBaseTests
       public void render(int pZPlaneIndexBegin, int pZPlaneIndexEnd)
       {
         //do nothing
+      }
+
+      @Override
+      public void render()
+      {
+        // TODO Auto-generated method stub
+        
+      }
+
+      @Override
+      public void copyTo(ContiguousMemoryInterface pMemory,
+                         boolean pBlocking)
+      {
+        // TODO Auto-generated method stub
+        
       }
     };
 

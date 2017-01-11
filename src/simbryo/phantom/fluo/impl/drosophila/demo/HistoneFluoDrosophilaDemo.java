@@ -13,7 +13,6 @@ import clearcl.util.ElapsedTime;
 import clearcl.viewer.ClearCLImageViewer;
 import simbryo.dynamics.tissue.embryo.zoo.Drosophila;
 import simbryo.phantom.ClearCLPhantomRendererUtils;
-import simbryo.phantom.fluo.HistoneFluorescence;
 import simbryo.phantom.fluo.impl.drosophila.DrosophilaHistoneFluorescence;
 import simbryo.util.timing.Timming;
 
@@ -63,7 +62,7 @@ public class HistoneFluoDrosophilaDemo
       
       ClearCLImageViewer lOpenViewer = lDrosoFluo.openViewer();
 
-      lDrosophila.simulationSteps(4000, 1);
+      lDrosophila.simulationSteps(14000, 1);
 
       Timming lTimming = new Timming();
 

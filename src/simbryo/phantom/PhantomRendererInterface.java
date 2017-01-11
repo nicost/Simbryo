@@ -1,5 +1,6 @@
 package simbryo.phantom;
 
+import coremem.ContiguousMemoryInterface;
 import simbryo.dynamics.tissue.TissueDynamicsInterface;
 
 /**
@@ -12,10 +13,11 @@ public interface PhantomRendererInterface
 
   /**
    * Returns the tissue dynamics for this renderer.
+   * 
    * @return
    */
   TissueDynamicsInterface getTissue();
-  
+
   /**
    * Returns the rendered stack width
    * 
@@ -25,12 +27,14 @@ public interface PhantomRendererInterface
 
   /**
    * Returns the rendered stack height
+   * 
    * @return
    */
   long getHeight();
 
   /**
    * Returns the rendered stack depth
+   * 
    * @return
    */
   long getDepth();
@@ -39,6 +43,11 @@ public interface PhantomRendererInterface
    * Clears the render cache for all planes
    */
   void clear();
+
+  /**
+   * Renders whole stack.
+   */
+  void render();
 
   /**
    * @param pZPlaneIndex
@@ -67,6 +76,17 @@ public interface PhantomRendererInterface
   void invalidate(int pZPlaneIndex);
 
   /**
+   * Copies rendered stack data into memory region.
+   * 
+   * @param pMemory
+   *          memory
+   * @param pBlocking
+   *          true blocks call until copy done, false for asynch copy. Note: Some
+   *          implementations might not be capable of asynch copy.
+   */
+  void copyTo(ContiguousMemoryInterface pMemory, boolean pBlocking);
+
+  /**
    * Return phantom signal intensity
    * 
    * @return
@@ -93,7 +113,5 @@ public interface PhantomRendererInterface
    * @param pNoiseIntensity
    */
   void setNoiseOverSignalRatio(float pNoiseIntensity);
-
-
 
 }
