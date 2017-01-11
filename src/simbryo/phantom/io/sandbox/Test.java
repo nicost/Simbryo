@@ -1,56 +1,33 @@
 package simbryo.phantom.io.sandbox;
 
-import static org.junit.Assert.*;
-
 import java.io.IOException;
 
+import org.scijava.io.DefaultIOService;
 import org.scijava.io.IOService;
 
-import loci.common.services.DependencyException;
-import loci.common.services.ServiceException;
-import loci.common.services.ServiceFactory;
-import loci.formats.FormatException;
-import loci.formats.FormatTools;
-import loci.formats.IFormatWriter;
-import loci.formats.ImageWriter;
-import loci.formats.MetadataTools;
-import loci.formats.meta.IMetadata;
-import loci.formats.services.OMEXMLService;
+import io.scif.services.SCIFIODatasetService;
+import net.imagej.Dataset;
+import net.imagej.DatasetService;
+import net.imglib2.img.array.ArrayImgs;
 
 public class Test
 {
 
   @org.junit.Test
-  public void test() throws DependencyException, ServiceException, FormatException, IOException
+  public void test() throws 
+                     IOException
   {
-    System.out.println("Creating random image...");
-    int w = 512, h = 512, c = 1;
-    int pixelType = FormatTools.UINT16;
-    byte[] img = new byte[w * h * c * FormatTools.getBytesPerPixel(pixelType)];
+    DatasetService lDatasetService = new SCIFIODatasetService();
+    IOService lIOService = new DefaultIOService();
+    int width = 100;
+    int height = 100;
+    float[] myFloatArray = new float[width * height];
+    final Dataset d =
+                    lDatasetService.create(ArrayImgs.floats(myFloatArray,
+                                                            new long[]
+                                                            { width, height }));
+    lIOService.save(d, "myFile.tif");
 
-    // fill with random data
-    for (int i=0; i<img.length; i++) img[i] = (byte) (256 * Math.random());
-
-    // create metadata object with minimum required metadata fields
-    System.out.println("Populating metadata...");
-
-    ServiceFactory factory = new ServiceFactory();
-    OMEXMLService service = factory.getInstance(OMEXMLService.class);
-    IMetadata meta = service.createOMEXMLMetadata();
-
-    MetadataTools.populateMetadata(meta, 0, null, false, "XYZCT",
-      FormatTools.getPixelTypeString(pixelType), w, h, 1, c, 1, c);
-
-    String id ="test.tiff";
-    // write image plane to disk
-    System.out.println("Writing image to '" + id  + "'...");
-    IFormatWriter writer = new ImageWriter();
-    writer.setMetadataRetrieve(meta);
-    writer.setId(id);
-    writer.saveBytes(0, img);
-    writer.close();
-
-    System.out.println("Done.");
   }
 
 }

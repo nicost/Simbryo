@@ -11,9 +11,6 @@ import clearcl.backend.ClearCLBackendInterface;
 import clearcl.backend.ClearCLBackends;
 import clearcl.util.ElapsedTime;
 import clearcl.viewer.ClearCLImageViewer;
-import loci.common.services.DependencyException;
-import loci.common.services.ServiceException;
-import loci.formats.FormatException;
 import simbryo.dynamics.tissue.embryo.zoo.Drosophila;
 import simbryo.phantom.ClearCLPhantomRendererUtils;
 import simbryo.phantom.fluo.impl.drosophila.DrosophilaHistoneFluorescence;
@@ -23,7 +20,7 @@ public class PhantomTiffWriterTests
 {
 
   @Test
-  public void test() throws IOException, InterruptedException, DependencyException, ServiceException, FormatException
+  public void test() throws IOException
   {
     String lUserHome = System.getProperty("user.home");
     File lDownloadFolder = new File(lUserHome+"/Downloads/"); 

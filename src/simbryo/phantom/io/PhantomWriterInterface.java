@@ -3,9 +3,9 @@ package simbryo.phantom.io;
 import java.io.File;
 import java.io.IOException;
 
-import loci.common.services.DependencyException;
-import loci.common.services.ServiceException;
-import loci.formats.FormatException;
+import io.scif.DependencyException;
+import io.scif.FormatException;
+import io.scif.services.ServiceException;
 import simbryo.phantom.PhantomRendererInterface;
 
 public interface PhantomWriterInterface
@@ -20,6 +20,6 @@ public interface PhantomWriterInterface
    * @throws IOException 
    * @throws FormatException 
    */
-  void write(PhantomRendererInterface pPhantomRenderer, File pFile) throws DependencyException, ServiceException, FormatException, IOException;
+  void write(PhantomRendererInterface pPhantomRenderer, File pFile) throws Throwable;
 
 }

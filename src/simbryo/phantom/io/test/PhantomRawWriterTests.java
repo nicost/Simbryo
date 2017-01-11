@@ -11,24 +11,16 @@ import clearcl.backend.ClearCLBackendInterface;
 import clearcl.backend.ClearCLBackends;
 import clearcl.util.ElapsedTime;
 import clearcl.viewer.ClearCLImageViewer;
-import loci.common.services.DependencyException;
-import loci.common.services.ServiceException;
-import loci.formats.FormatException;
 import simbryo.dynamics.tissue.embryo.zoo.Drosophila;
 import simbryo.phantom.ClearCLPhantomRendererUtils;
 import simbryo.phantom.fluo.impl.drosophila.DrosophilaHistoneFluorescence;
 import simbryo.phantom.io.PhantomRawWriter;
-import simbryo.phantom.io.PhantomTiffWriter;
 
 public class PhantomRawWriterTests
 {
 
   @Test
-  public void test() throws IOException,
-                     InterruptedException,
-                     DependencyException,
-                     ServiceException,
-                     FormatException
+  public void test() throws IOException
   {
     String lUserHome = System.getProperty("user.home");
     File lDownloadFolder = new File(lUserHome + "/Downloads/");
@@ -63,8 +55,7 @@ public class PhantomRawWriterTests
                                                                                  lHeight,
                                                                                  lDepth);
 
-      PhantomRawWriter lPhantomRawWriter = new PhantomRawWriter(1,
-                                                                   0);
+      PhantomRawWriter lPhantomRawWriter = new PhantomRawWriter(1, 0);
 
       ClearCLImageViewer lOpenViewer = lDrosoFluo.openViewer();
 
@@ -85,7 +76,7 @@ public class PhantomRawWriterTests
                                           lHeight,
                                           lDepth,
                                           lTimeIndex));
-        
+
         lPhantomRawWriter.write(lDrosoFluo, lFile);
       }
 

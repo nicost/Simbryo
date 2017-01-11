@@ -97,7 +97,7 @@ dependencies
     compile ('io.scif:scifio:0.30.0')                 {transitive= true; changing= true}
     
     // BioFormats
-    compile ('ome:bioformats_package:5.3.0')
+    //compile ('ome:bioformats_package:5.3.0')
 
     // JUnit:
     compile group: 'junit', name: 'junit', version: '4.11'
