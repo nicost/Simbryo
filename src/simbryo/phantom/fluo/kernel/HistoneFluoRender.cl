@@ -85,6 +85,7 @@ __kernel void hisrender(   __write_only    image3d_t  image,
   
   const float nucleiradiusvoxels = NUCLEIRADIUS*width ;
   
+  
   for(int k=0; k<MAXNEI; k++)
   {
     const uint nei = localneighboors[k]; 
@@ -103,7 +104,13 @@ __kernel void hisrender(   __write_only    image3d_t  image,
       const float4 noisepos         =   0.5f+normrelvoxposac+npn;
       const float  levelnoise       =   2.0f*read_imagef(perlin, sampler, noisepos).x-1.0f;
       
-      const float d      = fast_length(relvoxposac); 
+      // have the grad vector ='orientation vector' be a property of the nuclei and opimize code...
+      const float3 grad = (float3){(partpos.x-width/2)/1.0f,(partpos.y-height/2)/(0.43f*0.43f),(partpos.z-depth/2)/(0.43f*0.43f)};
+      const float cosval = fabs(dot(grad,relvoxposac)/(fast_length(grad)*fast_length(relvoxposac)));
+      const float eccentricity = -(0.5f*cosval*cosval)*nucleiradiusvoxels;
+      //optimal would be: plot r=1+0.5*abs(cos(theta))^2.3 from 0 to 2Pi
+      
+      const float d      = fast_length(relvoxposac) + eccentricity; 
       const float noisyd = d + NUCLEIROUGHNESS*levelnoise;
       
       const float  level      =  native_recip(1.0f+native_exp2(NUCLEISHARPNESS*(noisyd-nucleiradiusvoxels)));

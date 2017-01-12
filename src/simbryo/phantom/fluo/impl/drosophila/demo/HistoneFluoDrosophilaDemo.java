@@ -62,15 +62,15 @@ public class HistoneFluoDrosophilaDemo
       
       ClearCLImageViewer lOpenViewer = lDrosoFluo.openViewer();
 
-      lDrosophila.simulationSteps(14000, 1);
+      lDrosophila.simulationSteps(4000, 1);
 
       Timming lTimming = new Timming();
 
-      int lPeriod = 50;
+      int lPeriod = 100;
 
       int i = 0;
       boolean lAbort = false;
-      while (lOpenViewer.isShowing())
+      while (lOpenViewer.isShowing() && !lAbort)
       {
         // System.out.println("i=" + i);
         lTimming.syncAtPeriod(1);

@@ -6,7 +6,7 @@ float rngfloat1(uint x);
 #define AUTOSHARPNESS 10.0f
 #define AUTOBACKGROUND 0.5f
 #define AUTOYOLK 0.25f 
-//0.30f
+
 
 inline float autofluo(float3 dim, float3 voxelpos, sampler_t sampler, __read_only image3d_t  perlin, int timeindex )
 {
