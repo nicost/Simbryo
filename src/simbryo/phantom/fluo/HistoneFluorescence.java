@@ -69,7 +69,7 @@ public abstract class HistoneFluorescence extends
          10f,
          0.8f,
          0.75f,
-         1e-6f,
+         6e-2f,
          pStackDimensions);
   }
 

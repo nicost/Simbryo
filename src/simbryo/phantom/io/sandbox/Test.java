@@ -2,14 +2,6 @@ package simbryo.phantom.io.sandbox;
 
 import java.io.IOException;
 
-import org.scijava.io.DefaultIOService;
-import org.scijava.io.IOService;
-
-import io.scif.services.SCIFIODatasetService;
-import net.imagej.Dataset;
-import net.imagej.DatasetService;
-import net.imglib2.img.array.ArrayImgs;
-
 public class Test
 {
 
@@ -17,7 +9,7 @@ public class Test
   public void test() throws 
                      IOException
   {
-    DatasetService lDatasetService = new SCIFIODatasetService();
+    /*DatasetService lDatasetService = new SCIFIODatasetService();
     IOService lIOService = new DefaultIOService();
     int width = 100;
     int height = 100;
@@ -27,6 +19,7 @@ public class Test
                                                             new long[]
                                                             { width, height }));
     lIOService.save(d, "myFile.tif");
+    /**/
 
   }
 

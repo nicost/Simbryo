@@ -11,6 +11,7 @@ import clearcl.backend.ClearCLBackendInterface;
 import clearcl.backend.ClearCLBackends;
 import clearcl.util.ElapsedTime;
 import clearcl.viewer.ClearCLImageViewer;
+import javafx.scene.control.Slider;
 import simbryo.dynamics.tissue.embryo.zoo.Drosophila;
 import simbryo.phantom.ClearCLPhantomRendererUtils;
 import simbryo.phantom.fluo.impl.drosophila.DrosophilaHistoneFluorescence;
@@ -61,12 +62,13 @@ public class HistoneFluoDrosophilaDemo
       
       
       ClearCLImageViewer lOpenViewer = lDrosoFluo.openViewer();
+      Slider lZSlider = lOpenViewer.getZSlider();
 
-      lDrosophila.simulationSteps(4000, 1);
+      lDrosophila.simulationSteps(1000, 1);
 
       Timming lTimming = new Timming();
 
-      int lPeriod = 100;
+      int lPeriod = 10;
 
       int i = 0;
       boolean lAbort = false;
@@ -82,9 +84,12 @@ public class HistoneFluoDrosophilaDemo
         if (i % lPeriod == 0)
         {
           lDrosoFluo.clear();
-          lDrosoFluo.renderSmart(0, (int) lDrosoFluo.getDepth());
+          
+          
+          //lDrosoFluo.renderSmart(0, (int) lDrosoFluo.getDepth());
+          lDrosoFluo.render((int)lZSlider.valueProperty().get()-1,(int)lZSlider.valueProperty().get()+1);
 
-          float lMaximalCellOccupancy =
+          /*float lMaximalCellOccupancy =
                                       lDrosophila.getNeighborhoodGrid()
                                                  .getMaximalCellOccupancy();
 
@@ -95,8 +100,8 @@ public class HistoneFluoDrosophilaDemo
           {
             System.err.println("MAXIMAL OCCUPANCY REACHED!!!");
             lAbort = true;
-          }
-          Thread.sleep(5);
+          }/**/
+          //Thread.sleep(5);
         }
 
         i++;

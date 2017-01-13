@@ -115,6 +115,11 @@ public abstract class ClearCLPhantomRendererBase extends
   private void renderInternal(int pZPlaneIndexBegin,
                               int pZPlaneIndexEnd)
   {
+    if(pZPlaneIndexEnd==pZPlaneIndexBegin)
+      pZPlaneIndexEnd+=mLocalSizeZ; 
+    
+    System.out.println("pZPlaneIndexBegin="+pZPlaneIndexBegin);
+    System.out.println("pZPlaneIndexEnd  ="+pZPlaneIndexEnd);
     mRenderKernel.setGlobalOffsets(0, 0, pZPlaneIndexBegin);
     mRenderKernel.setGlobalSizes(getWidth(),
                                  getHeight(),

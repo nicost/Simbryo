@@ -1,4 +1,4 @@
-package simbryo.phantom.io.test;
+package simbryo.phantom.io.demo;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,21 +11,24 @@ import clearcl.backend.ClearCLBackendInterface;
 import clearcl.backend.ClearCLBackends;
 import clearcl.util.ElapsedTime;
 import clearcl.viewer.ClearCLImageViewer;
+import coremem.enums.NativeTypeEnum;
 import simbryo.dynamics.tissue.embryo.zoo.Drosophila;
 import simbryo.phantom.ClearCLPhantomRendererUtils;
 import simbryo.phantom.fluo.impl.drosophila.DrosophilaHistoneFluorescence;
-import simbryo.phantom.io.PhantomTiffWriter;
+import simbryo.phantom.io.PhantomRawWriter;
 
-public class PhantomTiffWriterTests
+public class PhantomRawWriterDemo
 {
 
   @Test
   public void test() throws IOException
   {
-    String lUserHome = System.getProperty("user.home");
-    File lDownloadFolder = new File(lUserHome+"/Downloads/"); 
-    File lDataFolder = new File(lDownloadFolder,"DrosoStacks"); 
+    /*String lUserHome = System.getProperty("user.home");
+    File lDownloadFolder = new File(lUserHome + "/Downloads/");
+    File lDataFolder = new File(lDownloadFolder, "DrosoStacks");/**/
     
+    File lDataFolder = new File("/Volumes/green-carpet/Simbryo");
+
     int lWidth = 512;
     int lHeight = 512;
     int lDepth = 512;
@@ -54,23 +57,37 @@ public class PhantomTiffWriterTests
                                                                                  lWidth,
                                                                                  lHeight,
                                                                                  lDepth);
+
+      PhantomRawWriter lPhantomRawWriter = new PhantomRawWriter(100, 0);
+      lPhantomRawWriter.setOverwrite(false);
+      lPhantomRawWriter.setDataType(NativeTypeEnum.Byte);
+
+      //lDrosophila.simulationSteps(14000, 1);
       
-      PhantomTiffWriter lPhantomTiffWriter = new PhantomTiffWriter(1,0);
+      //ClearCLImageViewer lOpenViewer = lDrosoFluo.openViewer();
 
-      ClearCLImageViewer lOpenViewer = lDrosoFluo.openViewer();
+      int lPeriod = 10;
 
-      int lPeriod = 50;
-
-      while (lOpenViewer.isShowing())
+      while (lDrosophila.getTimeStepIndex()<15000)
       {
         lDrosophila.simulationSteps(lPeriod, 1);
         long lTimeIndex = lDrosophila.getTimeStepIndex();
 
         lDrosoFluo.clear();
         lDrosoFluo.render();
-        
-        File lFile = new File(lDataFolder,String.format("stack%d.tiff",lTimeIndex));
-        lPhantomTiffWriter.write(lDrosoFluo,lFile);
+
+        File lFile =
+                   new File(lDataFolder,
+                            String.format("stack.%d.%d.%d.%d.%s.raw",
+                                          lWidth,
+                                          lHeight,
+                                          lDepth,
+                                          lTimeIndex,lPhantomRawWriter.getDataType()));
+
+        if(lPhantomRawWriter.write(lDrosoFluo, lFile))
+        {
+          System.out.println("Writting file: "+lFile);
+        }
       }
 
       lDrosoFluo.close();

@@ -1,4 +1,4 @@
-package simbryo.phantom.io.test;
+package simbryo.phantom.io.demo;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,18 +14,18 @@ import clearcl.viewer.ClearCLImageViewer;
 import simbryo.dynamics.tissue.embryo.zoo.Drosophila;
 import simbryo.phantom.ClearCLPhantomRendererUtils;
 import simbryo.phantom.fluo.impl.drosophila.DrosophilaHistoneFluorescence;
-import simbryo.phantom.io.PhantomRawWriter;
+import simbryo.phantom.io.PhantomTiffWriter;
 
-public class PhantomRawWriterTests
+public class PhantomTiffWriterDemo
 {
 
   @Test
-  public void test() throws IOException
+  public void test() throws Throwable
   {
     String lUserHome = System.getProperty("user.home");
-    File lDownloadFolder = new File(lUserHome + "/Downloads/");
-    File lDataFolder = new File(lDownloadFolder, "DrosoStacks");
-
+    File lDownloadFolder = new File(lUserHome+"/Downloads/"); 
+    File lDataFolder = new File(lDownloadFolder,"DrosoStacks"); 
+    
     int lWidth = 512;
     int lHeight = 512;
     int lDepth = 512;
@@ -54,12 +54,12 @@ public class PhantomRawWriterTests
                                                                                  lWidth,
                                                                                  lHeight,
                                                                                  lDepth);
-
-      PhantomRawWriter lPhantomRawWriter = new PhantomRawWriter(1, 0);
+      
+      PhantomTiffWriter lPhantomTiffWriter = new PhantomTiffWriter(1,0);
 
       ClearCLImageViewer lOpenViewer = lDrosoFluo.openViewer();
 
-      int lPeriod = 500;
+      int lPeriod = 50;
 
       while (lOpenViewer.isShowing())
       {
@@ -68,16 +68,9 @@ public class PhantomRawWriterTests
 
         lDrosoFluo.clear();
         lDrosoFluo.render();
-
-        File lFile =
-                   new File(lDataFolder,
-                            String.format("stack.%d.%d.%d.%d.float.raw",
-                                          lWidth,
-                                          lHeight,
-                                          lDepth,
-                                          lTimeIndex));
-
-        lPhantomRawWriter.write(lDrosoFluo, lFile);
+        
+        File lFile = new File(lDataFolder,String.format("stack%d.tiff",lTimeIndex));
+        lPhantomTiffWriter.write(lDrosoFluo,lFile);
       }
 
       lDrosoFluo.close();
