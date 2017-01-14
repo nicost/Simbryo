@@ -64,7 +64,7 @@ public class HistoneFluoDrosophilaDemo
       ClearCLImageViewer lOpenViewer = lDrosoFluo.openViewer();
       Slider lZSlider = lOpenViewer.getZSlider();
 
-      lDrosophila.simulationSteps(1000, 1);
+      lDrosophila.simulationSteps(13000, 1);
 
       Timming lTimming = new Timming();
 

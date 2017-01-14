@@ -1,5 +1,8 @@
 package simbryo.phantom;
 
+import static java.lang.Math.floor;
+import static java.lang.Math.min;
+
 import clearcl.ClearCLDevice;
 
 /**
@@ -12,10 +15,7 @@ public abstract class ClearCLPhantomRendererUtils
 
   /**
    * Returns optimal grid dimensions for a given OpenCL device and stack dimensions.
-   * 
-   * //TODO: currently it is set to a constant: 8 but if in the future we figure out a way to
-   * choose that more wisely, we will. Also, this also depends on the actual max neighboours per grid cell,
-   * which further complicates things...
+   *
    * 
    * @param pDevice
    * @param pStackDimensions
@@ -27,10 +27,13 @@ public abstract class ClearCLPhantomRendererUtils
     int lDimension = pStackDimensions.length;
     int[] lGridDimensions = new int[lDimension];
 
+    long lMaxWorkGroupSize = pDevice.getMaxWorkGroupSize();
+    
+    int lMaxGridDim = (int) floor(min(8,Math.pow(lMaxWorkGroupSize, 1.0/3)));
     
     for (int d = 0; d < lDimension; d++)
     {
-      lGridDimensions[d] = pStackDimensions[d] / 8;
+      lGridDimensions[d] = pStackDimensions[d] / lMaxGridDim;
     }
 
     return lGridDimensions;
