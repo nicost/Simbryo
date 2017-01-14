@@ -18,7 +18,6 @@ __kernel void hisrender(   __write_only    image3d_t  image,
 {
   const sampler_t sampler = CLK_NORMALIZED_COORDS_TRUE | CLK_ADDRESS_MIRRORED_REPEAT | CLK_FILTER_NEAREST;
  
-  __local int first;
   __local int localneighboors[MAXNEI];
   __local float localpositions[3*MAXNEI];
   
@@ -62,7 +61,7 @@ __kernel void hisrender(   __write_only    image3d_t  image,
     const int nei = neighboors[gi*MAXNEI+li];
     localneighboors[li] = nei;
     
-    if(nei!=-1)
+    if(nei>=0)
     {
       const float3 partpos = vload3(nei,positions)*dim;
       vstore3(partpos,li,localpositions);
@@ -77,7 +76,7 @@ __kernel void hisrender(   __write_only    image3d_t  image,
   value += autofluo(dim, voxelpos, sampler, perlin, timeindex);
   value += NOISERATIO*rngfloat3(x+timeindex,y+timeindex,z+timeindex);    
   
-  if(localneighboors[0]==-1)
+  if(localneighboors[0]>=0)
   {
     write_imagef (image, (int4){x,y,z,0.0f}, intensity*value);
     return;
@@ -100,7 +99,8 @@ __kernel void hisrender(   __write_only    image3d_t  image,
       const float npnz = rngfloat1((2654435789*3)^nei);
       const float4 npn = (float4){npnx,npny,npnz,0.0f};
       
-      const float4 normrelvoxposac  = (float4){(relvoxposac*INOISEDIM).xyz,0.0f};
+      const float3 relvoxposacndim  = relvoxposac*INOISEDIM;
+      const float4 normrelvoxposac  = (float4){relvoxposacndim.x, relvoxposacndim.y, relvoxposacndim.z, 0.0f};
       const float4 noisepos         =   0.5f+normrelvoxposac+npn;
       const float  levelnoise       =   2.0f*read_imagef(perlin, sampler, noisepos).x-1.0f;
       

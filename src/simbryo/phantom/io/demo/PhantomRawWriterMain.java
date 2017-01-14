@@ -17,93 +17,92 @@ import simbryo.phantom.io.PhantomRawWriter;
 public class PhantomRawWriterMain
 {
 
-  public static void main(String[] args)
-  {
-    try
-    {
-      write(args[0]);
-    }
-    catch (Throwable e)
-    {
-      e.printStackTrace();
-    }
+	public static void main(final String[] args)
+	{
+		try
+		{
+			write(args[0]);
+		}
+		catch (final Throwable e)
+		{
+			e.printStackTrace();
+		}
 
-  }
+	}
 
-  private static void write(String pFolderPathString) throws IOException
-  {
-    /*String lUserHome = System.getProperty("user.home");
-    File lDownloadFolder = new File(lUserHome + "/Downloads/");
-    File lDataFolder = new File(lDownloadFolder, "DrosoStacks");/**/
+	private static void write(final String pFolderPathString) throws IOException
+	{
+		/*String lUserHome = System.getProperty("user.home");
+		File lDownloadFolder = new File(lUserHome + "/Downloads/");
+		File lDataFolder = new File(lDownloadFolder, "DrosoStacks");/**/
 
-    File lDataFolder = new File(pFolderPathString);
+		final File lDataFolder = new File(pFolderPathString);
 
-    int lWidth = 512;
-    int lHeight = 512;
-    int lDepth = 512;
+		final int lWidth = 512;
+		final int lHeight = 512;
+		final int lDepth = 512;
 
-    ElapsedTime.sStandardOutput = true;
+		ElapsedTime.sStandardOutput = true;
 
-    ClearCLBackendInterface lBestBackend =
-                                         ClearCLBackends.getBestBackend();
-    System.out.println("lBestBackend=" + lBestBackend);
-    try (ClearCL lClearCL = new ClearCL(lBestBackend);
-        ClearCLDevice lFastestGPUDevice =
-                                        lClearCL.getFastestGPUDeviceForImages();)
-    {
+		final ClearCLBackendInterface lBestBackend = ClearCLBackends.getBestBackend();
+		System.out.println("lBestBackend=" + lBestBackend);
+		try (ClearCL lClearCL = new ClearCL(lBestBackend);
+				ClearCLDevice lFastestGPUDevice =
+																				lClearCL.getFastestGPUDeviceForImages();)
+		{
+			System.out.println("lFastestGPUDevice=" + lFastestGPUDevice);
 
-      int[] lGridDimensions =
-                            ClearCLPhantomRendererUtils.getOptimalGridDimensions(lFastestGPUDevice,
-                                                                                 lWidth,
-                                                                                 lHeight,
-                                                                                 lDepth);
+			final int[] lGridDimensions =
+																	ClearCLPhantomRendererUtils.getOptimalGridDimensions(	lFastestGPUDevice,
+																																												lWidth,
+																																												lHeight,
+																																												lDepth);
 
-      Drosophila lDrosophila = new Drosophila(16, lGridDimensions);
+			final Drosophila lDrosophila = new Drosophila(16,
+																										lGridDimensions);
 
-      DrosophilaHistoneFluorescence lDrosoFluo =
-                                               new DrosophilaHistoneFluorescence(lFastestGPUDevice,
-                                                                                 lDrosophila,
-                                                                                 lWidth,
-                                                                                 lHeight,
-                                                                                 lDepth);
+			final DrosophilaHistoneFluorescence lDrosoFluo = new DrosophilaHistoneFluorescence(	lFastestGPUDevice,
+																																													lDrosophila,
+																																													lWidth,
+																																													lHeight,
+																																													lDepth);
 
-      PhantomRawWriter lPhantomRawWriter =
-                                         new PhantomRawWriter(100, 0);
-      lPhantomRawWriter.setOverwrite(false);
-      lPhantomRawWriter.setDataType(NativeTypeEnum.Byte);
+			final PhantomRawWriter lPhantomRawWriter = new PhantomRawWriter(100,
+																																			0);
+			lPhantomRawWriter.setOverwrite(false);
+			lPhantomRawWriter.setDataType(NativeTypeEnum.Byte);
 
-      // lDrosophila.simulationSteps(14000, 1);
+			// lDrosophila.simulationSteps(14000, 1);
 
-      // ClearCLImageViewer lOpenViewer = lDrosoFluo.openViewer();
+			// ClearCLImageViewer lOpenViewer = lDrosoFluo.openViewer();
 
-      int lPeriod = 10;
+			final int lPeriod = 10;
 
-      while (lDrosophila.getTimeStepIndex() < 15000)
-      {
-        lDrosophila.simulationSteps(lPeriod, 1);
-        long lTimeIndex = lDrosophila.getTimeStepIndex();
+			while (lDrosophila.getTimeStepIndex() < 15000)
+			{
+				lDrosophila.simulationSteps(lPeriod, 1);
+				final long lTimeIndex = lDrosophila.getTimeStepIndex();
 
-        lDrosoFluo.clear();
-        lDrosoFluo.render();
+				lDrosoFluo.clear();
+				lDrosoFluo.render();
 
-        File lFile =
-                   new File(lDataFolder,
-                            String.format("stack.%d.%d.%d.%d.%s.raw",
-                                          lWidth,
-                                          lHeight,
-                                          lDepth,
-                                          lTimeIndex,
-                                          lPhantomRawWriter.getDataType()));
+				final File lFile = new File(lDataFolder,
+																		String.format("stack.%d.%d.%d.%d.%s.raw",
+																									lWidth,
+																									lHeight,
+																									lDepth,
+																									lTimeIndex,
+																									lPhantomRawWriter.getDataType()));
 
-        if (lPhantomRawWriter.write(lDrosoFluo, lFile))
-        {
-          System.out.println("Writting file: " + lFile);
-        }
-      }
+				if (lPhantomRawWriter.write(lDrosoFluo, lFile))
+				{
+					System.out.println("Writting file: " + lFile);
+				}
+			}
 
-      lDrosoFluo.close();
+			lDrosoFluo.close();
 
-    }
-  }
+		}
+	}
 
 }
