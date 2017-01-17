@@ -4,27 +4,88 @@ import simbryo.dynamics.tissue.TissueDynamics;
 import simbryo.util.DoubleBufferingFloatArray;
 
 /**
- * Cell properties are quantities attached to each cell. Operators can be used to
- * modify these values over time.
+ * Cell properties are quantities attached to each cell. Operators can be used
+ * to modify these values over time.
  *
  * @author royer
  */
 public class CellProperty
 {
-  private TissueDynamics mEmbryo;
-  private final DoubleBufferingFloatArray mPropertyArray;
+  private final TissueDynamics mEmbryo;
+  private final int mDimension;
+
+  protected final DoubleBufferingFloatArray mPropertyArray;
 
   /**
-   * Constructs a cell property for a given embryo.
+   * Constructs a 1D cell property for a given embryo.
    * 
-   * @param pEmbryo
+   * @param pTissueDynamics
+   *          tissue dynamics
    */
-  public CellProperty(TissueDynamics pEmbryo)
+  public CellProperty(TissueDynamics pTissueDynamics)
+  {
+    this(pTissueDynamics, 1);
+  }
+
+  /**
+   * Constructs a nD cell property for a given embryo.
+   * 
+   * @param pTissueDynamics
+   *          tissue dynamics
+   * @param pDimension
+   *          dimension of cell property
+   */
+  public CellProperty(TissueDynamics pTissueDynamics, int pDimension)
   {
     super();
-    mEmbryo = pEmbryo;
+    mEmbryo = pTissueDynamics;
+    mDimension = pDimension;
     mPropertyArray =
-                    new DoubleBufferingFloatArray(mEmbryo.getMaxNumberOfParticles());
+                   new DoubleBufferingFloatArray(getDimension()
+                                                 * mEmbryo.getMaxNumberOfParticles());
+  }
+
+  /**
+   * Returns the maximum number of particles.
+   * 
+   * @return max number of particles
+   */
+  public int getMaxNumberOfParticles()
+  {
+    return mEmbryo.getMaxNumberOfParticles();
+  }
+
+  /**
+   * Returns dimension of property.
+   * 
+   * @return dimension
+   */
+  public int getDimension()
+  {
+    return mDimension;
+  }
+
+  /**
+   * Copies values from read to write arrays.
+   * 
+   * @param pBeginId
+   * @param pEndId
+   */
+  public void copyDefault(int pBeginId, int pEndId)
+  {
+    mPropertyArray.copyDefault(pBeginId * mDimension,
+                               pEndId * mDimension);
+  }
+
+  /**
+   * Clear cell property to zero.
+   * 
+   * @param pBeginId
+   * @param pEndId
+   */
+  public void clear(int pBeginId, int pEndId)
+  {
+    mPropertyArray.clear(pBeginId * mDimension, pEndId * mDimension);
   }
 
   /**
@@ -38,8 +99,10 @@ public class CellProperty
   public void copyValue(int pSourceParticleId, int pDestParticleId)
   {
     float[] lMorphogenArray = mPropertyArray.getCurrentArray();
-    lMorphogenArray[pDestParticleId] =
-                                     lMorphogenArray[pSourceParticleId];
+    lMorphogenArray[getDimension()
+                    * pDestParticleId] =
+                                       lMorphogenArray[getDimension()
+                                                       * pSourceParticleId];
   }
 
   /**

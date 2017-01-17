@@ -3,6 +3,7 @@ package simbryo.dynamics.tissue;
 import java.util.ArrayList;
 
 import simbryo.dynamics.tissue.cellprop.CellProperty;
+import simbryo.dynamics.tissue.cellprop.VectorCellProperty;
 import simbryo.dynamics.tissue.cellprop.operators.CellPropertyOperatorInterface;
 import simbryo.particles.ParticleSystem;
 import simbryo.particles.forcefield.interaction.impl.CollisionForceField;
@@ -12,13 +13,14 @@ import simbryo.util.DoubleBufferingFloatArray;
 import simbryo.util.sequence.Sequence;
 
 /**
- * Tissue dynamics extend from a particle system with standard dynamics appropriate for
- * simulating the motion of cells, as well as features such as morphogens and
- * target radii.
+ * Tissue dynamics extend from a particle system with standard dynamics
+ * appropriate for simulating the motion of cells, as well as features such as
+ * morphogens and target radii.
  *
  * @author royer
  */
-public class TissueDynamics extends ParticleSystem implements TissueDynamicsInterface
+public class TissueDynamics extends ParticleSystem
+                            implements TissueDynamicsInterface
 {
 
   protected static final int cMaximumNumberOfCells = 100000;
@@ -37,15 +39,14 @@ public class TissueDynamics extends ParticleSystem implements TissueDynamicsInte
 
   protected final CollisionForceField mCollisionForceField;
 
-  protected ArrayList<CellProperty> mMorphogenList =
-                                                   new ArrayList<>();
+  protected ArrayList<CellProperty> mCellPropertyList =
+                                                      new ArrayList<>();
 
   protected volatile long mTimeStepIndex = 0;
   protected final Sequence mSequence = new Sequence();
 
   private ParticleViewer3D mParticleViewer3D;
 
-  
   /**
    * Constructs a tissue of given dimensions (2D or 3D), dimension, grid size,
    * max number of particle per neighborhood cell, collision force between
@@ -119,7 +120,7 @@ public class TissueDynamics extends ParticleSystem implements TissueDynamicsInte
     mTargetRadii.getCurrentArray()[lNewParticleId] =
                                                    mTargetRadii.getCurrentArray()[pSourceParticleId];
 
-    for (CellProperty lMorphogen : mMorphogenList)
+    for (CellProperty lMorphogen : mCellPropertyList)
     {
       lMorphogen.copyValue(pSourceParticleId, lNewParticleId);
     }
@@ -128,19 +129,32 @@ public class TissueDynamics extends ParticleSystem implements TissueDynamicsInte
   }
 
   /**
-   * Adds a new morphogen to this tissue.
+   * Adds a new 1D cell property to this tissue.
    * 
-   * @return the new morphogen.
+   * @return the new cell property.
    */
-  protected CellProperty addMorphogen()
+  protected CellProperty addCellProperty()
   {
-    CellProperty lMorphogen = new CellProperty(this);
-    mMorphogenList.add(lMorphogen);
-    return lMorphogen;
+    return addVectorCellProperty(1);
   }
 
   /**
-   * Applies a number of simulationsteps to the tissue.
+   * Adds a new nD vector cell property to this tissue.
+   * 
+   * @param pDimension
+   * @return the new vector cell property.
+   */
+  protected VectorCellProperty addVectorCellProperty(int pDimension)
+  {
+    VectorCellProperty lVectorCellProperty =
+                                           new VectorCellProperty(this,
+                                                                  pDimension);
+    mCellPropertyList.add(lVectorCellProperty);
+    return lVectorCellProperty;
+  }
+
+  /**
+   * Applies a number of simulation steps to the tissue.
    * 
    * @param pNumberOfSteps
    *          number of simulation steps.
@@ -215,21 +229,21 @@ public class TissueDynamics extends ParticleSystem implements TissueDynamicsInte
   }
 
   /**
-   * Applies a single simulation step for an operator and a set of morphogens.
+   * Applies a single simulation step for an operator and a set of cell properties.
    * 
    * @param pOperator
    *          operator
-   * @param pMorphogens
-   *          a list of morphogens
+   * @param pCellProperties
+   *          a list of cell properties
    */
-  public void applyOperator(CellPropertyOperatorInterface pOperator,
-                            CellProperty... pMorphogens)
+  public <CP extends CellProperty> void applyOperator(CellPropertyOperatorInterface<CP> pOperator,
+                                                      CP... pCellProperties)
   {
-    apply(0, getNumberOfParticles(), pOperator, pMorphogens);
+    apply(0, getNumberOfParticles(), pOperator, pCellProperties);
   }
 
   /**
-   * Applies a single simulation step for an operator and a set of morphogens
+   * Applies a single simulation step for an operator and a set of cell properties
    * for a given range of cell ids.
    * 
    * @param pBeginId
@@ -238,15 +252,15 @@ public class TissueDynamics extends ParticleSystem implements TissueDynamicsInte
    *          end id
    * @param pOperator
    *          operator
-   * @param pMorphogens
-   *          a list of morphogens
+   * @param pCellProperties
+   *          a list of cell properties
    */
-  public void apply(int pBeginId,
-                    int pEndId,
-                    CellPropertyOperatorInterface pOperator,
-                    CellProperty... pMorphogens)
+  public <CP extends CellProperty> void apply(int pBeginId,
+                                              int pEndId,
+                                              CellPropertyOperatorInterface<CP> pOperator,
+                                              CP... pCellProperties)
   {
-    pOperator.apply(pBeginId, pEndId, this, pMorphogens);
+    pOperator.apply(pBeginId, pEndId, this, pCellProperties);
   }
 
 }

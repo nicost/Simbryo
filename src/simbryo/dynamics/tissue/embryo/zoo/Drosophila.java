@@ -1,21 +1,22 @@
 package simbryo.dynamics.tissue.embryo.zoo;
 
-import simbryo.dynamics.tissue.TissueDynamics;
 import simbryo.dynamics.tissue.cellprop.CellProperty;
+import simbryo.dynamics.tissue.cellprop.HasPolarity;
+import simbryo.dynamics.tissue.cellprop.VectorCellProperty;
+import simbryo.dynamics.tissue.cellprop.operators.impl.NematicOrderOperator;
 import simbryo.dynamics.tissue.cellprop.operators.impl.StrogatzWaveOperator;
+import simbryo.dynamics.tissue.cellprop.operators.impl.SurfaceGradientOperator;
 import simbryo.dynamics.tissue.embryo.EmbryoDynamics;
 import simbryo.particles.forcefield.ForceFieldInterface;
 import simbryo.particles.forcefield.external.impl.OneSidedIsoSurfaceForceField;
-import simbryo.particles.isosurf.IsoSurfaceInterface;
 import simbryo.particles.isosurf.impl.Ellipsoid;
-import simbryo.particles.isosurf.impl.RiceGrain;
 
 /**
  * Drosophila melanogster embryo (First 14 divisions).
  *
  * @author royer
  */
-public class Drosophila extends EmbryoDynamics
+public class Drosophila extends EmbryoDynamics implements HasPolarity
 {
 
   private static final float cCellDivisionRadiusShrinkage =
@@ -33,13 +34,16 @@ public class Drosophila extends EmbryoDynamics
   private ForceFieldInterface mOutsideEllipseForceField;
   private ForceFieldInterface mInsideEllipseForceField;
 
-  private CellProperty mCellCycleMorphogen;
+  private CellProperty mCellCycleProperty;
   private StrogatzWaveOperator mStrogatzOscillator;
+
+  private VectorCellProperty mPolarityProperty;
+  private SurfaceGradientOperator mSurfaceGradientOperator;
 
   private volatile int mCellDivCount;
 
   public float mEllipsoidA = 1.0f, mEllipsoidB = 0.43f,
-      mEllipsoidC = 0.43f, mEllipsoidR = 0.48f;
+      mEllipsoidC = 0.43f, mEllipsoidR = 0.47f;
 
   /**
    * Creates a Drosophila embryo.
@@ -52,13 +56,13 @@ public class Drosophila extends EmbryoDynamics
   {
     super(Fc, D, pMaxNumberOfParticlesPerGridCell, pGridDimensions);
 
-    setSurface(new Ellipsoid(0.48f,
+    setSurface(new Ellipsoid(mEllipsoidR,
                              0.5f,
                              0.5f,
                              0.5f,
-                             1f,
-                             0.43f,
-                             0.43f));
+                             mEllipsoidA,
+                             mEllipsoidB,
+                             mEllipsoidC));
 
     for (int i = 0; i < 1; i++)
     {
@@ -84,7 +88,7 @@ public class Drosophila extends EmbryoDynamics
                                                               Fafc,
                                                               getSurface());
 
-    mCellCycleMorphogen = addMorphogen();
+    mCellCycleProperty = addCellProperty();
     mStrogatzOscillator =
                         new StrogatzWaveOperator(0.001f, 0.01f, 0.1f)
                         {
@@ -104,6 +108,17 @@ public class Drosophila extends EmbryoDynamics
 
                         };
 
+    mPolarityProperty = addVectorCellProperty(3);
+    mPolarityProperty.initializeRandom();
+    mPolarityProperty.normalize();
+    mSurfaceGradientOperator = new SurfaceGradientOperator();
+
+  }
+  
+  @Override
+  public VectorCellProperty getPolarityProperty()
+  {
+    return mPolarityProperty;
   }
 
   private float cellDivisionHook(boolean pEvent,
@@ -117,9 +132,9 @@ public class Drosophila extends EmbryoDynamics
 
       int lNewParticleId = cloneParticle(pId, 0.001f);
 
-      mCellCycleMorphogen.getArray()
-                         .getWriteArray()[lNewParticleId] =
-                                                          pNewMorphogenValue;
+      mCellCycleProperty.getArray()
+                        .getWriteArray()[lNewParticleId] =
+                                                         pNewMorphogenValue;
 
       if (pNewMorphogenValue >= 6)
       {
@@ -154,9 +169,10 @@ public class Drosophila extends EmbryoDynamics
   {
     for (int i = 0; i < pNumberOfSteps; i++)
     {
-      applyOperator(mStrogatzOscillator, mCellCycleMorphogen);
+      applyOperator(mStrogatzOscillator, mCellCycleProperty);
+      applyOperator(mSurfaceGradientOperator, mPolarityProperty);
 
-      adjustForceFieldInsideEllipse();
+      adjustForceFieldInsideEmbryo();
 
       applyForceField(mOutsideEllipseForceField);
       applyForceField(mInsideEllipseForceField);
@@ -165,7 +181,7 @@ public class Drosophila extends EmbryoDynamics
     }
   }
 
-  private void adjustForceFieldInsideEllipse()
+  private void adjustForceFieldInsideEmbryo()
   {
     final float lForce;
 

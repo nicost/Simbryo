@@ -64,7 +64,7 @@ public class HistoneFluoDrosophilaDemo
       ClearCLImageViewer lOpenViewer = lDrosoFluo.openViewer();
       Slider lZSlider = lOpenViewer.getZSlider();
 
-      lDrosophila.simulationSteps(13000, 1);
+      //lDrosophila.simulationSteps(13000, 1);
 
       Timming lTimming = new Timming();
 
@@ -86,8 +86,8 @@ public class HistoneFluoDrosophilaDemo
           lDrosoFluo.clear();
           
           
-          //lDrosoFluo.renderSmart(0, (int) lDrosoFluo.getDepth());
-          lDrosoFluo.render((int)lZSlider.valueProperty().get()-1,(int)lZSlider.valueProperty().get()+1);
+          lDrosoFluo.renderSmart(0, (int) lDrosoFluo.getDepth());
+          //lDrosoFluo.render((int)lZSlider.valueProperty().get()-1,(int)lZSlider.valueProperty().get()+1);
 
           /*float lMaximalCellOccupancy =
                                       lDrosophila.getNeighborhoodGrid()

@@ -8,7 +8,7 @@ import simbryo.dynamics.tissue.cellprop.CellProperty;
  *
  * @author royer
  */
-public interface CellPropertyOperatorInterface
+public interface CellPropertyOperatorInterface<CP extends CellProperty>
 {
 
   /**
@@ -16,12 +16,12 @@ public interface CellPropertyOperatorInterface
    * 
    * @param pBeginId
    * @param pEndId
-   * @param pEmbryo
+   * @param pTissueDynamics
    * @param pCellProperty
    */
   void apply(int pBeginId,
              int pEndId,
-             TissueDynamics pEmbryo,
-             CellProperty... pCellProperty);
+             TissueDynamics pTissueDynamics,
+             CP... pCellProperty);
 
 }

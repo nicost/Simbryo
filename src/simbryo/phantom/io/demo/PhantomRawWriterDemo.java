@@ -27,7 +27,7 @@ public class PhantomRawWriterDemo
     File lDownloadFolder = new File(lUserHome + "/Downloads/");
     File lDataFolder = new File(lDownloadFolder, "DrosoStacks");/**/
     
-    File lDataFolder = new File("/Volumes/green-carpet/Simbryo");
+    File lDataFolder = new File("/Volumes/green-carpet/Simbryo/stacks");
 
     int lWidth = 512;
     int lHeight = 512;
@@ -62,7 +62,7 @@ public class PhantomRawWriterDemo
       lPhantomRawWriter.setOverwrite(false);
       lPhantomRawWriter.setDataType(NativeTypeEnum.Byte);
 
-      //lDrosophila.simulationSteps(14000, 1);
+      lDrosophila.simulationSteps(8500, 1);
       
       //ClearCLImageViewer lOpenViewer = lDrosoFluo.openViewer();
 

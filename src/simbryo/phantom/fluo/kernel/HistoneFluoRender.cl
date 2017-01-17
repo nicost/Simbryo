@@ -9,7 +9,8 @@ float autofluo(float3 dim, float3 voxelpos, sampler_t sampler, __read_only image
                                     
 __kernel void hisrender(   __write_only    image3d_t  image,
                            __global const  int*       neighboors,
-                           __global const  float*     positions, //
+                           __global const  float*     positions,
+                           __global const  float*     polarities,
                            __global const  float*     radii,
                                     const  float      intensity,
                                     const  int        timeindex,
@@ -20,6 +21,7 @@ __kernel void hisrender(   __write_only    image3d_t  image,
  
   __local int localneighboors[MAXNEI];
   __local float localpositions[3*MAXNEI];
+  __local float localpolarities[3*MAXNEI];
   
   const uint width  = get_image_width(image);
   const uint height = get_image_height(image);
@@ -65,6 +67,8 @@ __kernel void hisrender(   __write_only    image3d_t  image,
     {
       const float3 partpos = vload3(nei,positions)*dim;
       vstore3(partpos,li,localpositions);
+      const float3 partpol = vload3(nei,polarities);
+      vstore3(partpol,li,localpolarities);
     }
     
   }
@@ -76,7 +80,7 @@ __kernel void hisrender(   __write_only    image3d_t  image,
   value += autofluo(dim, voxelpos, sampler, perlin, timeindex);
   value += NOISERATIO*rngfloat3(x+timeindex,y+timeindex,z+timeindex);    
   
-  if(localneighboors[0]>=0)
+  if(localneighboors[0]<0)
   {
     write_imagef (image, (int4){x,y,z,0.0f}, intensity*value);
     return;
@@ -87,8 +91,8 @@ __kernel void hisrender(   __write_only    image3d_t  image,
   
   for(int k=0; k<MAXNEI; k++)
   {
-    const uint nei = localneighboors[k]; 
-    if(nei!=-1)
+    const int nei = localneighboors[k]; 
+    if(nei>=0)
     {
       const float3 partpos     = vload3(k,localpositions);
       const float3 relvoxpos   = voxelpos-partpos;
@@ -104,11 +108,9 @@ __kernel void hisrender(   __write_only    image3d_t  image,
       const float4 noisepos         =   0.5f+normrelvoxposac+npn;
       const float  levelnoise       =   2.0f*read_imagef(perlin, sampler, noisepos).x-1.0f;
       
-      // have the grad vector ='orientation vector' be a property of the nuclei and opimize code...
-      const float3 grad = (float3){(partpos.x-width/2)/1.0f,(partpos.y-height/2)/(0.43f*0.43f),(partpos.z-depth/2)/(0.43f*0.43f)};
-      const float cosval = fabs(dot(grad,relvoxposac)/(fast_length(grad)*fast_length(relvoxposac)));
+      const float3 partpol     = vload3(k,localpolarities);
+      const float cosval = fabs(dot(partpol,relvoxposac)/(fast_length(relvoxposac)));
       const float eccentricity = -(0.5f*cosval*cosval)*nucleiradiusvoxels;
-      //optimal would be: plot r=1+0.5*abs(cos(theta))^2.3 from 0 to 2Pi
       
       const float d      = fast_length(relvoxposac) + eccentricity; 
       const float noisyd = d + NUCLEIROUGHNESS*levelnoise;

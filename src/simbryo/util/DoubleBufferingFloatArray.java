@@ -1,5 +1,7 @@
 package simbryo.util;
 
+import java.util.Arrays;
+
 /**
  * Instances of this class implement a double-buffering scheme for float arrays.
  * Two arrays are maintained: a read and write array, a method is provided to
@@ -73,6 +75,18 @@ public class DoubleBufferingFloatArray
   {
     return mWriteArray;
   }
+  
+  /**
+   * Clears array with zeros.
+   * @param pBeginIndex begin index (inclusive)
+   * @param pEndIndex end index (exclusive)
+   */
+  public void clear(int pBeginIndex, int pEndIndex)
+  {
+    for(int i=pBeginIndex; i<pEndIndex; i++)
+      mWriteArray[i]=0;
+  }
+  
 
   /**
    * Copies the values from the read array to the write array. This is useful if
@@ -87,8 +101,8 @@ public class DoubleBufferingFloatArray
    * Copies the values from the read array to the write array. This is useful if
    * you know that only a few values will be changed.
    * 
-   * @param pBeginIndex
-   * @param pEndIndex
+   * @param pBeginIndex  begin index (inclusive)
+   * @param pEndIndex end index (exclusive)
    */
   public void copyDefault(int pBeginIndex, int pEndIndex)
   {
@@ -116,9 +130,9 @@ public class DoubleBufferingFloatArray
    * these values with a constant factor.
    * 
    * @param pBeginIndex
-   *          begin index
+   *          begin index (inclusive)
    * @param pEndIndex
-   *          end index
+   *          end index (exclusive)
    * @param pValue
    *          value
    */
@@ -152,5 +166,7 @@ public class DoubleBufferingFloatArray
   {
     System.arraycopy(getCurrentArray(), 0, pArrayCopy, 0, pLength);
   }
+
+
 
 }

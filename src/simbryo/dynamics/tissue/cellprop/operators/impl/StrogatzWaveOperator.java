@@ -21,8 +21,7 @@ import simbryo.util.geom.GeometryUtils;
  * http://epubs.siam.org/doi/abs/10.1137/0150098
  * 
  */
-public class StrogatzWaveOperator extends OperatorBase implements
-                                  CellPropertyOperatorInterface
+public class StrogatzWaveOperator extends OperatorBase<CellProperty>
 {
   private float mCouplingConstant;
 
@@ -57,10 +56,10 @@ public class StrogatzWaveOperator extends OperatorBase implements
   public void apply(int pBeginId,
                     int pEndId,
                     TissueDynamics pEmbryo,
-                    CellProperty... pMorphogens)
+                    CellProperty... pCellProperty)
   {
     final int lDimension = pEmbryo.getDimension();
-    final CellProperty lMorphogen = pMorphogens[0];
+    final CellProperty lCellProperty = pCellProperty[0];
 
     final NeighborhoodGrid lNeighborhood = pEmbryo.getNeighborhoodGrid();
     final int lMaxNumberOfParticlesPerGridCell =
@@ -92,16 +91,16 @@ public class StrogatzWaveOperator extends OperatorBase implements
     final int[] lCellCoordMax = new int[lDimension];
     final int[] lCellCoordCurrent = new int[lDimension];
 
-    final float[] lMorphogenArrayRead = lMorphogen.getArray()
+    final float[] lCellPropertyArrayRead = lCellProperty.getArray()
                                                   .getReadArray();
-    final float[] lMorphogenArrayWrite = lMorphogen.getArray()
+    final float[] lCellPropertyArrayWrite = lCellProperty.getArray()
                                                    .getWriteArray();
 
     for (int idu = pBeginId; idu < pEndId; idu++)
     {
       final float ru = lRadii[idu];
 
-      float lOldValue = lMorphogenArrayRead[idu];
+      float lOldValue = lCellPropertyArrayRead[idu];
 
       int lNumberOfNeighboors =
                               lNeighborhood.getAllNeighborsForParticle(lNeighboors,
@@ -122,7 +121,7 @@ public class StrogatzWaveOperator extends OperatorBase implements
                                                  lPositions,
                                                  lVelocities,
                                                  lRadii,
-                                                 lMorphogenArrayRead,
+                                                 lCellPropertyArrayRead,
                                                  lNeighboors,
                                                  lNumberOfNeighboors,
                                                  idu);
@@ -131,7 +130,7 @@ public class StrogatzWaveOperator extends OperatorBase implements
 
       lNewValue = (lEvent ? (int) lNewValue : lNewValue);
 
-      lMorphogenArrayWrite[idu] = eventHook(lEvent,
+      lCellPropertyArrayWrite[idu] = eventHook(lEvent,
                                             idu,
                                             lPositions,
                                             lVelocities,
@@ -140,7 +139,7 @@ public class StrogatzWaveOperator extends OperatorBase implements
 
     }
 
-    lMorphogen.getArray().swap();
+    lCellProperty.getArray().swap();
 
   }
 

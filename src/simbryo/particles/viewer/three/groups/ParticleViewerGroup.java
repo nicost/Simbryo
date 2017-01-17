@@ -12,6 +12,8 @@ import javafx.scene.shape.Box;
 import javafx.scene.shape.CullFace;
 import javafx.scene.shape.DrawMode;
 import javafx.scene.shape.Sphere;
+import simbryo.dynamics.tissue.cellprop.HasPolarity;
+import simbryo.dynamics.tissue.cellprop.VectorCellProperty;
 import simbryo.particles.ParticleSystem;
 
 public class ParticleViewerGroup extends Group
@@ -28,10 +30,11 @@ public class ParticleViewerGroup extends Group
   private float[] mPositions;
   private float[] mVelocities;
   private float[] mRadiis;
+  private float[] mPolarities;
 
-  private Group mParticlesGroup;
-  private final PhongMaterial mParticleMaterial;
-  private final PhongMaterial mBoxMaterial;
+  private Group mParticlesGroup, mParticlesPolarityGroup;
+  private final PhongMaterial mBoxMaterial, mParticleMaterial,
+      mParticlePolarityMaterial;
 
   public ParticleViewerGroup(int pWidth, int pHeight, int pDepth)
   {
@@ -56,17 +59,30 @@ public class ParticleViewerGroup extends Group
     lBoundingBox.setOpacity(0.01);
 
     mParticleMaterial = new PhongMaterial();
-    getParticleMaterial().setDiffuseColor(Color.WHITE);
-    getParticleMaterial().setSpecularColor(Color.LIGHTBLUE);
+    mParticleMaterial.setDiffuseColor(Color.WHITE);
+    mParticleMaterial.setSpecularColor(Color.LIGHTBLUE);
+
+    mParticlePolarityMaterial = new PhongMaterial();
+    mParticlePolarityMaterial.setDiffuseColor(Color.LIGHTCORAL);
+    mParticlePolarityMaterial.setSpecularColor(Color.LIGHTCORAL);
 
     // box.setMaterial(mParticleMaterial);
     mParticlesGroup = new Group();
-    getChildren().addAll(lBoundingBox, mParticlesGroup);
+    mParticlesPolarityGroup = new Group();
+    getChildren().addAll(lBoundingBox,
+                         mParticlesGroup,
+                         mParticlesPolarityGroup);
   }
 
   public void updateDisplay(ParticleSystem pParticleSystem,
                             boolean pBlocking)
   {
+    boolean lHasPolarity = pParticleSystem instanceof HasPolarity;
+    VectorCellProperty lPolarityProperty = null;
+    if (lHasPolarity)
+      lPolarityProperty =
+                        ((HasPolarity) pParticleSystem).getPolarityProperty();
+
     long lNow = System.nanoTime();
     float lNewElapsedTime =
                           (float) (1e-6
@@ -103,18 +119,30 @@ public class ParticleViewerGroup extends Group
       mPositions = new float[lNumberOfParticles * lDimension];
       mVelocities = new float[lNumberOfParticles * lDimension];
       mRadiis = new float[lNumberOfParticles];
+
+      if (lHasPolarity)
+        mPolarities = new float[lNumberOfParticles * lDimension];
     }
 
     pParticleSystem.copyPositions(mPositions);
     pParticleSystem.copyVelocities(mVelocities);
     pParticleSystem.copyRadii(mRadiis);
+    if (lHasPolarity)
+      lPolarityProperty.getArray()
+                       .copyCurrentArrayTo(mPolarities,
+                                           mPolarities.length);
 
     Platform.runLater(() -> {
 
       getChildren().remove(mParticlesGroup);
+      if (lHasPolarity)
+        getChildren().remove(mParticlesPolarityGroup);
 
       final ObservableList<Node> lParticlesSpheres =
                                                    mParticlesGroup.getChildren();
+
+      final ObservableList<Node> lParticlesPolaritySpheres =
+                                                           mParticlesPolarityGroup.getChildren();
 
       while (lParticlesSpheres.size() < pParticleSystem.getNumberOfParticles())
       {
@@ -126,11 +154,26 @@ public class ParticleViewerGroup extends Group
 
         lParticlesSpheres.add(lSphere);
         // System.out.println("ADDING");
+
+        if (lHasPolarity)
+        {
+          Sphere lPolaritySphere = new Sphere(1, 3);
+          lPolaritySphere.setMaterial(getParticlePolarityMaterial());
+          lPolaritySphere.setTranslateX(0);
+          lPolaritySphere.setTranslateY(0);
+          lPolaritySphere.setTranslateZ(0);
+
+          lParticlesPolaritySpheres.add(lPolaritySphere);
+        }
       }
 
       while (lParticlesSpheres.size() > pParticleSystem.getNumberOfParticles())
       {
         lParticlesSpheres.remove(lParticlesSpheres.size() - 1);
+
+        if (lHasPolarity)
+          lParticlesPolaritySpheres.remove(lParticlesPolaritySpheres.size()
+                                           - 1);
         // System.out.println("REMOVING");
       }
 
@@ -146,26 +189,54 @@ public class ParticleViewerGroup extends Group
         float vx = mVelocities[i + 0];
         float vy = mVelocities[i + 1];
         float vz = mVelocities[i + 2];
+
         // float v = vx * vx + vy * vy + vz * vz;
 
-        double lWorldX = mWidth * (x - 0.5f);
-        double lWorldY = mHeight * (y - 0.5f);
-        double lWorldZ = mDepth * (z - 0.5f);
+        double lSphereWorldX = mWidth * (x - 0.5f);
+        double lSphereWorldY = mHeight * (y - 0.5f);
+        double lSphereWorldZ = mDepth * (z - 0.5f);
         double lRadius =
                        mDisplayRadius ? mWidth * r : mWidth * 0.005f;
 
         Sphere lSphere = (Sphere) lParticlesSpheres.get(id);
 
-        lSphere.setTranslateX(lWorldX);
-        lSphere.setTranslateY(lWorldY);
-        lSphere.setTranslateZ(lWorldZ);
+        lSphere.setTranslateX(lSphereWorldX);
+        lSphere.setTranslateY(lSphereWorldY);
+        lSphere.setTranslateZ(lSphereWorldZ);
         lSphere.setScaleX(lRadius);
         lSphere.setScaleY(lRadius);
         lSphere.setScaleZ(lRadius);
 
+        if (lHasPolarity)
+        {
+
+          Sphere lPolaritySphere =
+                                 (Sphere) lParticlesPolaritySpheres.get(id);
+
+          double lPolarityX = mPolarities[id * lDimension + 0];
+          double lPolarityY = mPolarities[id * lDimension + 1];
+          double lPolarityZ = mPolarities[id * lDimension + 2];
+
+          double lPolarityWorldX =
+                                 lSphereWorldX + lRadius * lPolarityX;
+          double lPolarityWorldY =
+                                 lSphereWorldY + lRadius * lPolarityY;
+          double lPolarityWorldZ =
+                                 lSphereWorldZ + lRadius * lPolarityZ;
+
+          lPolaritySphere.setTranslateX(lPolarityWorldX);
+          lPolaritySphere.setTranslateY(lPolarityWorldY);
+          lPolaritySphere.setTranslateZ(lPolarityWorldZ);
+          lPolaritySphere.setScaleX(lRadius / 4);
+          lPolaritySphere.setScaleY(lRadius / 4);
+          lPolaritySphere.setScaleZ(lRadius / 4);
+        }
+
       }
 
       getChildren().add(mParticlesGroup);
+      if (lHasPolarity)
+        getChildren().add(mParticlesPolarityGroup);
 
       mCountDownLatch.countDown();
 
@@ -206,6 +277,11 @@ public class ParticleViewerGroup extends Group
   public PhongMaterial getParticleMaterial()
   {
     return mParticleMaterial;
+  }
+
+  public PhongMaterial getParticlePolarityMaterial()
+  {
+    return mParticlePolarityMaterial;
   }
 
 }

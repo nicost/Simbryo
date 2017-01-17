@@ -325,7 +325,7 @@ public class NeighborhoodGrid
    * 
    * @param pNeighboors
    *          array in which to store the list of ids.
-   * @param pNeighboors
+   * @param pNeighboorsTemp
    *          working array of the same size as pNeighboors, used internally.
    * @param pPositions
    *          array of particle positions

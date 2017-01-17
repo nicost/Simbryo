@@ -19,6 +19,7 @@ import coremem.offheap.OffHeapMemory;
 import coremem.util.Size;
 import simbryo.dynamics.tissue.TissueDynamics;
 import simbryo.dynamics.tissue.TissueDynamicsInterface;
+import simbryo.dynamics.tissue.cellprop.HasPolarity;
 import simbryo.dynamics.tissue.embryo.HasSurface;
 import simbryo.phantom.ClearCLPhantomRendererBase;
 import simbryo.phantom.PhantomRendererInterface;
@@ -38,13 +39,14 @@ public abstract class HistoneFluorescence extends
 {
   private static final int cNoiseDim = 32;
   private ClearCLBuffer mNeighboorsBuffer, mPositionsBuffer,
-      mRadiiBuffer;
+      mPolaritiesBuffer, mRadiiBuffer;
   private OffHeapMemory mNeighboorsMemory, mPositionsMemory,
-      mRadiiMemory;
+      mPolaritiesMemory, mRadiiMemory;
   private ClearCLImage mPerlinNoiseImage;
 
   private float mNucleiRadius, mNucleiSharpness, mNucleiRoughness,
       mNucleiTextureContrast;
+  private boolean mHasPolarity;
 
   /**
    * Instantiates a histone fluorescence renderer for a given OpenCL device,
@@ -104,6 +106,7 @@ public abstract class HistoneFluorescence extends
   {
     super(pDevice, pTissueDynamics, pStackDimensions);
 
+    mHasPolarity = pTissueDynamics instanceof HasPolarity;
     mNucleiRadius = pNucleiRadius;
     mNucleiSharpness = pNucleiSharpness;
     mNucleiRoughness = pNucleiRoughness;
@@ -124,6 +127,7 @@ public abstract class HistoneFluorescence extends
     mRenderKernel.setArgument("image", mImage);
     mRenderKernel.setArgument("neighboors", mNeighboorsBuffer);
     mRenderKernel.setArgument("positions", mPositionsBuffer);
+    mRenderKernel.setArgument("polarities", mPolaritiesBuffer);
     mRenderKernel.setArgument("radii", mRadiiBuffer);
 
     mRenderKernel.setArgument("perlin", mPerlinNoiseImage);
@@ -152,6 +156,13 @@ public abstract class HistoneFluorescence extends
                                            NativeTypeEnum.Float,
                                            lDimension * pTissueDynamics.getMaxNumberOfParticles());
 
+    mPolaritiesBuffer =
+                      mContext.createBuffer(HostAccessType.WriteOnly,
+                                            KernelAccessType.ReadOnly,
+                                            NativeTypeEnum.Float,
+                                            lDimension * pTissueDynamics.getMaxNumberOfParticles());
+    mPolaritiesBuffer.fill((byte) 1, true);
+
     mRadiiBuffer =
                  mContext.createBuffer(HostAccessType.WriteOnly,
                                        KernelAccessType.ReadOnly,
@@ -164,6 +175,10 @@ public abstract class HistoneFluorescence extends
     mPositionsMemory =
                      OffHeapMemory.allocateFloats(lDimension
                                                   * pTissueDynamics.getMaxNumberOfParticles());
+
+    mPolaritiesMemory =
+                      OffHeapMemory.allocateFloats(lDimension
+                                                   * pTissueDynamics.getMaxNumberOfParticles());
     mRadiiMemory =
                  OffHeapMemory.allocateFloats(pTissueDynamics.getMaxNumberOfParticles());
   }
@@ -198,7 +213,7 @@ public abstract class HistoneFluorescence extends
    * 
    * @param pClearCLProgram
    *          program to add source to.
-   * @throws IOException 
+   * @throws IOException
    */
   public abstract void addAutoFluoFunctionSourceCode(ClearCLProgram pClearCLProgram) throws IOException;
 
@@ -241,35 +256,53 @@ public abstract class HistoneFluorescence extends
     ElapsedTime.measure("data copy", () -> {
 
       mNeighboorsMemory.copyFrom(getTissue().getNeighborhoodGrid()
-                                        .getArray());
+                                            .getArray());
+
+      mPositionsMemory.copyFrom(getTissue().getPositions()
+                                           .getCurrentArray(),
+                                0,
+                                0,
+                                lDimension * lNumberOfCells);
+
+      if (mHasPolarity)
+      {
+        HasPolarity lHasPolarity = (HasPolarity) getTissue();
+        float[] lPolarityArray = lHasPolarity.getPolarityProperty()
+                                             .getArray()
+                                             .getCurrentArray();
+
+        mPolaritiesMemory.copyFrom(lPolarityArray,
+                                   0,
+                                   0,
+                                   lDimension * lNumberOfCells);
+      }
 
       mRadiiMemory.copyFrom(getTissue().getRadii().getCurrentArray(),
                             0,
                             0,
                             lNumberOfCells);
 
-      mPositionsMemory.copyFrom(getTissue().getPositions()
-                                       .getCurrentArray(),
-                                0,
-                                0,
-                                lDimension * lNumberOfCells);
-
       mNeighboorsBuffer.readFrom(mNeighboorsMemory, false);
-
-      mRadiiBuffer.readFrom(mRadiiMemory.subRegion(0,
-                                                   lNumberOfCells
-                                                      * Size.FLOAT),
-                            false);
 
       mPositionsBuffer.readFrom(mPositionsMemory.subRegion(0,
                                                            lNumberOfCells
                                                               * 3
                                                               * Size.FLOAT),
-                                true);
+                                false);
+
+      mPolaritiesBuffer.readFrom(mPolaritiesMemory.subRegion(0,
+                                                             lNumberOfCells
+                                                                * 3
+                                                                * Size.FLOAT),
+                                 false);
+
+      mRadiiBuffer.readFrom(mRadiiMemory.subRegion(0,
+                                                   lNumberOfCells
+                                                      * Size.FLOAT),
+                            true);
     });
     /**/
 
-    System.out.println("updateBuffers()");
   }
 
   @Override
@@ -282,7 +315,8 @@ public abstract class HistoneFluorescence extends
   @Override
   public boolean render(int pZPlaneIndex)
   {
-    mRenderKernel.setArgument("num", getTissue().getNumberOfParticles());
+    mRenderKernel.setArgument("num",
+                              getTissue().getNumberOfParticles());
     return super.render(pZPlaneIndex);
   }
 
