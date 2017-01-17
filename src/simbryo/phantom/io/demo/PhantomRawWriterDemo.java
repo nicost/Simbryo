@@ -62,13 +62,17 @@ public class PhantomRawWriterDemo
       lPhantomRawWriter.setOverwrite(false);
       lPhantomRawWriter.setDataType(NativeTypeEnum.Byte);
 
-      lDrosophila.simulationSteps(8500, 1);
+      int lStart = 8500;
+      int lEnd   = 15000;
+      
+      //move forward in simulation:
+      lDrosophila.simulationSteps(lStart, 1);
       
       //ClearCLImageViewer lOpenViewer = lDrosoFluo.openViewer();
 
       int lPeriod = 10;
 
-      while (lDrosophila.getTimeStepIndex()<15000)
+      while (lDrosophila.getTimeStepIndex()<lEnd)
       {
         lDrosophila.simulationSteps(lPeriod, 1);
         long lTimeIndex = lDrosophila.getTimeStepIndex();
