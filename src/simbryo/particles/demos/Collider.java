@@ -10,21 +10,24 @@ import simbryo.particles.forcefield.interaction.impl.CollisionForceField;
 import simbryo.particles.viewer.two.ParticleViewer2D;
 import simbryo.util.timing.Timming;
 
+/**
+ * Collider App - Play with thousands of colliding disks.
+ *
+ * @author royer
+ */
 public class Collider extends Application
 {
 
-  public int N = 20;
-  public float V = 0.0000001f;
+  private int cNumberOfParticles = 20;
+  private float cInitialVelocity = 0.0000001f;
 
-  public float R = (float) (0.395 / Math.sqrt(N));
-  public float D = 0.99f;
-  public float Db = 0.9f;
-  public float Fc = 0.0001f;
-  public float Fg = 0.000001f;
+  private float cRadius = (float) (0.395 / Math.sqrt(cNumberOfParticles));
+  private float cDragCoeficient = 0.99f;
+  private float cBouncingVelocityLoss = 0.9f;
+  private float cCollisionForce = 0.0001f;
+  private float cGravityForce = 0.000001f;
 
-  public int G = (int) (1/R);
-
-  Thread mThread;
+  private Thread mThread;
 
   @Override
   public void start(Stage primaryStage)
@@ -47,11 +50,9 @@ public class Collider extends Application
       result.ifPresent(name -> {
         try
         {
-          N = Integer.parseInt(name);
-          R = (float) (0.395 / Math.sqrt(N));
-          G = (int) (1 / R);
+          cNumberOfParticles = Integer.parseInt(name);
+          cRadius = (float) (0.395 / Math.sqrt(cNumberOfParticles));
 
-          System.out.println("G=" + G);
         }
         catch (Throwable e)
         {
@@ -61,14 +62,14 @@ public class Collider extends Application
       });
 
       CollisionForceField lCollisionForceField =
-                                               new CollisionForceField(Fc,
-                                                                       D,
+                                               new CollisionForceField(cCollisionForce,
+                                                                       cDragCoeficient,
                                                                        true);
 
       ParticleSystem lParticleSystem = new ParticleSystem(2,
-                                                          N,
-                                                          0.5f * R,
-                                                          R);
+                                                          cNumberOfParticles,
+                                                          0.5f * cRadius,
+                                                          cRadius);
 
       ParticleViewer2D lParticleViewer =
                                        new ParticleViewer2D(lParticleSystem,
@@ -80,7 +81,7 @@ public class Collider extends Application
 
       Runnable lRunnable = () -> {
 
-        for (int i = 0; i < N; i++)
+        for (int i = 0; i < cNumberOfParticles; i++)
         {
           addParticle(lParticleSystem);
         }
@@ -103,10 +104,10 @@ public class Collider extends Application
           // lParticleSystem.repelAround(lMouseX, lMouseY, 0.00001f);
           lParticleSystem.updateNeighborhoodCells();
           lParticleSystem.applyForceField(lCollisionForceField);
-          if (Fg > 0)
-            lParticleSystem.applyForce(0f, Fg);
+          if (cGravityForce > 0)
+            lParticleSystem.applyForce(0f, cGravityForce);
           lParticleSystem.intergrateEuler();
-          lParticleSystem.enforceBounds(Db);
+          lParticleSystem.enforceBounds(cBouncingVelocityLoss);
 
           float lMouseX = (float) (lParticleViewer.getMouseX());
           float lMouseY = (float) (lParticleViewer.getMouseY());
@@ -144,23 +145,18 @@ public class Collider extends Application
     // System.out.format("(%d,%d) -> (%g,%g) \n", i, lId, x, y);
 
     lParticleSystem.setVelocity(lId,
-                                (float) (V * (Math.random() - 0.5f)),
-                                (float) (V * (Math.random() - 0.5f)));
-    lParticleSystem.setRadius(lId, (float) (1e-9 + (1 * R) + 0.0001f*(Math.random()-0.5f))); // 
+                                (float) (cInitialVelocity * (Math.random() - 0.5f)),
+                                (float) (cInitialVelocity * (Math.random() - 0.5f)));
+    lParticleSystem.setRadius(lId, (float) (1e-9 + (1 * cRadius) + 0.0001f*(Math.random()-0.5f))); // 
   }
 
-  private void sleep(int pMillis)
-  {
-    try
-    {
-      Thread.sleep(pMillis);
-    }
-    catch (InterruptedException e)
-    {
-      e.printStackTrace();
-    }
-  }
 
+
+  /**
+   * Main function
+   * @param args arguments 
+   * @throws InterruptedException NA
+   */
   public static void main(String[] args) throws InterruptedException
   {
     launch(args);

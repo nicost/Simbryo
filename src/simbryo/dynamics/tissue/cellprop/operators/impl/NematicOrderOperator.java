@@ -1,9 +1,7 @@
 package simbryo.dynamics.tissue.cellprop.operators.impl;
 
 import simbryo.dynamics.tissue.TissueDynamics;
-import simbryo.dynamics.tissue.cellprop.CellProperty;
 import simbryo.dynamics.tissue.cellprop.VectorCellProperty;
-import simbryo.dynamics.tissue.cellprop.operators.CellPropertyOperatorInterface;
 import simbryo.dynamics.tissue.cellprop.operators.OperatorBase;
 import simbryo.particles.neighborhood.NeighborhoodGrid;
 import simbryo.util.geom.GeometryUtils;
@@ -28,8 +26,8 @@ public class NematicOrderOperator extends
    * to dilate the size of the neighborhood around each cell. A good value is
    * for example 10% (hence 0.1).
    * 
-   * @param pCouplingConstant
-   * @param pNeighboorhoodRadiusDilationFactor
+   * @param pCouplingConstant coupling constant
+   * @param pNeighboorhoodRadiusDilationFactor neighborhood radius dilation factor.
    */
   public NematicOrderOperator(float pCouplingConstant,
                               float pNeighboorhoodRadiusDilationFactor)
@@ -61,8 +59,6 @@ public class NematicOrderOperator extends
 
     final float[] lPositions =
                              pEmbryo.getPositions().getCurrentArray();
-    final float[] lVelocities = pEmbryo.getVelocities()
-                                       .getCurrentArray();
     final float[] lRadii = pEmbryo.getRadii().getCurrentArray();
 
     int lNeighboorhoodListMaxLength = lMaxNumberOfParticlesPerGridCell

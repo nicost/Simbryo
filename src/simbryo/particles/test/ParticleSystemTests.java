@@ -4,9 +4,17 @@ import org.junit.Test;
 
 import simbryo.particles.ParticleSystem;
 
+/**
+ * Particles system test
+ *
+ * @author royer
+ */
 public class ParticleSystemTests
 {
 
+  /**
+   * Basic tests
+   */
   @Test
   public void test()
   {

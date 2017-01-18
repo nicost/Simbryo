@@ -1,7 +1,5 @@
 package simbryo.util;
 
-import java.util.Arrays;
-
 /**
  * Instances of this class implement a double-buffering scheme for float arrays.
  * Two arrays are maintained: a read and write array, a method is provided to

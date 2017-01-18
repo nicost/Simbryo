@@ -2,7 +2,6 @@ package simbryo.dynamics.tissue.cellprop.operators.impl;
 
 import simbryo.dynamics.tissue.TissueDynamics;
 import simbryo.dynamics.tissue.cellprop.CellProperty;
-import simbryo.dynamics.tissue.cellprop.operators.CellPropertyOperatorInterface;
 import simbryo.dynamics.tissue.cellprop.operators.OperatorBase;
 import simbryo.particles.neighborhood.NeighborhoodGrid;
 import simbryo.util.geom.GeometryUtils;
@@ -37,9 +36,9 @@ public class StrogatzWaveOperator extends OperatorBase<CellProperty>
    * defines a percentage to dilate the size of the neighborhood around each
    * cell. A good value is for example 10% (hence 0.1).
    * 
-   * @param pIncrement
-   * @param pCouplingConstant
-   * @param pNeighboorhoodRadiusDilationFactor
+   * @param pIncrement increment
+   * @param pCouplingConstant coupling constant
+   * @param pNeighboorhoodRadiusDilationFactor neighborhood dilation factor
    */
   public StrogatzWaveOperator(float pIncrement,
                               float pCouplingConstant,

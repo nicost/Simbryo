@@ -27,11 +27,9 @@ public class NeighborhoodGrid
    * Constructs an instance given the maximal number of particles per cell and
    * the grid dimensions.
    * 
-   * @param pDimension
-   *          dimension
+
    * @param pMaxParticlesPerCell
    *          max particles per cell
-   * 
    * @param pGridDimensions
    *          grid dimensions
    * 
@@ -146,7 +144,7 @@ public class NeighborhoodGrid
   /**
    * Returns the maximal number of particles per grid cell.
    * 
-   * @return
+   * @return max particles per grid cell
    */
   public int getMaxParticlesPerGridCell()
   {
@@ -166,6 +164,10 @@ public class NeighborhoodGrid
     return lVolume;
   }
 
+  /**
+   * Returns array.
+   * @return array
+   */
   public int[] getArray()
   {
     return mNeighboorhoodArray;

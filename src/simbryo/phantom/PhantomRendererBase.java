@@ -2,17 +2,17 @@ package simbryo.phantom;
 
 import java.util.Arrays;
 
-import simbryo.dynamics.tissue.TissueDynamics;
 import simbryo.dynamics.tissue.TissueDynamicsInterface;
 
 /**
  * Base class providing common fields and methods for all classes implementing
  * the phantom renderer interface
  *
+ * @param <I> type of image used to store the phantom
  * @author royer
  */
-public abstract class PhantomRendererBase implements
-                                          PhantomRendererInterface
+public abstract class PhantomRendererBase<I> implements
+                                          PhantomRendererInterface<I>
 {
   private final TissueDynamicsInterface mTissue;
   protected long[] mStackDimensions;
@@ -67,7 +67,7 @@ public abstract class PhantomRendererBase implements
   }
 
   @Override
-  public boolean render(int pZPlaneIndex)
+  public boolean renderSmart(int pZPlaneIndex)
   {
     boolean lAlreadyDrawn = mPlaneAlreadyDrawnTable[pZPlaneIndex];
     mPlaneAlreadyDrawnTable[pZPlaneIndex] = true;

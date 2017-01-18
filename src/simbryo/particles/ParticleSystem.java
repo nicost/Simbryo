@@ -99,17 +99,12 @@ public class ParticleSystem implements ParticleSystemInterface
   }
 
   /**
-   * Constructs a particle system with a given number of dimensions, grid size,
+   * Constructs a particle system with a given grid size,
    * max number of particles and particles per cell.
    * 
-   * @param pDimension
-   *          dimension
-   * @param pGridSize
-   *          grid size
-   * @param pMaxNumberOfParticlesPerGridCell
-   *          max number of particles per cell
-   * @param pMaxNumberOfParticles
-   *          max number of particles
+   * @param pMaxNumberOfParticlesPerGridCell max number of particles per grid cell 
+   * @param pMaxNumberOfParticles max number of particles
+   * @param pGridDimensions grid dimensions
    */
   public ParticleSystem(int pMaxNumberOfParticlesPerGridCell,
                         int pMaxNumberOfParticles,
@@ -463,8 +458,6 @@ public class ParticleSystem implements ParticleSystemInterface
   public void applyForce(int pBeginId, int pEndId, float... pForce)
   {
     final int lDimension = mDimension;
-    final float[] lPositionsRead = mPositions.getReadArray();
-    final float[] lPositionsWrite = mPositions.getWriteArray();
     final float[] lVelocitiesRead = mVelocities.getReadArray();
     final float[] lVelocitiesWrite = mVelocities.getWriteArray();
 

@@ -7,9 +7,11 @@ import simbryo.dynamics.tissue.cellprop.CellProperty;
  * property operators.
  *
  * @author royer
+ * @param <CP>
+ *          cell property type
  */
 public abstract class OperatorBase<CP extends CellProperty> implements
-                                   CellPropertyOperatorInterface<CP>
+                                  CellPropertyOperatorInterface<CP>
 {
   // nothing yet
 }

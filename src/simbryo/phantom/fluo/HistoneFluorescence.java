@@ -10,22 +10,17 @@ import clearcl.ClearCLProgram;
 import clearcl.enums.HostAccessType;
 import clearcl.enums.ImageChannelDataType;
 import clearcl.enums.KernelAccessType;
-import clearcl.enums.MemAllocMode;
-import clearcl.ops.Noise;
 import clearcl.util.ElapsedTime;
-import clearcl.viewer.ClearCLImageViewer;
 import coremem.enums.NativeTypeEnum;
 import coremem.offheap.OffHeapMemory;
 import coremem.util.Size;
 import simbryo.dynamics.tissue.TissueDynamics;
 import simbryo.dynamics.tissue.TissueDynamicsInterface;
 import simbryo.dynamics.tissue.cellprop.HasPolarity;
-import simbryo.dynamics.tissue.embryo.HasSurface;
 import simbryo.phantom.ClearCLPhantomRendererBase;
 import simbryo.phantom.PhantomRendererInterface;
 import simbryo.textures.noise.FractalNoise;
 import simbryo.textures.noise.SimplexNoise;
-import simbryo.util.timing.Timming;
 
 /**
  * This renders histone fluorescence for the nuclei.
@@ -35,7 +30,7 @@ import simbryo.util.timing.Timming;
 public abstract class HistoneFluorescence extends
                                           ClearCLPhantomRendererBase
                                           implements
-                                          PhantomRendererInterface
+                                          PhantomRendererInterface<ClearCLImage>
 {
   private static final int cNoiseDim = 32;
   private ClearCLBuffer mNeighboorsBuffer, mPositionsBuffer,
@@ -89,12 +84,15 @@ public abstract class HistoneFluorescence extends
    *          nuclei sharpness
    * @param pNucleiRoughness
    *          nuclei roughness
+   * @param pNucleiTextureContrast
+   *          nuclei texture contrast
    * @param pNoiseOverSignalRatio
+   *          noise over signal ratio
    * @param pStackDimensions
    *          stack dimensions
    * @throws IOException
+   *           thrown in OpenCL kernels cannot be read.
    */
-
   public HistoneFluorescence(ClearCLDevice pDevice,
                              TissueDynamicsInterface pTissueDynamics,
                              float pNucleiRadius,
@@ -214,6 +212,7 @@ public abstract class HistoneFluorescence extends
    * @param pClearCLProgram
    *          program to add source to.
    * @throws IOException
+   *           thrown if source code canot be read.
    */
   public abstract void addAutoFluoFunctionSourceCode(ClearCLProgram pClearCLProgram) throws IOException;
 
@@ -313,11 +312,11 @@ public abstract class HistoneFluorescence extends
   }
 
   @Override
-  public boolean render(int pZPlaneIndex)
+  public boolean renderSmart(int pZPlaneIndex)
   {
     mRenderKernel.setArgument("num",
                               getTissue().getNumberOfParticles());
-    return super.render(pZPlaneIndex);
+    return super.renderSmart(pZPlaneIndex);
   }
 
   @Override
@@ -360,7 +359,7 @@ public abstract class HistoneFluorescence extends
   /**
    * Sets nuclei sharpness
    * 
-   * @param pNucleiSharpness
+   * @param pNucleiSharpness nuclei sharpness
    */
   public void setNucleiSharpness(float pNucleiSharpness)
   {

@@ -7,9 +7,17 @@ import simbryo.dynamics.tissue.embryo.zoo.Organoid;
 import simbryo.dynamics.tissue.embryo.zoo.Spheroid;
 import simbryo.util.timing.Timming;
 
+/**
+ * Basic demos for Embryo dynamics
+ *
+ * @author royer
+ */
 public class EmbryoDemo
 {
 
+  /**
+   * @throws InterruptedException NA
+   */
   @Test
   public void demoOrganoid() throws InterruptedException
   {
@@ -29,6 +37,9 @@ public class EmbryoDemo
     lOrganoid.getViewer().waitWhileShowing();
   }
 
+  /**
+   * @throws InterruptedException NA
+   */
   @Test
   public void demoSpheroid() throws InterruptedException
   {
@@ -47,6 +58,9 @@ public class EmbryoDemo
     lSpheroid.getViewer().waitWhileShowing();
   }
 
+  /**
+   * @throws InterruptedException NA
+   */
   @Test
   public void demoDrosophila() throws InterruptedException
   {

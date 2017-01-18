@@ -7,6 +7,7 @@ import simbryo.dynamics.tissue.cellprop.CellProperty;
  * Cell property operators can modify the values of a set of properties over time.
  *
  * @author royer
+ * @param <CP> cell property type
  */
 public interface CellPropertyOperatorInterface<CP extends CellProperty>
 {
@@ -22,6 +23,6 @@ public interface CellPropertyOperatorInterface<CP extends CellProperty>
   void apply(int pBeginId,
              int pEndId,
              TissueDynamics pTissueDynamics,
-             CP... pCellProperty);
+             @SuppressWarnings("unchecked") CP... pCellProperty);
 
 }

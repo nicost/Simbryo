@@ -1,6 +1,6 @@
 package simbryo.particles.neighborhood.test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
 
@@ -8,9 +8,17 @@ import org.junit.Test;
 
 import simbryo.particles.neighborhood.NeighborhoodGrid;
 
+/**
+ * Neighborhood data structure tests
+ *
+ * @author royer
+ */
 public class NeighborhoodTests
 {
 
+  /**
+   * Test neighboorhood queries without radius
+   */
   @Test
   public void testNoRadius()
   {
@@ -66,10 +74,13 @@ public class NeighborhoodTests
     assertEquals(2, lNeighborhood.getCellContentsAt(0.95f, 0.19f)[0]);
   }
 
+  /**
+   * Test neighborhood without radius
+   */
   @Test
   public void testWithRadius()
   {
-    NeighborhoodGrid lNeighborhood = new NeighborhoodGrid(10,4,4);
+    NeighborhoodGrid lNeighborhood = new NeighborhoodGrid(10, 4, 4);
 
     lNeighborhood.clear();
 
@@ -99,10 +110,13 @@ public class NeighborhoodTests
 
   }
 
+  /**
+   * Test neighborhood queries with radius
+   */
   @Test
   public void testWithRadiusQuery()
   {
-    NeighborhoodGrid lNeighborhood = new NeighborhoodGrid(10,4,4);
+    NeighborhoodGrid lNeighborhood = new NeighborhoodGrid(10, 4, 4);
 
     lNeighborhood.clear();
 

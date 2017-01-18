@@ -48,12 +48,10 @@ public class ParticleViewer2D extends Stage
   }
 
   /**
-   * Creates a view for a given image, window title.
+   * Creates a view for a given particle system
    * 
-   * @param pClearCLImage
-   *          image
-   * @param pWindowTitle
-   *          window title
+   * @param pParticleSystem
+   *          particle system
    */
   public ParticleViewer2D(ParticleSystem pParticleSystem)
   {
@@ -73,7 +71,6 @@ public class ParticleViewer2D extends Stage
    * @param pWindowHeight
    *          window height
    */
-  @SuppressWarnings("restriction")
   public ParticleViewer2D(ParticleSystem pParticleSystem,
                           String pWindowTitle,
                           int pWindowWidth,
@@ -175,7 +172,8 @@ public class ParticleViewer2D extends Stage
   }
 
   /**
-   * @param pDisplayGrid
+   * Sets the display grid flag
+   * @param pDisplayGrid true -> grid displayed, false otherwise
    */
   public void setDisplayGrid(boolean pDisplayGrid)
   {
@@ -183,12 +181,14 @@ public class ParticleViewer2D extends Stage
   }
 
   /**
-   * @param pDisplayElapsedTime
+   * Sets the display elapsed time flag
+   * @param pDisplayElapsedTime true -> elapsed time displayed, false otherwise
    */
   public void setDisplayElapsedTime(boolean pDisplayElapsedTime)
   {
     mViewParticles2D.setDisplayElapsedTime(pDisplayElapsedTime);
   }
+
 
   @Override
   public void setDisplayRadius(boolean pDisplayRadius)

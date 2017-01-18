@@ -1,14 +1,22 @@
 package simbryo.particles.isosurf.impl.test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
 import simbryo.particles.isosurf.impl.Ellipsoid;
 
+/**
+ * Ellipsoid tests
+ *
+ * @author royer
+ */
 public class EllipsoidTests
 {
 
+  /**
+   * Test
+   */
   @Test
   public void test()
   {

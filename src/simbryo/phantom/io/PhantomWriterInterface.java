@@ -4,6 +4,11 @@ import java.io.File;
 
 import simbryo.phantom.PhantomRendererInterface;
 
+/**
+ * Phantom writer interface
+ *
+ * @author royer
+ */
 public interface PhantomWriterInterface
 {
 
@@ -14,6 +19,6 @@ public interface PhantomWriterInterface
    * @return true if file written, false otherwise
    * @throws Throwable if anything goes wrong...
    */
-  boolean write(PhantomRendererInterface pPhantomRenderer, File pFile) throws Throwable;
+  boolean write(PhantomRendererInterface<?> pPhantomRenderer, File pFile) throws Throwable;
 
 }

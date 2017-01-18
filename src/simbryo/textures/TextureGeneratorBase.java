@@ -15,7 +15,7 @@ public abstract class TextureGeneratorBase implements
   /**
    * Instantiates a texture generator with given dimension.
    * 
-   * @param pDimension
+   * @param pDimension dimension
    */
   public TextureGeneratorBase(int pDimension)
   {
@@ -28,6 +28,7 @@ public abstract class TextureGeneratorBase implements
     setScale(lScale);
   }
 
+  @Override
   public abstract TextureGeneratorInterface clone();
 
   /**

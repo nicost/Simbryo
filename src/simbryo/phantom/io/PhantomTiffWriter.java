@@ -1,25 +1,40 @@
 package simbryo.phantom.io;
 
 import java.io.File;
-import java.io.IOException;
 
-import coremem.offheap.OffHeapMemory;
 import simbryo.phantom.PhantomRendererInterface;
 
+/**
+ * Phantom TIFF writer
+ * 
+ * TODO: not working until someone figures out how to save tiff files, which
+ * does not seem to be me ;-)
+ *
+ * @author royer
+ */
 public class PhantomTiffWriter extends PhantomWriterBase
                                implements PhantomWriterInterface
 {
 
-  private OffHeapMemory mTransferMemory;
-  private byte[] mTransferArray;
+  // private OffHeapMemory mTransferMemory;
+  // private byte[] mTransferArray;
 
+  /**
+   * Instanciates a Phantom raw writer. The voxel values produced by the phantom
+   * are scaled accoding to y = a*x+b.
+   * 
+   * @param pScaling
+   *          value scaling a
+   * @param pOffset
+   *          value offset b
+   */
   public PhantomTiffWriter(float pScaling, float pOffset)
   {
     super(pScaling, pOffset);
   }
 
   @Override
-  public boolean write(PhantomRendererInterface pPhantomRenderer,
+  public boolean write(PhantomRendererInterface<?> pPhantomRenderer,
                        File pFile) throws Throwable
   {
     return pFile.getParentFile().mkdirs();

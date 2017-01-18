@@ -36,7 +36,6 @@ public class ParticleViewer3D extends Stage
   private final CameraGroup mCameraGroup = new CameraGroup();
   private final ParticleViewerGroup mParticleViewerGroup;
 
-
   private volatile double mousePosX, mousePosY, mouseOldX, mouseOldY,
       mouseDeltaX, mouseDeltaY;
 
@@ -69,12 +68,10 @@ public class ParticleViewer3D extends Stage
   }
 
   /**
-   * Creates a view for a given image, window title.
+   * Creates a view for a particle system
    * 
-   * @param pClearCLImage
-   *          image
-   * @param pWindowTitle
-   *          window title
+   * @param pParticleSystem
+   *          particle system
    */
   public ParticleViewer3D(ParticleSystem pParticleSystem)
   {
@@ -94,7 +91,6 @@ public class ParticleViewer3D extends Stage
    * @param pWindowHeight
    *          window height
    */
-  @SuppressWarnings("restriction")
   public ParticleViewer3D(ParticleSystem pParticleSystem,
                           String pWindowTitle,
                           int pWindowWidth,
@@ -247,7 +243,6 @@ public class ParticleViewer3D extends Stage
       }
     }
   }
-
 
   @Override
   public void setDisplayRadius(boolean pDisplayRadius)

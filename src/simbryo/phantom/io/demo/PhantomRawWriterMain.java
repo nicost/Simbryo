@@ -14,9 +14,18 @@ import simbryo.phantom.ClearCLPhantomRendererUtils;
 import simbryo.phantom.fluo.impl.drosophila.DrosophilaHistoneFluorescence;
 import simbryo.phantom.io.PhantomRawWriter;
 
+/**
+ * Phantom raw writer main program
+ *
+ * @author royer
+ */
 public class PhantomRawWriterMain
 {
 
+	/**
+	 * Main
+	 * @param args arguments
+	 */
 	public static void main(final String[] args)
 	{
 		try

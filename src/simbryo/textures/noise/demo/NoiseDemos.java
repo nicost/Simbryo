@@ -13,9 +13,17 @@ import clearcl.viewer.ClearCLImageViewer;
 import simbryo.textures.noise.BSplineNoise;
 import simbryo.textures.noise.SimplexNoise;
 
+/**
+ * Noise Textures Demos
+ *
+ * @author royer
+ */
 public class NoiseDemos
 {
 
+  /**
+   * Simplex Noise 2D Demo
+   */
   @Test
   public void demoSimplexNoise2D()
   {
@@ -50,6 +58,9 @@ public class NoiseDemos
 
   }
 
+  /**
+   * Simplex 3D noise demo
+   */
   @Test
   public void demoSimplexNoise3D()
   {
@@ -85,6 +96,9 @@ public class NoiseDemos
 
   }
 
+  /**
+   * B-Spline 2D noise demo
+   */
   @Test
   public void demoBSplineNoise2D()
   {
@@ -118,6 +132,9 @@ public class NoiseDemos
     }
   }
 
+  /**
+   * B-Spline 3D noise demo
+   */
   @Test
   public void demoBSplineNoise3D()
   {

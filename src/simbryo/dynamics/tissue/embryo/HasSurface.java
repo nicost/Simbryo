@@ -11,15 +11,15 @@ public interface HasSurface
 {
 
   /**
-   * Returns the surface
-   * @return
+   * Returns the iso-surface
+   * @return iso-surface
    */
   IsoSurfaceInterface getSurface();
 
   /**
    * Sets the surface represented as an iso-surface.
-   * @param pEmbryoSurface iso-surface
+   * @param pSurface iso-surface
    */
-  void setSurface(IsoSurfaceInterface pEmbryoSurface);
+  void setSurface(IsoSurfaceInterface pSurface);
 
 }

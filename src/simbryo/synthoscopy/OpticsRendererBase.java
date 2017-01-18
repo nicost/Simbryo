@@ -1,0 +1,71 @@
+package simbryo.synthoscopy;
+
+import java.util.ArrayList;
+
+import simbryo.phantom.PhantomRendererInterface;
+import simbryo.synthoscopy.camera.CameraModelInterface;
+import simbryo.synthoscopy.detection.DetectionOpticsInterface;
+import simbryo.synthoscopy.illumination.IlluminationOpticsInterface;
+
+/**
+ * Optics renderer base class
+ *
+ * @param <I> type used to store and manipulate images during optics rendering
+ * @author royer
+ */
+public abstract class OpticsRendererBase<I> implements
+                                         OpticsRendererInterface<I>
+{
+
+  private PhantomRendererInterface<I> mPhantomRenderer;
+
+  private ArrayList<IlluminationOpticsInterface<I>> mIlluminationOpticsList =
+                                                                         new ArrayList<>();
+  private ArrayList<DetectionOpticsInterface<I>> mDetectionOpticsList =
+                                                                   new ArrayList<>();
+  private ArrayList<CameraModelInterface<I>> mCameraModelList =
+                                                           new ArrayList<>();
+
+  /**
+   * Instanciates a optics renderer base class given a phantom renderer
+   * @param pPhantomRenderer phantom renderer
+   */
+  public OpticsRendererBase(PhantomRendererInterface<I> pPhantomRenderer)
+  {
+    super();
+    mPhantomRenderer = pPhantomRenderer;
+  }
+
+  @SafeVarargs
+  @Override
+  public final void addIlluminationOptics(IlluminationOpticsInterface<I>... pIlluminationOptics)
+  {
+    for (IlluminationOpticsInterface<I> lIlluminationOptics : pIlluminationOptics)
+    {
+      mIlluminationOpticsList.add(lIlluminationOptics);
+      lIlluminationOptics.setPhantom(mPhantomRenderer);
+    }
+  }
+
+  @SafeVarargs
+  @Override
+  public final void addDetectionOptics(DetectionOpticsInterface<I>... pDetectionOptics)
+  {
+    for (DetectionOpticsInterface<I> lDetectionOptics : pDetectionOptics)
+    {
+      mDetectionOpticsList.add(lDetectionOptics);
+      lDetectionOptics.setPhantom(mPhantomRenderer);
+    }
+  }
+
+  @SafeVarargs
+  @Override
+  public final void addCameraModel(CameraModelInterface<I>... pCameraModels)
+  {
+    for (CameraModelInterface<I> lCameraModel : pCameraModels)
+    {
+      mCameraModelList.add(lCameraModel);
+    }
+  }
+
+}

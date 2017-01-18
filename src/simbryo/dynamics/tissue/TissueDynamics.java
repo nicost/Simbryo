@@ -52,16 +52,10 @@ public class TissueDynamics extends ParticleSystem
    * max number of particle per neighborhood cell, collision force between
    * particles, and drag.
    * 
-   * @param pDimension
-   *          dimension
-   * @param pGridSize
-   *          grid size
-   * @param pMaxNumberOfParticlesPerGridCell
-   *          max number of particles per cell
-   * @param pCollisionForce
-   *          collision force
-   * @param pDrag
-   *          drag.
+   * @param pCollisionForce collision force
+   * @param pDrag drag coeficient
+   * @param pMaxNumberOfParticlesPerGridCell max number of particles per grid cell
+   * @param pGridDimensions grid dimensions
    */
   public TissueDynamics(float pCollisionForce,
                         float pDrag,
@@ -85,6 +79,7 @@ public class TissueDynamics extends ParticleSystem
    * 
    * @return current time step index.
    */
+  @Override
   public long getTimeStepIndex()
   {
     return mTimeStepIndex;
@@ -236,6 +231,7 @@ public class TissueDynamics extends ParticleSystem
    * @param pCellProperties
    *          a list of cell properties
    */
+  @SuppressWarnings("unchecked")
   public <CP extends CellProperty> void applyOperator(CellPropertyOperatorInterface<CP> pOperator,
                                                       CP... pCellProperties)
   {
@@ -255,6 +251,7 @@ public class TissueDynamics extends ParticleSystem
    * @param pCellProperties
    *          a list of cell properties
    */
+  @SuppressWarnings("unchecked")
   public <CP extends CellProperty> void apply(int pBeginId,
                                               int pEndId,
                                               CellPropertyOperatorInterface<CP> pOperator,

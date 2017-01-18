@@ -20,7 +20,7 @@ public interface TextureGeneratorInterface
    * 
    * @param pIndex
    *          dimension index
-   * @return
+   * @return scale
    */
   float getScale(int pIndex);
 

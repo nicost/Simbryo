@@ -3,7 +3,6 @@ package simbryo.dynamics.tissue.embryo.zoo;
 import simbryo.dynamics.tissue.cellprop.CellProperty;
 import simbryo.dynamics.tissue.cellprop.HasPolarity;
 import simbryo.dynamics.tissue.cellprop.VectorCellProperty;
-import simbryo.dynamics.tissue.cellprop.operators.impl.NematicOrderOperator;
 import simbryo.dynamics.tissue.cellprop.operators.impl.StrogatzWaveOperator;
 import simbryo.dynamics.tissue.cellprop.operators.impl.SurfaceGradientOperator;
 import simbryo.dynamics.tissue.embryo.EmbryoDynamics;
@@ -29,7 +28,6 @@ public class Drosophila extends EmbryoDynamics implements HasPolarity
   private static final float Fafc = 0.00005f;
 
   private static final float Ri = 0.08f;
-  private static final int cMaxNumberOfParticlesPerGridCell = 32;
 
   private ForceFieldInterface mOutsideEllipseForceField;
   private ForceFieldInterface mInsideEllipseForceField;
@@ -42,27 +40,29 @@ public class Drosophila extends EmbryoDynamics implements HasPolarity
 
   private volatile int mCellDivCount;
 
-  public float mEllipsoidA = 1.0f, mEllipsoidB = 0.43f,
+  private final float mEllipsoidA = 1.0f, mEllipsoidB = 0.43f,
       mEllipsoidC = 0.43f, mEllipsoidR = 0.47f;
 
   /**
    * Creates a Drosophila embryo.
    *
    * @param pMaxNumberOfParticlesPerGridCell
+   *          max number of particles per grid cell
    * @param pGridDimensions
+   *          grid dimensions
    */
   public Drosophila(int pMaxNumberOfParticlesPerGridCell,
                     int... pGridDimensions)
   {
     super(Fc, D, pMaxNumberOfParticlesPerGridCell, pGridDimensions);
 
-    setSurface(new Ellipsoid(mEllipsoidR,
+    setSurface(new Ellipsoid(getEllipsoidR(),
                              0.5f,
                              0.5f,
                              0.5f,
-                             mEllipsoidA,
-                             mEllipsoidB,
-                             mEllipsoidC));
+                             getEllipsoidA(),
+                             getEllipsoidB(),
+                             getEllipsoidC()));
 
     for (int i = 0; i < 1; i++)
     {
@@ -114,7 +114,47 @@ public class Drosophila extends EmbryoDynamics implements HasPolarity
     mSurfaceGradientOperator = new SurfaceGradientOperator();
 
   }
-  
+
+  /**
+   * Returns the Drosophilas ellipsoid X axis A parameter
+   * 
+   * @return A parameter
+   */
+  public float getEllipsoidA()
+  {
+    return mEllipsoidA;
+  }
+
+  /**
+   * Returns the Drosophilas ellipsoid X axis B parameter
+   * 
+   * @return B parameter
+   */
+  public float getEllipsoidB()
+  {
+    return mEllipsoidB;
+  }
+
+  /**
+   * Returns the Drosophilas ellipsoid X axis C parameter
+   * 
+   * @return C parameter
+   */
+  public float getEllipsoidC()
+  {
+    return mEllipsoidC;
+  }
+
+  /**
+   * Returns the Drosophilas ellipsoid R parameter (radius)
+   * 
+   * @return R parameter
+   */
+  public float getEllipsoidR()
+  {
+    return mEllipsoidR;
+  }
+
   @Override
   public VectorCellProperty getPolarityProperty()
   {

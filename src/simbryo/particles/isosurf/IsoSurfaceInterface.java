@@ -11,7 +11,7 @@ public interface IsoSurfaceInterface
   /**
    * Returns the dimension (1D, 2D, ...) of the iso-surface.
    * 
-   * @return
+   * @return dimension
    */
   int getDimension();
 
@@ -33,7 +33,7 @@ public interface IsoSurfaceInterface
    * is practical or required. But it should be continuous and be zero at the
    * surface.
    * 
-   * @return
+   * @return distance to surface
    */
   float getDistance();
 

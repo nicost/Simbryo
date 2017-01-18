@@ -6,36 +6,38 @@ import simbryo.dynamics.tissue.TissueDynamicsInterface;
 /**
  * Phantom Renderers implement this interface
  *
+ * @param <I>
+ *          type of image used to store phantom
  * @author royer
  */
-public interface PhantomRendererInterface
+public interface PhantomRendererInterface<I>
 {
 
   /**
    * Returns the tissue dynamics for this renderer.
    * 
-   * @return
+   * @return tissue dynamics
    */
   TissueDynamicsInterface getTissue();
 
   /**
-   * Returns the rendered stack width
+   * Returns the rendered image width
    * 
-   * @return
+   * @return image width
    */
   long getWidth();
 
   /**
-   * Returns the rendered stack height
+   * Returns the rendered image height
    * 
-   * @return
+   * @return image height
    */
   long getHeight();
 
   /**
-   * Returns the rendered stack depth
+   * Returns the rendered image depth
    * 
-   * @return
+   * @return image depth
    */
   long getDepth();
 
@@ -50,21 +52,36 @@ public interface PhantomRendererInterface
   void render();
 
   /**
-   * @param pZPlaneIndex
-   * @return
-   */
-  boolean render(int pZPlaneIndex);
-
-  /**
+   * Renders a range of z plane indices. This method
+   * 
    * @param pZPlaneIndexBegin
+   *          begin of z plane index range
    * @param pZPlaneIndexEnd
+   *          end of z plane index range
    */
   void render(int pZPlaneIndexBegin, int pZPlaneIndexEnd);
 
   /**
+   * Renders a single plane (possibly more if renderer cannot render single
+   * planes but a whole chunk). This method is smart in the sense that it is
+   * cache-aware.
+   * 
+   * @param pZPlaneIndex
+   *          z plane index
+   * @return true if plane rendered (not in cache)
+   */
+  boolean renderSmart(int pZPlaneIndex);
+
+  /**
+   * Renders a range of z plane indices. this method is aware of the cache and
+   * only renders planes that have not been rendered previously (since last call
+   * to clear)
+   * 
    * @param pZPlaneIndexBegin
+   *          begin of z plane index range
    * @param pZPlaneIndexEnd
-   * @return
+   *          end of z plane index range
+   * @return number of rendered planes
    */
   int renderSmart(int pZPlaneIndexBegin, int pZPlaneIndexEnd);
 
@@ -76,20 +93,28 @@ public interface PhantomRendererInterface
   void invalidate(int pZPlaneIndex);
 
   /**
+   * Returns the internal representation of the phantom image. The type depends
+   * on the actual implementation.
+   * 
+   * @return phantom image
+   */
+  I getPhantomImage();
+
+  /**
    * Copies rendered stack data into memory region.
    * 
    * @param pMemory
    *          memory
    * @param pBlocking
-   *          true blocks call until copy done, false for asynch copy. Note: Some
-   *          implementations might not be capable of asynch copy.
+   *          true blocks call until copy done, false for asynch copy. Note:
+   *          Some implementations might not be capable of asynch copy.
    */
   void copyTo(ContiguousMemoryInterface pMemory, boolean pBlocking);
 
   /**
    * Return phantom signal intensity
    * 
-   * @return
+   * @return signal intensity
    */
   float getSignalIntensity();
 
@@ -101,9 +126,9 @@ public interface PhantomRendererInterface
   void setSignalIntensity(float pSignalIntensity);
 
   /**
-   * Return phantom noise intensity
+   * Return phantom noise over signal intensity ratio.
    * 
-   * @return
+   * @return noise over signal ratio
    */
   float getNoiseOverSignalRatio();
 

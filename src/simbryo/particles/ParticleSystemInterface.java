@@ -4,6 +4,11 @@ import simbryo.particles.forcefield.ForceFieldInterface;
 import simbryo.particles.neighborhood.NeighborhoodGrid;
 import simbryo.util.DoubleBufferingFloatArray;
 
+/**
+ * Particle systems interface
+ *
+ * @author royer
+ */
 public interface ParticleSystemInterface
 {
 
@@ -86,13 +91,12 @@ public interface ParticleSystemInterface
    * @param pPosition
    * @return particle id.
    */
-  int addParticle(float[] pPosition);
+  int addParticle(float... pPosition);
 
   /**
    * Removes a particle to this particle system.
    * 
-   * @param pPosition
-   * @return particle id.
+   * @param pParticleId
    */
   void removeParticle(int pParticleId);
 
@@ -127,6 +131,8 @@ public interface ParticleSystemInterface
    *          position noise
    * @param pVelocityNoise
    *          velocity noise
+   * @param pRadiusNoise
+   *          radius noise
    */
   void addNoiseToParticle(int pParticleId,
                           float pPositionNoise,
@@ -141,7 +147,7 @@ public interface ParticleSystemInterface
    * @param pParticlePosition
    *          particle new position.
    */
-  void setPosition(int pParticleId, float[] pParticlePosition);
+  void setPosition(int pParticleId, float... pParticlePosition);
 
   /**
    * Sets the velocity of a particle
@@ -151,7 +157,7 @@ public interface ParticleSystemInterface
    * @param pVelocity
    *          new velocity
    */
-  void setVelocity(int pParticleId, float[] pVelocity);
+  void setVelocity(int pParticleId, float... pVelocity);
 
   /**
    * Sets the radius of a particle
@@ -208,7 +214,7 @@ public interface ParticleSystemInterface
    * @param pIntensity
    *          intensity (force) of the brownian motion.
    */
-  void addBrownianMotion(float pAmount);
+  void addBrownianMotion(float pIntensity);
 
   /**
    * Applies a spatially invariant force to all particles.
@@ -216,7 +222,7 @@ public interface ParticleSystemInterface
    * @param pForce
    *          force.
    */
-  void applyForce(float[] pForce);
+  void applyForce(float... pForce);
 
   /**
    * Applies a spatially invariant force to a range of particles.
@@ -226,7 +232,7 @@ public interface ParticleSystemInterface
    * @param pForce
    *          force.
    */
-  void applyForce(int pBeginId, int pEndId, float[] pForce);
+  void applyForce(int pBeginId, int pEndId, float... pForce);
 
   /**
    * Applies a given force field to all particles.

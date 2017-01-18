@@ -7,34 +7,45 @@ import simbryo.particles.forcefield.interaction.impl.CollisionForceField;
 import simbryo.particles.viewer.three.ParticleViewer3D;
 import simbryo.util.timing.Timming;
 
+/**
+ * Particle 3D viewer demo
+ *
+ * @author royer
+ */
 public class ParticleViewer3DDemo
 {
 
+  private int cNumberOfParticles = 2000;
+  private float cInitialVelocity = 0.0001f;
+  private float cParticlesRadius = (float) (0.25 / Math.pow(cNumberOfParticles, 0.33f));
+  private float cParticlesMinRadius = 0.01f;
+  private float cDragCoefficient = 0.99f;
+  private float cCollisionVelocityLoss = 0.9f;
+  private float cCollisionForce = 0.0001f;
+  private float cGravityForce = 0.000001f;
+
+  /**
+   * Demo
+   * 
+   * @throws InterruptedException
+   *           NA
+   */
   @Test
   public void demo3D() throws InterruptedException
   {
-    int G = 16;
-    int N = 2000;
-    float V = 0.0001f;
-    float R = (float) (0.25 / Math.pow(N, 0.33f));
-    float Rm = 0.01f;
-    float D = 0.99f;
-    float Db = 0.9f;
-    float Fc = 0.0001f;
-    float Fg = 0.000001f;
 
     CollisionForceField lCollisionForceField =
-                                             new CollisionForceField(Fc,
-                                                                     D,
+                                             new CollisionForceField(cCollisionForce,
+                                                                     cDragCoefficient,
                                                                      true);
 
     ParticleSystem lParticleSystem = new ParticleSystem(3,
-                                                        N,
-                                                        Rm,
-                                                        Rm + 0.5f
-                                                             * R);
+                                                        cNumberOfParticles,
+                                                        cParticlesMinRadius,
+                                                        cParticlesMinRadius + 0.5f
+                                                             * cParticlesRadius);
 
-    for (int i = 0; i < N; i++)
+    for (int i = 0; i < cNumberOfParticles; i++)
     {
       float x = (float) Math.random();
       float y = (float) Math.random();
@@ -42,14 +53,14 @@ public class ParticleViewer3DDemo
 
       int lId = lParticleSystem.addParticle(x, y, z);
       lParticleSystem.setVelocity(lId,
-                                  (float) (V
+                                  (float) (cInitialVelocity
                                            * (Math.random() - 0.5f)),
-                                  (float) (V
+                                  (float) (cInitialVelocity
                                            * (Math.random() - 0.5f)),
-                                  (float) (V
+                                  (float) (cInitialVelocity
                                            * (Math.random() - 0.5f)));
       lParticleSystem.setRadius(lId,
-                                (float) (Rm + (R)
+                                (float) (cParticlesMinRadius + (cParticlesRadius)
                                          + 0.01 * Math.random())); //
     }
 
@@ -75,10 +86,10 @@ public class ParticleViewer3DDemo
 
       // lParticleSystem.repelAround(lMouseX, lMouseY, 0.00001f);
       lParticleSystem.applyForceField(lCollisionForceField);
-      if (Fg > 0)
-        lParticleSystem.applyForce(0f, Fg, 0f);
+      if (cGravityForce > 0)
+        lParticleSystem.applyForce(0f, cGravityForce, 0f);
       lParticleSystem.intergrateEuler();
-      lParticleSystem.enforceBounds(Db);
+      lParticleSystem.enforceBounds(cCollisionVelocityLoss);
       lParticleSystem.updateNeighborhoodCells();
 
       /*float lMouseX = (float) (lParticleViewer3D.getMouseX());

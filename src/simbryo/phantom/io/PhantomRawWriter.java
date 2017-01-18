@@ -16,19 +16,33 @@ import coremem.offheap.OffHeapMemory;
 import coremem.util.Size;
 import simbryo.phantom.PhantomRendererInterface;
 
+/**
+ * Phantom raw writer
+ *
+ * @author royer
+ */
 public class PhantomRawWriter extends PhantomWriterBase
                               implements PhantomWriterInterface
 {
 
   private OffHeapMemory mTransferMemory, mTempMemory;
 
+  /**
+   * Instanciates a Phantom raw writer. The voxel values produced by the phantom
+   * are scaled accoding to y = a*x+b.
+   * 
+   * @param pScaling
+   *          value scaling a
+   * @param pOffset
+   *          value offset b
+   */
   public PhantomRawWriter(float pScaling, float pOffset)
   {
     super(pScaling, pOffset);
   }
 
   @Override
-  public boolean write(PhantomRendererInterface pPhantomRenderer,
+  public boolean write(PhantomRendererInterface<?> pPhantomRenderer,
                        File pFile) throws IOException
   {
     pFile.getParentFile().mkdirs();
@@ -48,7 +62,7 @@ public class PhantomRawWriter extends PhantomWriterBase
     return true;
   }
 
-  private void writeFloats(PhantomRendererInterface pPhantomRenderer,
+  private void writeFloats(PhantomRendererInterface<?> pPhantomRenderer,
                            File pFile,
                            int lWidth,
                            int lHeight,
@@ -70,7 +84,7 @@ public class PhantomRawWriter extends PhantomWriterBase
     lFileChannel.close();
   }
 
-  private void copyToTransferMemory(PhantomRendererInterface pPhantomRenderer,
+  private void copyToTransferMemory(PhantomRendererInterface<?> pPhantomRenderer,
                                     int lWidth,
                                     int lHeight,
                                     int lDepth)
@@ -80,43 +94,44 @@ public class PhantomRawWriter extends PhantomWriterBase
     if (mTransferMemory == null
         || lSizeInBytes != mTransferMemory.getSizeInBytes())
     {
-      mTransferMemory =
-                      OffHeapMemory.allocateBytes("mTransferMemory",
-                                                  lSizeInBytes);
+      mTransferMemory = OffHeapMemory.allocateBytes("mTransferMemory",
+                                                    lSizeInBytes);
     }
 
     pPhantomRenderer.copyTo(mTransferMemory, true);
   }
-  
-  private void writeBytes(PhantomRendererInterface pPhantomRenderer,
-                           File pFile,
-                           int lWidth,
-                           int lHeight,
-                           int lDepth) throws IOException
+
+  private void writeBytes(PhantomRendererInterface<?> pPhantomRenderer,
+                          File pFile,
+                          int lWidth,
+                          int lHeight,
+                          int lDepth) throws IOException
   {
     copyToTransferMemory(pPhantomRenderer, lWidth, lHeight, lDepth);
 
     int lVolume = lWidth * lHeight * lDepth;
     long lSizeInBytes = lVolume * Size.BYTE;
-    
-    if(mTempMemory==null || mTempMemory.getSizeInBytes()!=lSizeInBytes)
+
+    if (mTempMemory == null
+        || mTempMemory.getSizeInBytes() != lSizeInBytes)
     {
       mTempMemory = OffHeapMemory.allocateBytes("mTempMemory",
                                                 lSizeInBytes);
     }
-      
-    ContiguousBuffer lContiguousBufferFloats = new ContiguousBuffer(mTransferMemory);
-    ContiguousBuffer lContiguousBufferBytes = new ContiguousBuffer(mTempMemory);
-    
-    while(lContiguousBufferFloats.hasRemainingFloat())
+
+    ContiguousBuffer lContiguousBufferFloats =
+                                             new ContiguousBuffer(mTransferMemory);
+    ContiguousBuffer lContiguousBufferBytes =
+                                            new ContiguousBuffer(mTempMemory);
+
+    while (lContiguousBufferFloats.hasRemainingFloat())
     {
       float lFloatValue = lContiguousBufferFloats.readFloat();
-      lFloatValue = getScaling()*lFloatValue+getOffset();
+      lFloatValue = getScaling() * lFloatValue + getOffset();
       int lIntValue = round(lFloatValue);
-      byte lByteValue = (byte) (lIntValue&0xFF);
+      byte lByteValue = (byte) (lIntValue & 0xFF);
       lContiguousBufferBytes.writeByte(lByteValue);
     }
-    
 
     Path lFilePath = pFile.toPath();
     FileChannel lFileChannel =

@@ -7,45 +7,61 @@ import simbryo.particles.forcefield.interaction.impl.CollisionForceField;
 import simbryo.particles.viewer.two.ParticleViewer2D;
 import simbryo.util.timing.Timming;
 
+/**
+ * Particle system 2D viewer demo
+ *
+ * @author royer
+ */
 public class ParticleViewer2DDemo
 {
 
+  private int cNumberOfParticles = 5000;
+  private float cInitialVelocity = 0.0000001f;
+  private float cParticleRadius =
+                                (float) (0.4
+                                         / Math.sqrt(cNumberOfParticles));
+  private float cParticleMinimalRadius = 0.001f;
+  private float cDragCoefficient = 0.99f;
+  private float cCollisionVelocityLoss = 0.9f;
+  private float cCollisionForce = 0.00001f;
+  private float cGravityForce = 0.0000001f;
+
+  /**
+   * Demo
+   * 
+   * @throws InterruptedException
+   *           NA
+   */
   @Test
   public void demo2D() throws InterruptedException
   {
-    int G = 16;
-    int N = 5000;
-    float V = 0.0000001f;
-    float R = (float) (0.4 / Math.sqrt(N));
-    float Rm = 0.001f;
-    float D = 0.99f;
-    float Db = 0.9f;
-    float Fc = 0.00001f;
-    float Fg = 0.0000001f;
 
     CollisionForceField lCollisionForceField =
-                                             new CollisionForceField(Fc,
-                                                                     D,
+                                             new CollisionForceField(cCollisionForce,
+                                                                     cDragCoefficient,
                                                                      true);
 
-    ParticleSystem lParticleSystem = new ParticleSystem(2,
-                                                        N,
-                                                        Rm,
-                                                        Rm + 0.5f
-                                                             * R);
+    ParticleSystem lParticleSystem =
+                                   new ParticleSystem(2,
+                                                      cNumberOfParticles,
+                                                      cParticleMinimalRadius,
+                                                      cParticleMinimalRadius + 0.5f
+                                                                               * cParticleRadius);
 
-    for (int i = 0; i < N; i++)
+    for (int i = 0; i < cNumberOfParticles; i++)
     {
       float x = (float) Math.random();
       float y = (float) Math.random();
 
       int lId = lParticleSystem.addParticle(x, y);
       lParticleSystem.setVelocity(lId,
-                                  (float) (V
+                                  (float) (cInitialVelocity
                                            * (Math.random() - 0.5f)),
-                                  (float) (V
+                                  (float) (cInitialVelocity
                                            * (Math.random() - 0.5f)));
-      lParticleSystem.setRadius(lId, Rm + (R));// Math.random() *
+      lParticleSystem.setRadius(lId,
+                                cParticleMinimalRadius
+                                     + (cParticleRadius));// Math.random() *
     }
 
     lParticleSystem.setRadius(0, 0.06f);
@@ -70,10 +86,10 @@ public class ParticleViewer2DDemo
 
       // lParticleSystem.repelAround(lMouseX, lMouseY, 0.00001f);
       lParticleSystem.applyForceField(lCollisionForceField);
-      if (Fg > 0)
-        lParticleSystem.applyForce(0f, Fg);
+      if (cGravityForce > 0)
+        lParticleSystem.applyForce(0f, cGravityForce);
       lParticleSystem.intergrateEuler();
-      lParticleSystem.enforceBounds(Db);
+      lParticleSystem.enforceBounds(cCollisionVelocityLoss);
       lParticleSystem.updateNeighborhoodCells();
 
       float lMouseX = (float) (lParticleViewer2D.getMouseX());

@@ -10,18 +10,26 @@ import clearcl.ClearCLDevice;
 import clearcl.backend.ClearCLBackendInterface;
 import clearcl.backend.ClearCLBackends;
 import clearcl.util.ElapsedTime;
-import clearcl.viewer.ClearCLImageViewer;
 import coremem.enums.NativeTypeEnum;
 import simbryo.dynamics.tissue.embryo.zoo.Drosophila;
 import simbryo.phantom.ClearCLPhantomRendererUtils;
 import simbryo.phantom.fluo.impl.drosophila.DrosophilaHistoneFluorescence;
 import simbryo.phantom.io.PhantomRawWriter;
 
+/**
+ * Phantom raw writer demo
+ *
+ * @author royer
+ */
 public class PhantomRawWriterDemo
 {
 
+  /**
+   * Demo 
+   * @throws IOException NA
+   */
   @Test
-  public void test() throws IOException
+  public void demo() throws IOException
   {
     /*String lUserHome = System.getProperty("user.home");
     File lDownloadFolder = new File(lUserHome + "/Downloads/");

@@ -1,7 +1,6 @@
 package simbryo.phantom.io.demo;
 
 import java.io.File;
-import java.io.IOException;
 
 import org.junit.Test;
 
@@ -16,11 +15,20 @@ import simbryo.phantom.ClearCLPhantomRendererUtils;
 import simbryo.phantom.fluo.impl.drosophila.DrosophilaHistoneFluorescence;
 import simbryo.phantom.io.PhantomTiffWriter;
 
+/**
+ * Phantom TIFF writer demo
+ *
+ * @author royer
+ */
 public class PhantomTiffWriterDemo
 {
 
+  /**
+   * Demo
+   * @throws Throwable NA
+   */
   @Test
-  public void test() throws Throwable
+  public void demo() throws Throwable
   {
     String lUserHome = System.getProperty("user.home");
     File lDownloadFolder = new File(lUserHome+"/Downloads/"); 

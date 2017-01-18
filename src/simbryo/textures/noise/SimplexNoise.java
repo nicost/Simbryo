@@ -2,8 +2,6 @@ package simbryo.textures.noise;
 
 import java.util.Arrays;
 
-import clearcl.ClearCLHostImageBuffer;
-import coremem.ContiguousMemoryInterface;
 import simbryo.textures.TextureGeneratorBase;
 import simbryo.textures.TextureGeneratorInterface;
 
@@ -36,7 +34,7 @@ public class SimplexNoise extends TextureGeneratorBase
   /**
    * Instantiates a simplex noise generator of given dimension.
    * 
-   * @param pDimension
+   * @param pDimension dimension
    */
   public SimplexNoise(int pDimension)
   {
@@ -208,7 +206,7 @@ public class SimplexNoise extends TextureGeneratorBase
   }
 
   // 2D simplex noise
-  public double noise(double xin, double yin)
+  private double noise(double xin, double yin)
   {
     double n0, n1, n2; // Noise contributions from the three corners
     // Skew the input space to determine which simplex cell we're in
@@ -281,7 +279,7 @@ public class SimplexNoise extends TextureGeneratorBase
   }
 
   // 3D simplex noise
-  public double noise(double xin, double yin, double zin)
+  private double noise(double xin, double yin, double zin)
   {
     double n0, n1, n2, n3; // Noise contributions from the four corners
     // Skew the input space to determine which simplex cell we're in
@@ -425,7 +423,8 @@ public class SimplexNoise extends TextureGeneratorBase
   }
 
   // 4D simplex noise, better simplex rank ordering method 2012-03-09
-  public double noise(double x, double y, double z, double w)
+  @SuppressWarnings("unused")
+  private double noise(double x, double y, double z, double w)
   {
 
     double n0, n1, n2, n3, n4; // Noise contributions from the five corners

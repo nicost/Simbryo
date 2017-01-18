@@ -8,6 +8,14 @@ package simbryo.particles.isosurf.impl;
 public class Sphere extends Ellipsoid
 {
 
+  /**
+   * Instanciates a sphere with given radius and center parameters.
+   * 
+   * @param pRadius
+   *          radius
+   * @param pCenter
+   *          center
+   */
   public Sphere(float pRadius, float... pCenter)
   {
     super(pRadius, addAxis(pCenter));

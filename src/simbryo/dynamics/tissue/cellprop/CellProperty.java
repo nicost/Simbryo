@@ -66,10 +66,12 @@ public class CellProperty
   }
 
   /**
-   * Copies values from read to write arrays.
+   * Copies values from read to write arrays within a given range.
    * 
    * @param pBeginId
+   *          begin id of range
    * @param pEndId
+   *          end id of range
    */
   public void copyDefault(int pBeginId, int pEndId)
   {
@@ -81,7 +83,9 @@ public class CellProperty
    * Clear cell property to zero.
    * 
    * @param pBeginId
+   *          begin id of range
    * @param pEndId
+   *          end id of range
    */
   public void clear(int pBeginId, int pEndId)
   {

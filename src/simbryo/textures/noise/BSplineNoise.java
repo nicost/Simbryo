@@ -33,7 +33,8 @@ public class BSplineNoise extends TextureGeneratorBase
   private long mSeed;
 
   /**
-   * @param pDimension
+   * Instanciates a B-Spline nosie object
+   * @param pDimension dimension
    */
   public BSplineNoise(int pDimension)
   {
@@ -87,7 +88,8 @@ public class BSplineNoise extends TextureGeneratorBase
     return 0;
   }
 
-  public double quadratic(final double x, final double y)
+  @SuppressWarnings("unused")
+  private double quadratic(final double x, final double y)
   {
     long cx0 = _floorToLong(x);
     long cy0 = _floorToLong(y);
@@ -116,7 +118,7 @@ public class BSplineNoise extends TextureGeneratorBase
     return NORMALIZER * (a + b + c) - 1.;
   }
 
-  public double cubic(final double x, final double y)
+  private double cubic(final double x, final double y)
   {
     long cx0 = _floorToLong(x);
     long cy0 = _floorToLong(y);

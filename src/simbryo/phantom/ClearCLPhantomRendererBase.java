@@ -17,149 +17,157 @@ import simbryo.dynamics.tissue.TissueDynamicsInterface;
  *
  * @author royer
  */
-public abstract class ClearCLPhantomRendererBase	extends
-																									PhantomRendererBase
-																										implements
-																									PhantomRendererInterface,
-																									AutoCloseable
+public abstract class ClearCLPhantomRendererBase extends
+                                                 PhantomRendererBase<ClearCLImage>
+                                                 implements
+                                                 PhantomRendererInterface<ClearCLImage>,
+                                                 AutoCloseable
 {
 
-	protected ClearCLContext mContext;
+  protected ClearCLContext mContext;
 
-	protected ClearCLImage mImage;
+  protected ClearCLImage mImage;
 
-	protected ClearCLKernel mRenderKernel;
+  protected ClearCLKernel mRenderKernel;
 
-	private final long mLocalSizeX, mLocalSizeY, mLocalSizeZ;
+  private final long mLocalSizeX, mLocalSizeY, mLocalSizeZ;
 
-	/**
-	 * Instantiates a Phantom renderer for a given OpenCL device, tissue dynamics,
-	 * and stack dimensions.
-	 * 
-	 * @param pDevice
-	 *          OpenCL device to use.
-	 * @param pTissueDynamics
-	 *          tissue dynamics object
-	 * @param pStackDimensions
-	 *          stack dimensions
-	 */
-	public ClearCLPhantomRendererBase(final ClearCLDevice pDevice,
-																		final TissueDynamicsInterface pTissueDynamics,
-																		final long... pStackDimensions)
-	{
-		super(pTissueDynamics, pStackDimensions);
-		mStackDimensions = pStackDimensions;
+  /**
+   * Instantiates a Phantom renderer for a given OpenCL device, tissue dynamics,
+   * and stack dimensions.
+   * 
+   * @param pDevice
+   *          OpenCL device to use.
+   * @param pTissueDynamics
+   *          tissue dynamics object
+   * @param pStackDimensions
+   *          stack dimensions
+   */
+  public ClearCLPhantomRendererBase(final ClearCLDevice pDevice,
+                                    final TissueDynamicsInterface pTissueDynamics,
+                                    final long... pStackDimensions)
+  {
+    super(pTissueDynamics, pStackDimensions);
 
-		mContext = pDevice.createContext();
+    mContext = pDevice.createContext();
 
-		mImage = mContext.createImage(ImageChannelOrder.R,
-																	ImageChannelDataType.Float,
-																	mStackDimensions);
+    mImage = mContext.createImage(ImageChannelOrder.R,
+                                  ImageChannelDataType.Float,
+                                  mStackDimensions);
 
-		final int[] lGridDimensions = pTissueDynamics.getGridDimensions();
+    final int[] lGridDimensions = pTissueDynamics.getGridDimensions();
 
-		mLocalSizeX = mStackDimensions[0] / lGridDimensions[0];
-		mLocalSizeY = mStackDimensions[1] / lGridDimensions[1];
-		mLocalSizeZ = mStackDimensions[2] / lGridDimensions[2];
+    mLocalSizeX = mStackDimensions[0] / lGridDimensions[0];
+    mLocalSizeY = mStackDimensions[1] / lGridDimensions[1];
+    mLocalSizeZ = mStackDimensions[2] / lGridDimensions[2];
 
-		mStackDimensions[0] = mLocalSizeX * lGridDimensions[0];
-		mStackDimensions[1] = mLocalSizeY * lGridDimensions[1];
-		mStackDimensions[2] = mLocalSizeZ * lGridDimensions[2];
+    mStackDimensions[0] = mLocalSizeX * lGridDimensions[0];
+    mStackDimensions[1] = mLocalSizeY * lGridDimensions[1];
+    mStackDimensions[2] = mLocalSizeZ * lGridDimensions[2];
 
-		mImage.fillZero(true);
-	}
+    mImage.fillZero(true);
+  }
 
-	@Override
-	public void clear()
-	{
-		// mImage.fillZero(true);
-		super.clear();
-	}
+  @Override
+  public void clear()
+  {
+    // mImage.fillZero(true);
+    super.clear();
+  }
 
-	@Override
-	public void render()
-	{
-		render(0, (int) (getDepth() - 1));
-	}
+  @Override
+  public void render()
+  {
+    render(0, (int) (getDepth() - 1));
+  }
 
-	@Override
-	public boolean render(final int pZPlaneIndex)
-	{
-		if (!mPlaneAlreadyDrawnTable[pZPlaneIndex])
-		{
-			System.out.println("render slice");
-			renderInternal(pZPlaneIndex, pZPlaneIndex + 1);
-		}
+  @Override
+  public boolean renderSmart(final int pZPlaneIndex)
+  {
+    if (!mPlaneAlreadyDrawnTable[pZPlaneIndex])
+    {
+      System.out.println("render slice");
+      renderInternal(pZPlaneIndex, pZPlaneIndex + 1);
+    }
 
-		return super.render(pZPlaneIndex);
-	}
+    return super.renderSmart(pZPlaneIndex);
+  }
 
-	@Override
-	public void render(int pZPlaneIndexBegin, int pZPlaneIndexEnd)
-	{
-		// First we snap the rendering z bounds to the grid cell boundaries:
-		pZPlaneIndexBegin =
-											(int) (Math.floor(pZPlaneIndexBegin
-																				/ mLocalSizeZ)
-															* mLocalSizeZ);
-		pZPlaneIndexEnd = (int) (Math.ceil(pZPlaneIndexEnd / mLocalSizeZ)
-															* mLocalSizeZ);
+  @Override
+  public void render(int pZPlaneIndexBegin, int pZPlaneIndexEnd)
+  {
+    // First we snap the rendering z bounds to the grid cell boundaries:
+    pZPlaneIndexBegin =
+                      (int) (Math.floor(pZPlaneIndexBegin
+                                        / mLocalSizeZ)
+                             * mLocalSizeZ);
+    pZPlaneIndexEnd = (int) (Math.ceil(pZPlaneIndexEnd / mLocalSizeZ)
+                             * mLocalSizeZ);
 
-		// Now we can render a possibly slightly larger chunck of the stack:
-		renderInternal(pZPlaneIndexBegin, pZPlaneIndexEnd);
-	}
+    // Now we can render a possibly slightly larger chunck of the stack:
+    renderInternal(pZPlaneIndexBegin, pZPlaneIndexEnd);
+  }
 
-	private void renderInternal(final int pZPlaneIndexBegin,
-															int pZPlaneIndexEnd)
-	{
-		if (pZPlaneIndexEnd == pZPlaneIndexBegin)
-			pZPlaneIndexEnd += mLocalSizeZ;
+  private void renderInternal(final int pZPlaneIndexBegin,
+                              int pZPlaneIndexEnd)
+  {
+    if (pZPlaneIndexEnd == pZPlaneIndexBegin)
+      pZPlaneIndexEnd += mLocalSizeZ;
 
-		System.out.println("pZPlaneIndexBegin=" + pZPlaneIndexBegin);
-		System.out.println("pZPlaneIndexEnd  =" + pZPlaneIndexEnd);
-		mRenderKernel.setGlobalOffsets(0, 0, pZPlaneIndexBegin);
-		mRenderKernel.setGlobalSizes(	getWidth(),
-																	getHeight(),
-																	pZPlaneIndexEnd
-																								- pZPlaneIndexBegin);
-		mRenderKernel.setLocalSizes(mLocalSizeX,
-																mLocalSizeY,
-																mLocalSizeZ);
-		mRenderKernel.setOptionalArgument("intensity",
-																			getSignalIntensity());
-		mRenderKernel.setOptionalArgument("timeindex",
-																			(int) getTissue().getTimeStepIndex());
-		System.out.println("before mRenderKernel.run(true);");
-		mRenderKernel.run(true);
-		System.out.println("after mRenderKernel.run(true);");
-		for (int z = pZPlaneIndexBegin; z < pZPlaneIndexEnd; z++)
-			mPlaneAlreadyDrawnTable[z] = true;
-		mImage.notifyListenersOfChange(mContext.getDefaultQueue());
-	}
+    System.out.println("pZPlaneIndexBegin=" + pZPlaneIndexBegin);
+    System.out.println("pZPlaneIndexEnd  =" + pZPlaneIndexEnd);
+    mRenderKernel.setGlobalOffsets(0, 0, pZPlaneIndexBegin);
+    mRenderKernel.setGlobalSizes(getWidth(),
+                                 getHeight(),
+                                 pZPlaneIndexEnd - pZPlaneIndexBegin);
+    mRenderKernel.setLocalSizes(mLocalSizeX,
+                                mLocalSizeY,
+                                mLocalSizeZ);
+    mRenderKernel.setOptionalArgument("intensity",
+                                      getSignalIntensity());
+    mRenderKernel.setOptionalArgument("timeindex",
+                                      (int) getTissue().getTimeStepIndex());
+    System.out.println("before mRenderKernel.run(true);");
+    mRenderKernel.run(true);
+    System.out.println("after mRenderKernel.run(true);");
+    for (int z = pZPlaneIndexBegin; z < pZPlaneIndexEnd; z++)
+      mPlaneAlreadyDrawnTable[z] = true;
+    mImage.notifyListenersOfChange(mContext.getDefaultQueue());
+  }
 
-	@Override
-	public void copyTo(	final ContiguousMemoryInterface pMemory,
-											final boolean pBlocking)
-	{
-		mImage.writeTo(	pMemory,
-										Region3.originZero(),
-										Region3.region(	getWidth(),
-																		getHeight(),
-																		getDepth()),
-										pBlocking);
-	}
+  @Override
+  public void copyTo(final ContiguousMemoryInterface pMemory,
+                     final boolean pBlocking)
+  {
+    mImage.writeTo(pMemory,
+                   Region3.originZero(),
+                   Region3.region(getWidth(),
+                                  getHeight(),
+                                  getDepth()),
+                   pBlocking);
+  }
 
-	public ClearCLImageViewer openViewer()
-	{
-		final ClearCLImageViewer lViewImage =
-																				ClearCLImageViewer.view(mImage);
-		return lViewImage;
-	}
+  @Override
+  public ClearCLImage getPhantomImage()
+  {
+    return mImage;
+  }
 
-	@Override
-	public void close()
-	{
-		mImage.close();
-	}
+  /**
+   * Opens viewer for the internal image
+   * @return viewer
+   */
+  public ClearCLImageViewer openViewer()
+  {
+    final ClearCLImageViewer lViewImage =
+                                        ClearCLImageViewer.view(mImage);
+    return lViewImage;
+  }
+
+  @Override
+  public void close()
+  {
+    mImage.close();
+  }
 
 }

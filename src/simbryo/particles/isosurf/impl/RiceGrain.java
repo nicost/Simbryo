@@ -2,7 +2,6 @@ package simbryo.particles.isosurf.impl;
 
 import static java.lang.Math.pow;
 
-import simbryo.particles.isosurf.IsoSurfaceBase;
 import simbryo.particles.isosurf.IsoSurfaceInterface;
 
 /**
@@ -20,8 +19,17 @@ public class RiceGrain extends Ellipsoid
 
   private float x, y, z;
   private float a, b, c;
-  private float s=2, p;
+  private float s = 2;
 
+  /**
+   * Instanciates a 'Rice-Grain' with a given radius, center and axis
+   * parameters. See Ellipsoid for more details.
+   * 
+   * @param pRadius
+   *          radius
+   * @param pCenterAndAxis
+   *          center and axis parameters
+   */
   public RiceGrain(float pRadius, float... pCenterAndAxis)
   {
     super(pRadius, pCenterAndAxis);

@@ -5,6 +5,11 @@ import javafx.scene.Group;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Transform;
 
+/**
+ * Camera group
+ *
+ * @author royer
+ */
 public class CameraGroup extends Group
 {
   Point3D px = new Point3D(1.0, 0.0, 0.0);
@@ -12,11 +17,20 @@ public class CameraGroup extends Group
   Rotate r;
   Transform t = new Rotate();
 
+  /**
+   * Instanciates a camera group
+   */
   public CameraGroup()
   {
     super();
   }
 
+  /**
+   * Rotates camera around X axis by a given angle
+   * 
+   * @param angle
+   *          rotation angle
+   */
   public void rx(double angle)
   {
     r = new Rotate(angle, px);
@@ -25,6 +39,12 @@ public class CameraGroup extends Group
     this.getTransforms().addAll(t);
   }
 
+  /**
+   * Rotates camera around Y axis by a given angle
+   * 
+   * @param angle
+   *          rotation angle
+   */
   public void ry(double angle)
   {
     r = new Rotate(angle, py);
@@ -32,7 +52,5 @@ public class CameraGroup extends Group
     this.getTransforms().clear();
     this.getTransforms().addAll(t);
   }
-  
-  
-  
+
 }

@@ -16,6 +16,11 @@ import simbryo.dynamics.tissue.cellprop.HasPolarity;
 import simbryo.dynamics.tissue.cellprop.VectorCellProperty;
 import simbryo.particles.ParticleSystem;
 
+/**
+ * Particle viewer group.
+ *
+ * @author royer
+ */
 public class ParticleViewerGroup extends Group
 {
 
@@ -36,6 +41,17 @@ public class ParticleViewerGroup extends Group
   private final PhongMaterial mBoxMaterial, mParticleMaterial,
       mParticlePolarityMaterial;
 
+  /**
+   * Instanciates a particle viewer group for a given volume
+   * (width,height,depth)
+   * 
+   * @param pWidth
+   *          width
+   * @param pHeight
+   *          height
+   * @param pDepth
+   *          deoth
+   */
   public ParticleViewerGroup(int pWidth, int pHeight, int pDepth)
   {
     super();
@@ -44,9 +60,9 @@ public class ParticleViewerGroup extends Group
     mDepth = pDepth;
 
     mBoxMaterial = new PhongMaterial();
-    getBoxMaterial().setDiffuseColor(Color.LIGHTBLUE);
-    getBoxMaterial().setSpecularColor(Color.BLACK);
-    getBoxMaterial().setSpecularPower(1);
+    mBoxMaterial.setDiffuseColor(Color.LIGHTBLUE);
+    mBoxMaterial.setSpecularColor(Color.BLACK);
+    mBoxMaterial.setSpecularPower(1);
 
     Box lBoundingBox = new Box(pWidth, pHeight, pDepth);
     lBoundingBox.setTranslateX(-0.0 * pWidth);
@@ -55,7 +71,7 @@ public class ParticleViewerGroup extends Group
     lBoundingBox.drawModeProperty().set(DrawMode.LINE);
     lBoundingBox.cullFaceProperty().set(CullFace.FRONT);
 
-    lBoundingBox.setMaterial(getBoxMaterial());
+    lBoundingBox.setMaterial(mBoxMaterial);
     lBoundingBox.setOpacity(0.01);
 
     mParticleMaterial = new PhongMaterial();
@@ -74,6 +90,68 @@ public class ParticleViewerGroup extends Group
                          mParticlesPolarityGroup);
   }
 
+  /**
+   * Returns true if grid is displayed
+   * 
+   * @return tru if grid displayed
+   */
+  public boolean isDisplayGrid()
+  {
+    return mDisplayGrid;
+  }
+
+  /**
+   * Sets the display-grid flag
+   * 
+   * @param pDisplayGrid
+   *          display-grid flag
+   */
+  public void setDisplayGrid(boolean pDisplayGrid)
+  {
+    mDisplayGrid = pDisplayGrid;
+  }
+
+  /**
+   * Returns true if the elapsed time during drawing is displayed.
+   * 
+   * @return true if ellasped time displayed
+   */
+  public boolean isDisplayElapsedTime()
+  {
+    return mDisplayElapsedTime;
+  }
+
+  /**
+   * Sets the elapsed time display flag.
+   * 
+   * @param pDisplayElapsedTime
+   *          true -> display ellapsed time, false otherwise.
+   */
+  public void setDisplayElapsedTime(boolean pDisplayElapsedTime)
+  {
+    mDisplayElapsedTime = pDisplayElapsedTime;
+  }
+
+  /**
+   * Sets the display radius flag.
+   * 
+   * @param pDisplayRadius
+   *          true -> display radius, false otherwise
+   */
+  public void setDisplayRadius(boolean pDisplayRadius)
+  {
+    mDisplayRadius = pDisplayRadius;
+  }
+
+
+  /**
+   * Updates display for a given particle system.
+   * 
+   * @param pParticleSystem
+   *          particle system
+   * @param pBlocking
+   *          true -> blocking call, false -> asynchronous call
+   */
   public void updateDisplay(ParticleSystem pParticleSystem,
                             boolean pBlocking)
   {
@@ -147,7 +225,7 @@ public class ParticleViewerGroup extends Group
       while (lParticlesSpheres.size() < pParticleSystem.getNumberOfParticles())
       {
         Sphere lSphere = new Sphere(1, mDisplayRadius ? 16 : 6);
-        lSphere.setMaterial(getParticleMaterial());
+        lSphere.setMaterial(mParticleMaterial);
         lSphere.setTranslateX(0);
         lSphere.setTranslateY(0);
         lSphere.setTranslateZ(0);
@@ -158,7 +236,7 @@ public class ParticleViewerGroup extends Group
         if (lHasPolarity)
         {
           Sphere lPolaritySphere = new Sphere(1, 3);
-          lPolaritySphere.setMaterial(getParticlePolarityMaterial());
+          lPolaritySphere.setMaterial(mParticlePolarityMaterial);
           lPolaritySphere.setTranslateX(0);
           lPolaritySphere.setTranslateY(0);
           lPolaritySphere.setTranslateZ(0);
@@ -186,9 +264,6 @@ public class ParticleViewerGroup extends Group
         float y = mPositions[i + 1];
         float z = mPositions[i + 2];
         float r = mRadiis[id];
-        float vx = mVelocities[i + 0];
-        float vy = mVelocities[i + 1];
-        float vz = mVelocities[i + 2];
 
         // float v = vx * vx + vy * vy + vz * vz;
 
@@ -242,46 +317,6 @@ public class ParticleViewerGroup extends Group
 
     });
 
-  }
-
-  public boolean isDisplayGrid()
-  {
-    return mDisplayGrid;
-  }
-
-  public void setDisplayGrid(boolean pDisplayGrid)
-  {
-    mDisplayGrid = pDisplayGrid;
-  }
-
-  public boolean isDisplayElapsedTime()
-  {
-    return mDisplayElapsedTime;
-  }
-
-  public void setDisplayElapsedTime(boolean pDisplayElapsedTime)
-  {
-    mDisplayElapsedTime = pDisplayElapsedTime;
-  }
-
-  public void setDisplayRadius(boolean pDisplayRadius)
-  {
-    mDisplayRadius = pDisplayRadius;
-  }
-
-  public PhongMaterial getBoxMaterial()
-  {
-    return mBoxMaterial;
-  }
-
-  public PhongMaterial getParticleMaterial()
-  {
-    return mParticleMaterial;
-  }
-
-  public PhongMaterial getParticlePolarityMaterial()
-  {
-    return mParticlePolarityMaterial;
   }
 
 }

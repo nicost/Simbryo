@@ -8,6 +8,11 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import simbryo.particles.ParticleSystem;
 
+/**
+ * Particle Viewer canvas
+ *
+ * @author royer
+ */
 public class ParticleViewerCanvas extends Canvas
 {
 
@@ -21,16 +26,89 @@ public class ParticleViewerCanvas extends Canvas
   private float[] mVelocities;
   private float[] mRadiis;
 
+  /**
+   * Instanciates a canvs with 512x512 dimensions in pixels.
+   */
   public ParticleViewerCanvas()
   {
     this(512, 512);
   }
 
+  /**
+   * Returns true if the grid is displayed
+   * 
+   * @return true -> grid displayed, false otherwise
+   */
+  public boolean isDisplayGrid()
+  {
+    return mDisplayGrid;
+  }
+
+  /**
+   * Sets the state of the display grid flag
+   * 
+   * @param pDisplayGrid
+   *          true -> display grid, false otherwise
+   */
+  public void setDisplayGrid(boolean pDisplayGrid)
+  {
+    mDisplayGrid = pDisplayGrid;
+  }
+
+  /**
+   * Returns true if the elapsed time is displayed.
+   * 
+   * @return true -> elapsed time displayed, false otherwise
+   */
+  public boolean isDisplayElapsedTime()
+  {
+    return mDisplayElapsedTime;
+  }
+
+  /**
+   * Sets the state of the display elapsed time flag.
+   * 
+   * @param pDisplayElapsedTime
+   *          true -> elapsed time displayed, false otherwise
+   */
+  public void setDisplayElapsedTime(boolean pDisplayElapsedTime)
+  {
+    mDisplayElapsedTime = pDisplayElapsedTime;
+  }
+
+  /**
+   * Sets the flag of the display radius flag.
+   * 
+   * @param pDisplayRadius
+   *          true -> display radius, false otherwise
+   */
+  public void setDisplayRadius(boolean pDisplayRadius)
+  {
+    mDisplayRadius = pDisplayRadius;
+
+  }
+
+  /**
+   * Instanciates a canvs with given dimensions (width,height) in pixels.
+   * 
+   * @param pWidth
+   *          with
+   * @param pHeight
+   *          height
+   */
   public ParticleViewerCanvas(double pWidth, double pHeight)
   {
     super(pWidth, pHeight);
   }
 
+  /**
+   * Update display for a given particle system
+   * 
+   * @param pParticleSystem
+   *          particle system
+   * @param pBlocking
+   *          true -> bloaking call, fals -> asynchronous call
+   */
   public void updateDisplay(ParticleSystem pParticleSystem,
                             boolean pBlocking)
   {
@@ -162,32 +240,6 @@ public class ParticleViewerCanvas extends Canvas
       mCountDownLatch.countDown();
 
     });
-
-  }
-
-  public boolean isDisplayGrid()
-  {
-    return mDisplayGrid;
-  }
-
-  public void setDisplayGrid(boolean pDisplayGrid)
-  {
-    mDisplayGrid = pDisplayGrid;
-  }
-
-  public boolean isDisplayElapsedTime()
-  {
-    return mDisplayElapsedTime;
-  }
-
-  public void setDisplayElapsedTime(boolean pDisplayElapsedTime)
-  {
-    mDisplayElapsedTime = pDisplayElapsedTime;
-  }
-
-  public void setDisplayRadius(boolean pDisplayRadius)
-  {
-    mDisplayRadius = pDisplayRadius;
 
   }
 

@@ -17,9 +17,9 @@ public abstract class ClearCLPhantomRendererUtils
    * Returns optimal grid dimensions for a given OpenCL device and stack dimensions.
    *
    * 
-   * @param pDevice
-   * @param pStackDimensions
-   * @return
+   * @param pDevice ClearCL device
+   * @param pStackDimensions stack dimensions
+   * @return array of grid dimensions
    */
   public static int[] getOptimalGridDimensions(ClearCLDevice pDevice,
                                                int... pStackDimensions)

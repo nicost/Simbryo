@@ -8,6 +8,11 @@ import coremem.ContiguousMemoryInterface;
 import simbryo.dynamics.tissue.embryo.zoo.Drosophila;
 import simbryo.phantom.PhantomRendererBase;
 
+/**
+ * Basic tests for Renderer base class
+ *
+ * @author royer
+ */
 public class RendererBaseTests
 {
 
@@ -18,7 +23,7 @@ public class RendererBaseTests
   public void testSmartness()
   {
     Drosophila lDrosophila = new Drosophila(64,64,16);
-    PhantomRendererBase lRenderer = new PhantomRendererBase(lDrosophila,
+    PhantomRendererBase<Object> lRenderer = new PhantomRendererBase<Object>(lDrosophila,
                                               512,
                                               512,
                                               128)
@@ -42,6 +47,13 @@ public class RendererBaseTests
       {
         // TODO Auto-generated method stub
         
+      }
+
+      @Override
+      public Object getPhantomImage()
+      {
+        // TODO Auto-generated method stub
+        return null;
       }
     };
 

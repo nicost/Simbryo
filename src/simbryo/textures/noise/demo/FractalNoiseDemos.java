@@ -13,11 +13,18 @@ import clearcl.viewer.ClearCLImageViewer;
 import simbryo.textures.noise.BSplineNoise;
 import simbryo.textures.noise.FractalNoise;
 import simbryo.textures.noise.SimplexNoise;
-import simbryo.textures.noise.UniformNoise;
 
+/**
+ * Fractal noise texture demos
+ *
+ * @author royer
+ */
 public class FractalNoiseDemos
 {
 
+  /**
+   * Simplex 2D fractal noise demo
+   */
   @Test
   public void demoWithSimplexNoise2D()
   {
@@ -59,6 +66,9 @@ public class FractalNoiseDemos
 
   }
 
+  /**
+   * Simplex 3D fractal noise demo
+   */
   @Test
   public void demoWithSimplexNoise3D()
   {
@@ -101,6 +111,9 @@ public class FractalNoiseDemos
 
   }
 
+  /**
+   * B-Spline 2D fractal noise demo
+   */
   @Test
   public void demoWithBSplineNoise2D()
   {
@@ -140,6 +153,10 @@ public class FractalNoiseDemos
 
   }
 
+  
+  /**
+   * B-Spline 3D fractal noise demo
+   */
   @Test
   public void demoWithBSplineNoise3D()
   {

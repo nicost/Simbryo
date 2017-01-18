@@ -1,9 +1,7 @@
 package simbryo.dynamics.tissue.embryo.zoo;
 
-import simbryo.dynamics.tissue.TissueDynamics;
 import simbryo.dynamics.tissue.embryo.EmbryoDynamics;
 import simbryo.particles.forcefield.external.impl.IsoSurfaceForceField;
-import simbryo.particles.isosurf.IsoSurfaceInterface;
 import simbryo.particles.isosurf.impl.Sphere;
 
 /**
@@ -32,13 +30,14 @@ public class Spheroid extends EmbryoDynamics
    * Creates a 'Spheroid'.
    *
    * @param pGridDimensions
+   *          grid dimensions
    */
   public Spheroid(int... pGridDimensions)
   {
     super(Fc, D, 32, pGridDimensions);
 
     setSurface(new Sphere(Fradius, 0.5f, 0.5f, 0.5f));
-    
+
     for (int i = 0; i < 1; i++)
     {
       float x = (float) (0.5f + 0.0001f * (Math.random() - 0.5f));
@@ -52,7 +51,6 @@ public class Spheroid extends EmbryoDynamics
 
     updateNeighborhoodCells();
 
-    
     mForceField = new IsoSurfaceForceField(Fpetal, getSurface());
   }
 
@@ -69,7 +67,7 @@ public class Spheroid extends EmbryoDynamics
     }
   }
 
-  public void triggerCellDivision()
+  private void triggerCellDivision()
   {
 
     int lNumberOfParticles = getNumberOfParticles();

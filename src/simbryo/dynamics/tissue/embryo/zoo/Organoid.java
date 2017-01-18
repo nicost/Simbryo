@@ -1,11 +1,10 @@
 package simbryo.dynamics.tissue.embryo.zoo;
 
-import simbryo.dynamics.tissue.TissueDynamics;
 import simbryo.dynamics.tissue.embryo.EmbryoDynamics;
 import simbryo.particles.forcefield.external.impl.CentriForceField;
 
 /**
- * 'Organoid' just a clum of cells dividing 14 times.
+ * 'Organoid' just a clump of cells dividing 14 times.
  *
  * @author royer
  */
@@ -30,6 +29,7 @@ public class Organoid extends EmbryoDynamics
    * Creates an 'Organoid'.
    *
    * @param pGridDimensions
+   *          grid dimensions
    */
   public Organoid(int... pGridDimensions)
   {
@@ -65,7 +65,7 @@ public class Organoid extends EmbryoDynamics
     }
   }
 
-  public void triggerCellDivision()
+  private void triggerCellDivision()
   {
 
     int lNumberOfParticles = getNumberOfParticles();

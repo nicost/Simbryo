@@ -15,6 +15,15 @@ public class EmbryoDynamics extends TissueDynamics implements
 {
   private IsoSurfaceInterface mEmbryoSurface;
 
+  /**
+   * Instanciates embryo dynamics given a collision force, drag coefficient, max
+   * number of particles per grid cell, and grid dimensions.
+   * 
+   * @param pCollisionForce collision force
+   * @param pDrag drag coefficient
+   * @param pMaxNumberOfParticlesPerGridCell max number of particles per grid cell
+   * @param pGridDimensions grid dimensions
+   */
   public EmbryoDynamics(float pCollisionForce,
                         float pDrag,
                         int pMaxNumberOfParticlesPerGridCell,
