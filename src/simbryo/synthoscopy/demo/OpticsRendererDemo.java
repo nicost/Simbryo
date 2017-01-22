@@ -5,6 +5,7 @@ import java.util.Arrays;
 import org.junit.Test;
 
 import clearcl.ClearCL;
+import clearcl.ClearCLContext;
 import clearcl.ClearCLDevice;
 import clearcl.ClearCLImage;
 import clearcl.backend.ClearCLBackendInterface;
@@ -47,7 +48,8 @@ public class OpticsRendererDemo
     System.out.println("lBestBackend=" + lBestBackend);
     try (ClearCL lClearCL = new ClearCL(lBestBackend);
         ClearCLDevice lFastestGPUDevice =
-                                        lClearCL.getFastestGPUDeviceForImages();)
+                                        lClearCL.getFastestGPUDeviceForImages();
+        ClearCLContext lContext = lFastestGPUDevice.createContext();)
     {
 
       int[] lGridDimensions =
@@ -67,7 +69,7 @@ public class OpticsRendererDemo
       // lDrosophila.getViewer().setDisplayRadius(false);
 
       DrosophilaHistoneFluorescence lDrosoFluo =
-                                               new DrosophilaHistoneFluorescence(lFastestGPUDevice,
+                                               new DrosophilaHistoneFluorescence(lContext,
                                                                                  lDrosophila,
                                                                                  lPhantomWidth,
                                                                                  lPhantomHeight,
@@ -80,8 +82,8 @@ public class OpticsRendererDemo
       OpticsRenderer<ClearCLImage> lOpticsRenderer =
                                                    new OpticsRenderer<>(lDrosoFluo);
 
-      LightSheetIllumination lLightSheetIllumination =
-                                                     new LightSheetIllumination(lFastestGPUDevice,lDrosoFluo);
+     /* LightSheetIllumination lLightSheetIllumination =
+                                                     new LightSheetIllumination(lContext,lDrosoFluo);
       lOpticsRenderer.addIlluminationOptics(lLightSheetIllumination);
 
       WideFieldDetectionOptics lWideFieldDetectionOptics =
@@ -89,7 +91,7 @@ public class OpticsRendererDemo
       lOpticsRenderer.addDetectionOptics(lWideFieldDetectionOptics);
 
       SCMOSCameraModel lSCMOSCameraModel = new SCMOSCameraModel(lDrosoFluo);
-      lOpticsRenderer.addCameraModel(lSCMOSCameraModel);
+      lOpticsRenderer.addCameraModel(lSCMOSCameraModel);/**/
 
       // lDrosophila.simulationSteps(13000, 1);
 

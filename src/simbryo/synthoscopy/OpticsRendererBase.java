@@ -35,6 +35,20 @@ public abstract class OpticsRendererBase<I> implements
     super();
     mPhantomRenderer = pPhantomRenderer;
   }
+  
+  @Override
+  public float getLightLambda()
+  {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public void setLightLambda(float pLambda)
+  {
+    // TODO Auto-generated method stub
+    
+  }
 
   @SafeVarargs
   @Override
