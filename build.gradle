@@ -97,6 +97,9 @@ dependencies
     compile ('net.clearvolume:clearcl:[0.3.29,)')     {transitive= true; changing= true}
     compile ('net.clearvolume:clearaudio:[1.0.0,)')   {transitive= true; changing= true}
     
+    // Vecmath:
+    compile ('javax.vecmath:vecmath:1.5.2')
+    
     // SCIFIO:
     //compile ('io.scif:scifio:0.30.0')                 {transitive= true; changing= true}
     

@@ -25,9 +25,9 @@ inline float autofluo(float3 dim, float3 voxelpos, sampler_t sampler, __read_onl
   const float npnz = rngfloat1((2654435789*3)^timeindex);
   const float4 npn = (float4){npnx,npny,npnz,0.0f};
 
-  const float4 noisepos       = (float4){5.0f*normpos.x+7.0f*normpos.y-3.0f*normpos.z*npnx,
-                                         5.0f*normpos.y-7.0f*normpos.z+3.0f*normpos.x*npny,
-                                         5.0f*normpos.z+7.0f*normpos.x-3.0f*normpos.y*npnz, 0.0f};
+  const float4 noisepos       = (float4){5.0f*normpos.x+7.1f*normpos.y-3.2f*normpos.z*npnx,
+                                         5.0f*normpos.y-7.3f*normpos.z+3.5f*normpos.x*npny,
+                                         5.0f*normpos.z+7.7f*normpos.x-3.8f*normpos.y*npnz, 0.0f};
   const float noiseval        = read_imagef(perlin, sampler, noisepos).x;
 
   const float autoyolk1       = native_recip(1.0f+native_exp2(100.0f*(0.1f-insdistance)));

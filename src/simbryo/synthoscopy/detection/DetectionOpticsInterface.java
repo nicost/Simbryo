@@ -1,7 +1,5 @@
 package simbryo.synthoscopy.detection;
 
-import simbryo.synthoscopy.interfaces.HasPhantom;
-
 /**
  * Detection optics interface
  *
@@ -10,7 +8,7 @@ import simbryo.synthoscopy.interfaces.HasPhantom;
  *          images
  * @author royer
  */
-public interface DetectionOpticsInterface<I> extends HasPhantom<I>
+public interface DetectionOpticsInterface<I> 
 {
 
 }

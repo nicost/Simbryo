@@ -60,8 +60,6 @@ public class SimplexNoise extends TextureGeneratorBase
       permMod12[i] = (short) (perm[i] % 12);
     }
 
-    System.out.println(Arrays.toString(mPermutation));
-
   }
 
   @Override

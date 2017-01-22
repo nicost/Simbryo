@@ -6,6 +6,7 @@ import java.util.Arrays;
 import org.junit.Test;
 
 import clearcl.ClearCL;
+import clearcl.ClearCLContext;
 import clearcl.ClearCLDevice;
 import clearcl.backend.ClearCLBackendInterface;
 import clearcl.backend.ClearCLBackends;
@@ -51,7 +52,8 @@ public class HistoneFluorescenceDrosophilaDemo
     System.out.println("lBestBackend=" + lBestBackend);
     try (ClearCL lClearCL = new ClearCL(lBestBackend);
         ClearCLDevice lFastestGPUDevice =
-                                        lClearCL.getFastestGPUDeviceForImages();)
+                                        lClearCL.getFastestGPUDeviceForImages();
+        ClearCLContext lContext = lFastestGPUDevice.createContext())
     {
 
       int[] lGridDimensions =
@@ -60,8 +62,6 @@ public class HistoneFluorescenceDrosophilaDemo
                                                                                  cHeight,
                                                                                  cDepth);
 
-      System.out.println("lGridDimensions="
-                         + Arrays.toString(lGridDimensions));
 
       Drosophila lDrosophila = new Drosophila(16, lGridDimensions);
 
@@ -71,12 +71,14 @@ public class HistoneFluorescenceDrosophilaDemo
       // lDrosophila.getViewer().setDisplayRadius(false);
 
       DrosophilaHistoneFluorescence lDrosoFluo =
-                                               new DrosophilaHistoneFluorescence(lFastestGPUDevice,
+                                               new DrosophilaHistoneFluorescence(lContext,
                                                                                  lDrosophila,
                                                                                  cWidth,
                                                                                  cHeight,
                                                                                  cDepth);
 
+      
+      
       ClearCLImageViewer lOpenViewer = lDrosoFluo.openViewer();
       Slider lZSlider = lOpenViewer.getZSlider();
 

@@ -6,6 +6,7 @@ import clearcl.ClearCLBuffer;
 import clearcl.ClearCLContext;
 import clearcl.ClearCLDevice;
 import clearcl.ClearCLImage;
+import clearcl.ClearCLKernel;
 import clearcl.ClearCLProgram;
 import clearcl.enums.HostAccessType;
 import clearcl.enums.ImageChannelDataType;
@@ -44,11 +45,11 @@ public abstract class HistoneFluorescence extends
   private boolean mHasPolarity;
 
   /**
-   * Instantiates a histone fluorescence renderer for a given OpenCL device,
+   * Instantiates a histone fluorescence renderer for a given OpenCL context,
    * tissue dynamics, and stack dimensions.
    * 
-   * @param pDevice
-   *          OpenCL device
+   * @param pContext
+   *          OpenCL context
    * @param pTissueDynamics
    *          tissue dynamics
    * @param pStackDimensions
@@ -56,26 +57,26 @@ public abstract class HistoneFluorescence extends
    * @throws IOException
    *           thrown in case kernel code cannot be read.
    */
-  public HistoneFluorescence(ClearCLDevice pDevice,
+  public HistoneFluorescence(ClearCLContext pContext,
                              TissueDynamics pTissueDynamics,
                              long... pStackDimensions) throws IOException
   {
-    this(pDevice,
+    this(pContext,
          pTissueDynamics,
          0.004f,
          10f,
          0.8f,
          0.75f,
-         6e-2f,
+         1e-2f,
          pStackDimensions);
   }
 
   /**
-   * Instantiates a histone fluorescence renderer for a given OpenCL device,
+   * Instantiates a histone fluorescence renderer for a given OpenCL context,
    * tissue dynamics, and stack dimensions.
    * 
-   * @param pDevice
-   *          OpenCL device
+   * @param pContext
+   *          OpenCL context
    * @param pTissueDynamics
    *          tissue dynamics
    * @param pNucleiRadius
@@ -93,7 +94,7 @@ public abstract class HistoneFluorescence extends
    * @throws IOException
    *           thrown in OpenCL kernels cannot be read.
    */
-  public HistoneFluorescence(ClearCLDevice pDevice,
+  public HistoneFluorescence(ClearCLContext pContext,
                              TissueDynamicsInterface pTissueDynamics,
                              float pNucleiRadius,
                              float pNucleiSharpness,
@@ -102,7 +103,7 @@ public abstract class HistoneFluorescence extends
                              float pNoiseOverSignalRatio,
                              long... pStackDimensions) throws IOException
   {
-    super(pDevice, pTissueDynamics, pStackDimensions);
+    super(pContext, pTissueDynamics, pStackDimensions);
 
     mHasPolarity = pTissueDynamics instanceof HasPolarity;
     mNucleiRadius = pNucleiRadius;
@@ -117,8 +118,7 @@ public abstract class HistoneFluorescence extends
 
     setupNoiseBuffers(mContext);
 
-    ClearCLProgram lProgram = setupProgram(lMaxParticlesPerGridCell);
-    setupKernel(lProgram, lMaxParticlesPerGridCell);
+    setupProgramAndKernel(lMaxParticlesPerGridCell);
 
     setupBuffersAndImages(pTissueDynamics, lMaxParticlesPerGridCell);
 
@@ -127,7 +127,6 @@ public abstract class HistoneFluorescence extends
     mRenderKernel.setArgument("positions", mPositionsBuffer);
     mRenderKernel.setArgument("polarities", mPolaritiesBuffer);
     mRenderKernel.setArgument("radii", mRadiiBuffer);
-
     mRenderKernel.setArgument("perlin", mPerlinNoiseImage);
 
   }
@@ -181,7 +180,7 @@ public abstract class HistoneFluorescence extends
                  OffHeapMemory.allocateFloats(pTissueDynamics.getMaxNumberOfParticles());
   }
 
-  protected ClearCLProgram setupProgram(final int pMaxParticlesPerGridCell) throws IOException
+  protected void setupProgramAndKernel(final int pMaxParticlesPerGridCell) throws IOException
   {
     ClearCLProgram lProgram = mContext.createProgram();
 
@@ -201,7 +200,8 @@ public abstract class HistoneFluorescence extends
 
     lProgram.buildAndLog();
     // System.out.println(lProgram.getSourceCode());
-    return lProgram;
+    
+    mRenderKernel = lProgram.createKernel("hisrender");
   }
 
   /**
@@ -216,11 +216,7 @@ public abstract class HistoneFluorescence extends
    */
   public abstract void addAutoFluoFunctionSourceCode(ClearCLProgram pClearCLProgram) throws IOException;
 
-  protected void setupKernel(ClearCLProgram pClearCLProgram,
-                             final int pMaxParticlesPerGridCell) throws IOException
-  {
-    mRenderKernel = pClearCLProgram.createKernel("hisrender");
-  }
+
 
   private void setupNoiseBuffers(ClearCLContext pContext) throws IOException
   {

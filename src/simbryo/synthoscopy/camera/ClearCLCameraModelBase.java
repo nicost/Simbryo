@@ -1,6 +1,7 @@
 package simbryo.synthoscopy.camera;
 
 import clearcl.ClearCLImage;
+import simbryo.phantom.PhantomRendererInterface;
 
 /**
  * Camera model base class for camera models computation based on CLearCL
@@ -12,5 +13,10 @@ public class ClearCLCameraModelBase extends
                                     implements
                                     CameraModelInterface<ClearCLImage>
 {
+
+  public ClearCLCameraModelBase()
+  {
+    super();
+  }
 
 }

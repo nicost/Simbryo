@@ -43,7 +43,6 @@ public abstract class OpticsRendererBase<I> implements
     for (IlluminationOpticsInterface<I> lIlluminationOptics : pIlluminationOptics)
     {
       mIlluminationOpticsList.add(lIlluminationOptics);
-      lIlluminationOptics.setPhantom(mPhantomRenderer);
     }
   }
 
@@ -54,7 +53,6 @@ public abstract class OpticsRendererBase<I> implements
     for (DetectionOpticsInterface<I> lDetectionOptics : pDetectionOptics)
     {
       mDetectionOpticsList.add(lDetectionOptics);
-      lDetectionOptics.setPhantom(mPhantomRenderer);
     }
   }
 

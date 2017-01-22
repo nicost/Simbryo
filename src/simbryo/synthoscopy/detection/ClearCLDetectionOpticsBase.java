@@ -1,6 +1,7 @@
 package simbryo.synthoscopy.detection;
 
 import clearcl.ClearCLImage;
+import simbryo.phantom.PhantomRendererInterface;
 
 /**
  *  Detection optics base class for detection optics computation based on CLearCL
@@ -12,5 +13,10 @@ public abstract class ClearCLDetectionOpticsBase extends
                                              implements
                                              DetectionOpticsInterface<ClearCLImage>
 {
+
+  public ClearCLDetectionOpticsBase()
+  {
+    super();
+  }
 
 }

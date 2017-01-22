@@ -2,6 +2,7 @@ package simbryo.phantom.fluo.impl.drosophila;
 
 import java.io.IOException;
 
+import clearcl.ClearCLContext;
 import clearcl.ClearCLDevice;
 import clearcl.ClearCLProgram;
 import simbryo.dynamics.tissue.embryo.zoo.Drosophila;
@@ -18,8 +19,8 @@ public class DrosophilaHistoneFluorescence extends HistoneFluorescence
   /**
    * Instanciates a Drosophila embryo histone fluorescence renderer.
    * 
-   * @param pDevice
-   *          ClearCL device
+   * @param pContext
+   *          ClearCL context
    * @param pDrosophila
    *          drosophila embryo dynamics
    * @param pStackDimensions
@@ -27,11 +28,11 @@ public class DrosophilaHistoneFluorescence extends HistoneFluorescence
    * @throws IOException
    *           thrown if OpenCL kernels cannot be read.
    */
-  public DrosophilaHistoneFluorescence(ClearCLDevice pDevice,
+  public DrosophilaHistoneFluorescence(ClearCLContext pContext,
                                        Drosophila pDrosophila,
                                        long... pStackDimensions) throws IOException
   {
-    super(pDevice, pDrosophila, pStackDimensions);
+    super(pContext, pDrosophila, pStackDimensions);
   }
 
   @Override

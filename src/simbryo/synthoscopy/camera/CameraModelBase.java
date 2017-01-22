@@ -1,5 +1,6 @@
 package simbryo.synthoscopy.camera;
 
+import simbryo.phantom.PhantomRendererInterface;
 import simbryo.synthoscopy.OpticsBase;
 
 /**
@@ -16,6 +17,11 @@ public abstract class CameraModelBase<I> extends OpticsBase<I>
 
   private long mWidth, mHeight;
 
+  public CameraModelBase()
+  {
+    super();
+  }
+  
   @Override
   public long getWidth()
   {

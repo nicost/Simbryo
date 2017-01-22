@@ -40,7 +40,7 @@ public class Drosophila extends EmbryoDynamics implements HasPolarity
 
   private volatile int mCellDivCount;
 
-  private final float mEllipsoidA = 1.0f, mEllipsoidB = 0.43f,
+  private final float mEllipsoidA = 0.43f, mEllipsoidB = 1.00f,
       mEllipsoidC = 0.43f, mEllipsoidR = 0.47f;
 
   /**
@@ -66,8 +66,8 @@ public class Drosophila extends EmbryoDynamics implements HasPolarity
 
     for (int i = 0; i < 1; i++)
     {
-      float x = (float) (Ri - 0.02 * Math.random());
-      float y = (float) (0.5f + Ri * (Math.random() - 0.5f));
+      float x = (float) (0.5f + Ri * (Math.random() - 0.5f));
+      float y = (float) (Ri - 0.02 * Math.random());
       float z = (float) (0.5f + Ri * (Math.random() - 0.5f));
 
       int lId = addParticle(x, y, z);
@@ -189,9 +189,9 @@ public class Drosophila extends EmbryoDynamics implements HasPolarity
       if (pNewMorphogenValue >= 5)
       {
         float[] lPositions = mPositions.getReadArray();
-        float x = lPositions[pId * lDimension + 0];
-        if (x > 0.9f)
-          return (float) (pNewMorphogenValue + 0.1f * Math.pow(x, 4));
+        float y = lPositions[pId * lDimension + 1];
+        if (y > 0.9f)
+          return (float) (pNewMorphogenValue + 0.1f * Math.pow(y, 4));
       }
 
     }

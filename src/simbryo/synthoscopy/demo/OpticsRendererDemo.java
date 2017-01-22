@@ -18,7 +18,7 @@ import simbryo.phantom.fluo.impl.drosophila.DrosophilaHistoneFluorescence;
 import simbryo.synthoscopy.OpticsRenderer;
 import simbryo.synthoscopy.camera.SCMOSCameraModel;
 import simbryo.synthoscopy.detection.WideFieldDetectionOptics;
-import simbryo.synthoscopy.illumination.LightSheetIllumination;
+import simbryo.synthoscopy.illumination.impl.lightsheet.LightSheetIllumination;
 import simbryo.util.timing.Timming;
 
 /**
@@ -81,14 +81,14 @@ public class OpticsRendererDemo
                                                    new OpticsRenderer<>(lDrosoFluo);
 
       LightSheetIllumination lLightSheetIllumination =
-                                                     new LightSheetIllumination();
+                                                     new LightSheetIllumination(lFastestGPUDevice,lDrosoFluo);
       lOpticsRenderer.addIlluminationOptics(lLightSheetIllumination);
 
       WideFieldDetectionOptics lWideFieldDetectionOptics =
-                                                         new WideFieldDetectionOptics();
+                                                         new WideFieldDetectionOptics(lDrosoFluo);
       lOpticsRenderer.addDetectionOptics(lWideFieldDetectionOptics);
 
-      SCMOSCameraModel lSCMOSCameraModel = new SCMOSCameraModel();
+      SCMOSCameraModel lSCMOSCameraModel = new SCMOSCameraModel(lDrosoFluo);
       lOpticsRenderer.addCameraModel(lSCMOSCameraModel);
 
       // lDrosophila.simulationSteps(13000, 1);

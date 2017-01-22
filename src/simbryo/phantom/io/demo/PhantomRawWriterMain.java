@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import clearcl.ClearCL;
+import clearcl.ClearCLContext;
 import clearcl.ClearCLDevice;
 import clearcl.backend.ClearCLBackendInterface;
 import clearcl.backend.ClearCLBackends;
@@ -57,7 +58,8 @@ public class PhantomRawWriterMain
 		System.out.println("lBestBackend=" + lBestBackend);
 		try (ClearCL lClearCL = new ClearCL(lBestBackend);
 				ClearCLDevice lFastestGPUDevice =
-																				lClearCL.getFastestGPUDeviceForImages();)
+																				lClearCL.getFastestGPUDeviceForImages();
+		    ClearCLContext lContext = lFastestGPUDevice.createContext())
 		{
 			System.out.println("lFastestGPUDevice=" + lFastestGPUDevice);
 
@@ -70,7 +72,7 @@ public class PhantomRawWriterMain
 			final Drosophila lDrosophila = new Drosophila(16,
 																										lGridDimensions);
 
-			final DrosophilaHistoneFluorescence lDrosoFluo = new DrosophilaHistoneFluorescence(	lFastestGPUDevice,
+			final DrosophilaHistoneFluorescence lDrosoFluo = new DrosophilaHistoneFluorescence(	lContext,
 																																													lDrosophila,
 																																													lWidth,
 																																													lHeight,

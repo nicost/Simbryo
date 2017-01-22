@@ -47,12 +47,12 @@ public interface PhantomRendererInterface<I>
   void clear();
 
   /**
-   * Renders whole stack.
+   * Renders whole phantom stack. This method is not cache-aware, it will re-render already rendered planes
    */
   void render();
 
   /**
-   * Renders a range of z plane indices. This method
+   * Renders a range of z plane indices. This method is not cache-aware, it will re-render already rendered planes
    * 
    * @param pZPlaneIndexBegin
    *          begin of z plane index range
@@ -64,7 +64,7 @@ public interface PhantomRendererInterface<I>
   /**
    * Renders a single plane (possibly more if renderer cannot render single
    * planes but a whole chunk). This method is smart in the sense that it is
-   * cache-aware.
+   * cache-aware - it will not render planes previously rendered.
    * 
    * @param pZPlaneIndex
    *          z plane index

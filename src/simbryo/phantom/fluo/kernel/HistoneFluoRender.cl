@@ -105,8 +105,8 @@ __kernel void hisrender(   __write_only    image3d_t  image,
       
       const float3 relvoxposacndim  = relvoxposac*INOISEDIM;
       const float4 normrelvoxposac  = (float4){relvoxposacndim.x, relvoxposacndim.y, relvoxposacndim.z, 0.0f};
-      const float4 noisepos         =   0.5f+normrelvoxposac+npn;
-      const float  levelnoise       =   2.0f*read_imagef(perlin, sampler, noisepos).x-1.0f;
+      const float4 noisepos         = 0.5f+normrelvoxposac+npn;
+      const float  levelnoise       = 2.0f*read_imagef(perlin, sampler, noisepos).x-1.0f;
       
       const float3 partpol     = vload3(k,localpolarities);
       const float cosval = fabs(dot(partpol,relvoxposac)/(fast_length(relvoxposac)));

@@ -25,9 +25,7 @@ public abstract class ClearCLPhantomRendererBase extends
 {
 
   protected ClearCLContext mContext;
-
   protected ClearCLImage mImage;
-
   protected ClearCLKernel mRenderKernel;
 
   private final long mLocalSizeX, mLocalSizeY, mLocalSizeZ;
@@ -36,24 +34,24 @@ public abstract class ClearCLPhantomRendererBase extends
    * Instantiates a Phantom renderer for a given OpenCL device, tissue dynamics,
    * and stack dimensions.
    * 
-   * @param pDevice
-   *          OpenCL device to use.
+   * @param pContext
+   *          OpenCL context to use.
    * @param pTissueDynamics
    *          tissue dynamics object
    * @param pStackDimensions
    *          stack dimensions
    */
-  public ClearCLPhantomRendererBase(final ClearCLDevice pDevice,
+  public ClearCLPhantomRendererBase(final ClearCLContext pContext,
                                     final TissueDynamicsInterface pTissueDynamics,
                                     final long... pStackDimensions)
   {
     super(pTissueDynamics, pStackDimensions);
 
-    mContext = pDevice.createContext();
+    mContext = pContext;
 
-    mImage = mContext.createImage(ImageChannelOrder.R,
-                                  ImageChannelDataType.Float,
-                                  mStackDimensions);
+    mImage =
+           mContext.createSingleChannelImage(ImageChannelDataType.Float,
+                                             mStackDimensions);
 
     final int[] lGridDimensions = pTissueDynamics.getGridDimensions();
 
@@ -71,7 +69,7 @@ public abstract class ClearCLPhantomRendererBase extends
   @Override
   public void clear()
   {
-    // mImage.fillZero(true);
+    //mImage.fillZero(true);
     super.clear();
   }
 
@@ -86,7 +84,6 @@ public abstract class ClearCLPhantomRendererBase extends
   {
     if (!mPlaneAlreadyDrawnTable[pZPlaneIndex])
     {
-      System.out.println("render slice");
       renderInternal(pZPlaneIndex, pZPlaneIndex + 1);
     }
 
@@ -114,8 +111,8 @@ public abstract class ClearCLPhantomRendererBase extends
     if (pZPlaneIndexEnd == pZPlaneIndexBegin)
       pZPlaneIndexEnd += mLocalSizeZ;
 
-    System.out.println("pZPlaneIndexBegin=" + pZPlaneIndexBegin);
-    System.out.println("pZPlaneIndexEnd  =" + pZPlaneIndexEnd);
+    // System.out.println("pZPlaneIndexBegin=" + pZPlaneIndexBegin);
+    // System.out.println("pZPlaneIndexEnd =" + pZPlaneIndexEnd);
     mRenderKernel.setGlobalOffsets(0, 0, pZPlaneIndexBegin);
     mRenderKernel.setGlobalSizes(getWidth(),
                                  getHeight(),
@@ -127,9 +124,7 @@ public abstract class ClearCLPhantomRendererBase extends
                                       getSignalIntensity());
     mRenderKernel.setOptionalArgument("timeindex",
                                       (int) getTissue().getTimeStepIndex());
-    System.out.println("before mRenderKernel.run(true);");
     mRenderKernel.run(true);
-    System.out.println("after mRenderKernel.run(true);");
     for (int z = pZPlaneIndexBegin; z < pZPlaneIndexEnd; z++)
       mPlaneAlreadyDrawnTable[z] = true;
     mImage.notifyListenersOfChange(mContext.getDefaultQueue());
@@ -155,6 +150,7 @@ public abstract class ClearCLPhantomRendererBase extends
 
   /**
    * Opens viewer for the internal image
+   * 
    * @return viewer
    */
   public ClearCLImageViewer openViewer()

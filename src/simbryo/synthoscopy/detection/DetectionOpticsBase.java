@@ -1,5 +1,6 @@
 package simbryo.synthoscopy.detection;
 
+import simbryo.phantom.PhantomRendererInterface;
 import simbryo.synthoscopy.OpticsBase;
 
 /**
@@ -13,5 +14,10 @@ public abstract class DetectionOpticsBase<I> extends OpticsBase<I>
                                          implements
                                          DetectionOpticsInterface<I>
 {
+
+  public DetectionOpticsBase()
+  {
+    super();
+  }
 
 }
