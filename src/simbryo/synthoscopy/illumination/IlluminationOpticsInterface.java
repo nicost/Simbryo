@@ -22,17 +22,42 @@ public interface IlluminationOpticsInterface<I> extends
    */
   I getLightMapImage();
 
-  long getWidth();
-
-  long getHeight();
-
-  long getDepth();
-
+  /**
+   * Renders the light map for a given scattering phantom image and position and dimension along z of the lightmap. 
+   * 
+   * @param pScatteringPhantomImage scattering phantom
+   * @param pZCenterOffset z offset in normalized coordinates of the center plane of the lightmap stack relative to the phantom.
+   * @param pZDepth z depth in normalized coordinates of the lightmap stack relative to the phantom.
+   * @return light map image (same as returned by getLightMapImage() )
+   */
   I render(ClearCLImage pScatteringPhantomImage,
-           int pZCenterPlaneIndex);
+           float pZCenterOffset,
+           float pZDepth);
 
+  /**
+   * Clear the light map image
+   */
   void clear();
 
+  /**
+   * Light map image width.
+   * 
+   * @return light map image width
+   */
+  long getWidth();
 
+  /**
+   * Light map image height.
+   * 
+   * @return light map image height
+   */
+  long getHeight();
+
+  /**
+   * Light map image depth.
+   * 
+   * @return light map image depth
+   */
+  long getDepth();
 
 }

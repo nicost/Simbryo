@@ -18,6 +18,8 @@ public abstract class OpticsRendererBase<I> implements
 {
 
   private PhantomRendererInterface<I> mPhantomRenderer;
+  
+  private float mLambda;
 
   private ArrayList<IlluminationOpticsInterface<I>> mIlluminationOpticsList =
                                                                          new ArrayList<>();
@@ -39,15 +41,13 @@ public abstract class OpticsRendererBase<I> implements
   @Override
   public float getLightLambda()
   {
-    // TODO Auto-generated method stub
-    return 0;
+    return mLambda;
   }
 
   @Override
   public void setLightLambda(float pLambda)
   {
-    // TODO Auto-generated method stub
-    
+    mLambda = pLambda;
   }
 
   @SafeVarargs

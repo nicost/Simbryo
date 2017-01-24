@@ -3,7 +3,6 @@ package simbryo.phantom.fluo.impl.drosophila;
 import java.io.IOException;
 
 import clearcl.ClearCLContext;
-import clearcl.ClearCLDevice;
 import clearcl.ClearCLProgram;
 import simbryo.dynamics.tissue.embryo.zoo.Drosophila;
 import simbryo.phantom.fluo.HistoneFluorescence;

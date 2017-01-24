@@ -15,7 +15,6 @@ import simbryo.dynamics.tissue.embryo.zoo.Drosophila;
 import simbryo.phantom.ClearCLPhantomRendererUtils;
 import simbryo.phantom.fluo.impl.drosophila.DrosophilaHistoneFluorescence;
 import simbryo.synthoscopy.illumination.impl.lightsheet.LightSheetIllumination;
-import simbryo.util.timing.Timming;
 
 /**
  * Light sheet illumination demo
@@ -73,19 +72,32 @@ public class LightSheetIlluminationDemo
 
         LightSheetIllumination lLightSheetIllumination =
                                                        new LightSheetIllumination(lContext,
-                                                                                  lPhantomWidth,
-                                                                                  lPhantomHeight,
-                                                                                  21L);
+                                                                                  lPhantomWidth/4,
+                                                                                  lPhantomHeight/4,
+                                                                                  31L);
 
+        lLightSheetIllumination.setLightSheetHeigth(0.5f);
         lLightSheetIllumination.setLightSheetPosition(0.5f,
                                                       0.5f,
                                                       0.5f);
+        
+        //lLightSheetIllumination.setLightSheetNormalVector(0.0f, 0.0f, 1.0f);
+        //lLightSheetIllumination.setLightSheetAxisVector(1.0f, 0.3f, 0.0f);
+        
+        lLightSheetIllumination.setOrientationWithAnglesInDegrees(0, 0, 0);
+        lLightSheetIllumination.setLightSheetThetaInDeg(3.0f);
+        
+        
+        System.out.println("axis   vector:"+lLightSheetIllumination.getLightSheetAxisVector()  );
+        System.out.println("normal vector:"+lLightSheetIllumination.getLightSheetNormalVector());
+        
+
 
         //lDrosoFluo.getPhantomImage().fillZero(true);
 
         ElapsedTime.measure("renderlightsheet",
                             () -> lLightSheetIllumination.render(lDrosoFluo.getPhantomImage(),
-                                                                 lPhantomDepth / 2));
+                                                                 0.5f));
 
         ClearCLImageViewer lOpenViewer =
                                        lLightSheetIllumination.openViewer();

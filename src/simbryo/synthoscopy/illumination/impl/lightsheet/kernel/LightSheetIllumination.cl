@@ -3,7 +3,7 @@
 #include [OCLlib] "noise/noise.cl"
 
                
-#define LAMBDA 0.09f   
+#define DECAY 46.0f   
 #define KS 1  
 #define SIGMAMIN 0.05f
 #define SIGMAMOD  (1-SIGMAMIN)               
@@ -25,66 +25,31 @@ __kernel void initialize(
   write_imagef (sb, (int2){y,z}, 0.0f);
 }
 
-__kernel void diffuseY(
-                           __read_only    image2d_t  si,
-                           __write_only   image2d_t  so,
-                           const          int        radius 
-                       )   
-{
-  const sampler_t intsampler  = CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_CLAMP_TO_EDGE | CLK_FILTER_NEAREST;
-  const int y = get_global_id(0); 
-  const int z = get_global_id(1);
-  
-  float value = 0;
-  for(int iy=y-radius; iy<=y+radius; iy++)
-    value += read_imagef(si, intsampler, (int2){iy,z}).x;
-
-  value *= 1.0f/(2*radius+1);
-
-  write_imagef (so, (int2){y,z}, value);
-}
-
-__kernel void diffuseZ(
-                           __read_only    image2d_t  si,
-                           __write_only   image2d_t  so,
-                           const          int        radius 
-                       )   
-{
-  const sampler_t intsampler  = CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_CLAMP_TO_EDGE | CLK_FILTER_NEAREST;
-  const int y = get_global_id(0); 
-  const int z = get_global_id(1);
-  
-  float value = 0;
-  for(int iz=z-radius; iz<=z+radius; iz++)
-    value += read_imagef(si, intsampler, (int2){y,iz}).x;
-
-  value *= 1.0f/(2*radius+1);
-
-  write_imagef (so, (int2){y,z}, value);
-}
    
    
 inline float lightsheetfun( const float lambda,
                             const float intensity,
-                            const float theta,
-                            const float height,  
-                            const float3 lspvox, 
-                            const float3 lsovox, 
-                            const float3 posvox)
+                            const float w0,
+                            const float lsheight,  
+                            const float4 lsp, 
+                            const float4 lsa,
+                            const float4 lsn, 
+                            const float4 pos)
 {
-  const float3 relpos = posvox-lspvox;
-  const float d = fabs(relpos.z);
-  const float x =  relpos.x;
+  const float4 rel = pos-lsp;
+  const float x = dot(lsa,rel);
+  const float y = dot(cross(lsa,lsn),rel);
+  const float z = fabs(dot(lsn,rel)); // + fast_length(rel.yz);
   
-  const float wo = lambda/(((float)M_PI)*theta);
-  const float xr = lambda/(((float)M_PI)*theta*theta);
-  const float nx = x/xr;
-  const float wx = wo*native_sqrt(1.0f+nx*nx); 
+  const float w02  = w0*w0;
+  const float nx = (x*lambda)/(M_PI*w02);
+  const float wx2 = w02*(1.0f+nx*nx); 
+  const float a2 = w02/wx2;
+  const float b2 = (z*z)/wx2;
   
-  const float a = wo/wx;
-  const float b = d/wx;
+  const float sheet = intensity*a2*native_exp(-2*b2);
   
-  const float value = intensity*a*a*native_exp(-2*b*b);
+  const float value = sheet*(1-smoothstep(0.5f*lsheight, 0.5f*lsheight+0.01f,fabs(y)));
   
   return value;
 }   
@@ -97,52 +62,73 @@ __kernel void propagate(   __read_only    image3d_t  scattermap,
                            __read_only    image2d_t  sinput,
                            __write_only   image2d_t  soutput,
                            const          int        x,
-                           const          int        zoffset,
+                           const          float      zdepth,
+                           const          float      zoffset,
                            const          float      lambda,
                            const          float      intensity,
-                           const          float      theta,
-                           const          float      height,
+                           const          float      w0,
+                           const          float      lsheight,
                            const          float      lspx,
                            const          float      lspy,
                            const          float      lspz,
-                           const          float      lsox,
-                           const          float      lsoy,
-                           const          float      lsoz
+                           const          float      lsax,
+                           const          float      lsay,
+                           const          float      lsaz,
+                           const          float      lsnx,
+                           const          float      lsny,
+                           const          float      lsnz
                        )
 {
-  const sampler_t normsampler = CLK_NORMALIZED_COORDS_TRUE | CLK_ADDRESS_MIRRORED_REPEAT | CLK_FILTER_NEAREST;
+  const sampler_t normsampler = CLK_NORMALIZED_COORDS_TRUE | CLK_ADDRESS_MIRRORED_REPEAT | CLK_FILTER_LINEAR;
   const sampler_t intsampler  = CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_CLAMP_TO_EDGE | CLK_FILTER_NEAREST;
+ 
+  const int lmwidth  = get_image_width(lightmap);
+  const int lmheight = get_image_height(lightmap);
+  const int lmdepth  = get_image_depth(lightmap);
+  const float4 lmdim = (float4){(float)lmwidth,(float)lmheight,(float)lmdepth, 1.0f};
+  const float4 ilmdim = 1.0f/lmdim;
  
   const int smwidth  = get_image_width(scattermap);
   const int smheight = get_image_height(scattermap);
   const int smdepth  = get_image_depth(scattermap);
-  const float3 dim = (float3){(float)smwidth,(float)smheight,(float)smdepth};
-  const float3 iaspectr = (float3){(float)smwidth,(float)smwidth,(float)smwidth}/dim;
+  const float4 smdim = (float4){(float)smwidth,(float)smheight,(float)smdepth, 1.0f};
+
   
-  const float3 lsp    = (float3){lspx, lspy, lspz};
-  const float3 lspvox = lsp*dim; //note: aspect ratio?
-  const float3 lso    = (float3){lsox, lsoy, lsoz};
-  const float3 lsovox = lso*dim; //note: aspect ratio?
+  const float4 lsp    = (float4){lspx, lspy, lspz, 0.0f};
+  const float4 lspvox = lsp*smdim; //note: aspect ratio?
+  const float4 lsa    = (float4){lsax, lsay, lsaz, 0.0f};
+  const float4 lsavox = lsa*smdim; //note: aspect ratio?
+  const float4 lsn    = (float4){lsnx, lsny, lsnz, 0.0f};
+  const float4 lsnvox = lsn*smdim; //note: aspect ratio?
   
   const int y = get_global_id(0); 
   const int z = get_global_id(1);
   
+  const int height = get_global_size(0); 
+  const int depth  = get_global_size(1);
+  
   const int oy = get_global_offset(0); 
   const int oz = get_global_offset(1);
    
-  const float3 posvox = (float3){(float)x,(float)y,(float)(zoffset+z)};
+  const float2 dvec  = (float2){0.5f-lsay/lsax, 0.5f-lsaz/lsax}*ilmdim.yz;
+
+  const float4 pos = (float4){(float)x/lmwidth,(float)y/lmheight,zoffset+zdepth*(((float)z)/lmdepth), 0.0f};
+  
+  //printf("lsa(%f,%f,%f)\n",lsa.x, lsa.y, lsa.z);
+  //printf("lsn(%f,%f,%f)\n",lsn.x, lsn.y, lsn.z);
+  
   
   // formula for ballistic light distribution of lightsheet:
-  const float ballistic0 =  lightsheetfun(lambda, intensity, theta, height, lspvox, lsovox, posvox);
+  const float ballistic0 =  lightsheetfun(lambda, intensity, w0, lsheight, lsp, lsa, lsn, pos);
   
   // [READ IMAGE] proportion of ballistic light that made it through in previous planes:
-  const float oldballisticratio =  read_imagef(binput, intsampler, (int2){y,z}).x;
+  const float oldballisticratio =  read_imagef(binput, normsampler, dvec+(float2){y,z}/lmdim.yz).x;
  
   // scattering map value at voxel: 
-  const float scattermapvalue = read_imagef(scattermap, intsampler, (int4){x,y,zoffset+z,0.0f}).x;
+  const float scattermapvalue = read_imagef(scattermap, normsampler, pos).x;
   
   // local loss from ballistic light to scattered light: (1 -> no loss, 0 -> max loss)
-  const float loss = native_exp2(-LAMBDA*scattermapvalue);
+  const float loss = native_exp2(-(DECAY/lmwidth)*scattermapvalue);
   
   // updated ballistic ratio:
   const float ballisticratio = oldballisticratio*loss;
@@ -166,11 +152,13 @@ __kernel void propagate(   __read_only    image3d_t  scattermap,
   float previouslyscattered = 0.0f;
   for(  int iz=z-KS; iz<=z+KS; iz++)
     for(int iy=y-KS; iy<=y+KS; iy++)
-      previouslyscattered += read_imagef(sinput, intsampler, (int2){iy,iz}).x;
+    {
+      previouslyscattered += read_imagef(sinput, normsampler, dvec+(float2){iy,iz}*ilmdim.yz).x;
+    }
   previouslyscattered *= sigma; // weight /**/
   
   // [READ IMAGE] collect scattered light from previous plane without diffusion:
-  previouslyscattered +=  (1-sigma)*read_imagef(sinput, intsampler, (int2){y,z}).x;
+  previouslyscattered +=  (1-sigma)*read_imagef(sinput, normsampler, dvec+(float2){(float)y,(float)z}*ilmdim.yz ).x;
   
   // normalize to have conservation from one plane to the next:
   previouslyscattered *= 1.0f/((2*KS+1)*(2*KS+1)*sigma+(1-sigma));
@@ -183,14 +171,6 @@ __kernel void propagate(   __read_only    image3d_t  scattermap,
 
   // Light at a given point in space is the sum of the scattered and ballistic light:
   const float light = ballistic + scattered; // ballistic + scattered;
-
-  /*
-  if(y<300)
-    write_imagef (lightmap, (int4){x,y,z,0.0f}, ballistic);
-  else
-    write_imagef (lightmap, (int4){x,y,z,0.0f}, sigma);
-  /**/
-
 
   // [WRITE IMAGE] Write lightmap value:
   write_imagef (lightmap, (int4){x,y,z,0.0f}, light);

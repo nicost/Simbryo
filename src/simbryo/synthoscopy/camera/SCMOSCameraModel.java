@@ -1,7 +1,6 @@
 package simbryo.synthoscopy.camera;
 
 import clearcl.ClearCLImage;
-import simbryo.phantom.PhantomRendererInterface;
 
 /**
  * Generic camera model for sCMOS cameras

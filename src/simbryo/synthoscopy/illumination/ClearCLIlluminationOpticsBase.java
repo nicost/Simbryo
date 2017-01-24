@@ -1,13 +1,9 @@
 package simbryo.synthoscopy.illumination;
 
-import static java.lang.Math.round;
-
 import clearcl.ClearCLContext;
-import clearcl.ClearCLDevice;
 import clearcl.ClearCLImage;
 import clearcl.enums.ImageChannelDataType;
 import clearcl.viewer.ClearCLImageViewer;
-import simbryo.phantom.PhantomRendererInterface;
 
 /**
  * Ilumination optics base class for illumination optics computation based on
@@ -27,10 +23,12 @@ public abstract class ClearCLIlluminationOpticsBase extends
 
   /**
    * Instanciates a ClearCL powered illumination optics base class given a
-   * ClearCL context, phantom renderer, and light map image dimensions
+   * ClearCL context, and light map image dimensions.
    * 
-   * @param pContext ClearCL context
-   * @param pLightMapDimensions light map image dimensions
+   * @param pContext
+   *          ClearCL context
+   * @param pLightMapDimensions
+   *          light map image dimensions
    */
   public ClearCLIlluminationOpticsBase(final ClearCLContext pContext,
                                        long... pLightMapDimensions)
@@ -55,12 +53,14 @@ public abstract class ClearCLIlluminationOpticsBase extends
   }
 
   @Override
-  public ClearCLImage render(ClearCLImage pScatteringPhantomImage, int pZCenterPlaneIndex)
+  public ClearCLImage render(ClearCLImage pScatteringPhantomImage,
+                             float pZCenterOffset,
+                             float pZDepth)
   {
-    // not doing anything here, derived classes must actually cmpute something into mLightMapImage
+    // not doing anything here, derived classes must actually cmpute something
+    // into mLightMapImage
     return mLightMapImage;
   }
- 
 
   @Override
   public void clear()
@@ -68,11 +68,12 @@ public abstract class ClearCLIlluminationOpticsBase extends
     mLightMapImage.fillZero(true);
   }
 
+  @Override
   public void close()
   {
     mLightMapImage.close();
   }
-  
+
   /**
    * Opens viewer for the internal image
    * 

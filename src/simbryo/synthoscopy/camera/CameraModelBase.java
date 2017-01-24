@@ -1,6 +1,5 @@
 package simbryo.synthoscopy.camera;
 
-import simbryo.phantom.PhantomRendererInterface;
 import simbryo.synthoscopy.OpticsBase;
 
 /**

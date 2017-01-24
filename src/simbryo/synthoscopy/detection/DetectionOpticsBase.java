@@ -1,6 +1,5 @@
 package simbryo.synthoscopy.detection;
 
-import simbryo.phantom.PhantomRendererInterface;
 import simbryo.synthoscopy.OpticsBase;
 
 /**

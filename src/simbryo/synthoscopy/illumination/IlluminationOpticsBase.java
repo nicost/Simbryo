@@ -1,9 +1,5 @@
 package simbryo.synthoscopy.illumination;
 
-import static java.lang.Math.max;
-
-import clearcl.ClearCLImage;
-import simbryo.phantom.PhantomRendererInterface;
 import simbryo.synthoscopy.OpticsBase;
 
 /**
@@ -23,15 +19,16 @@ public abstract class IlluminationOpticsBase<I> extends OpticsBase<I>
   private final long[] mLightMapDimensions;
 
   /**
+   * Instanciates illumination optics base class given light map image dimensions.
+   * 
    * @param pLightMapDimensions
+   *          light map image dimensions
    */
   public IlluminationOpticsBase(long... pLightMapDimensions)
   {
     super();
     mLightMapDimensions = pLightMapDimensions;
-    mLambdaInNormUnits = 1.0f / max(pLightMapDimensions[0],
-                                    max(pLightMapDimensions[1],
-                                        pLightMapDimensions[2]));
+    mLambdaInNormUnits = 0.0006f;
     mLightIntensity = 1.0f;
   }
 

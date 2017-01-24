@@ -1,7 +1,5 @@
 package simbryo.textures.noise;
 
-import java.util.Arrays;
-
 import simbryo.textures.TextureGeneratorBase;
 import simbryo.textures.TextureGeneratorInterface;
 

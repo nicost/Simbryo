@@ -17,9 +17,6 @@ import simbryo.dynamics.tissue.embryo.zoo.Drosophila;
 import simbryo.phantom.ClearCLPhantomRendererUtils;
 import simbryo.phantom.fluo.impl.drosophila.DrosophilaHistoneFluorescence;
 import simbryo.synthoscopy.OpticsRenderer;
-import simbryo.synthoscopy.camera.SCMOSCameraModel;
-import simbryo.synthoscopy.detection.WideFieldDetectionOptics;
-import simbryo.synthoscopy.illumination.impl.lightsheet.LightSheetIllumination;
 import simbryo.util.timing.Timming;
 
 /**

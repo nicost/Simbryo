@@ -1,7 +1,6 @@
 package simbryo.synthoscopy.detection;
 
 import clearcl.ClearCLImage;
-import simbryo.phantom.PhantomRendererInterface;
 
 /**
  * Wide-field detetction optics

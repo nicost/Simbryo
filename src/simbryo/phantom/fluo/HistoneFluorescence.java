@@ -4,9 +4,7 @@ import java.io.IOException;
 
 import clearcl.ClearCLBuffer;
 import clearcl.ClearCLContext;
-import clearcl.ClearCLDevice;
 import clearcl.ClearCLImage;
-import clearcl.ClearCLKernel;
 import clearcl.ClearCLProgram;
 import clearcl.enums.HostAccessType;
 import clearcl.enums.ImageChannelDataType;

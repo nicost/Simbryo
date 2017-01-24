@@ -1,11 +1,9 @@
 package simbryo.phantom;
 
 import clearcl.ClearCLContext;
-import clearcl.ClearCLDevice;
 import clearcl.ClearCLImage;
 import clearcl.ClearCLKernel;
 import clearcl.enums.ImageChannelDataType;
-import clearcl.enums.ImageChannelOrder;
 import clearcl.util.Region3;
 import clearcl.viewer.ClearCLImageViewer;
 import coremem.ContiguousMemoryInterface;
