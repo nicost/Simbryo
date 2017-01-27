@@ -39,7 +39,7 @@ public abstract class OpticsRendererBase<I> implements
   }
   
   @Override
-  public float getLightLambda()
+  public float getLightWavelength()
   {
     return mLambda;
   }

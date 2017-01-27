@@ -1,5 +1,7 @@
 package simbryo.dynamics.tissue.cellprop;
 
+import java.io.Serializable;
+
 import simbryo.dynamics.tissue.TissueDynamics;
 import simbryo.util.DoubleBufferingFloatArray;
 
@@ -9,8 +11,10 @@ import simbryo.util.DoubleBufferingFloatArray;
  *
  * @author royer
  */
-public class CellProperty
+public class CellProperty implements Serializable
 {
+  private static final long serialVersionUID = 1L;
+ 
   private final TissueDynamics mEmbryo;
   private final int mDimension;
 

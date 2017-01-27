@@ -1,31 +1,8 @@
 #pragma OPENCL EXTENSION cl_khr_3d_image_writes : enable
 
 #include [OCLlib] "noise/noise.cl"
-
-               
-#define DECAY 46.0f   
+ 
 #define KS 1  
-#define SIGMAMIN 0.05f
-#define SIGMAMOD  (1-SIGMAMIN)               
-   
-
-__kernel void initialize(
-                           __write_only   image2d_t  ba,
-                           __write_only   image2d_t  bb,
-                           __write_only   image2d_t  sa,
-                           __write_only   image2d_t  sb
-                       )   
-{
-  const int y = get_global_id(0); 
-  const int z = get_global_id(1);
-  
-  write_imagef (ba, (int2){y,z}, 1.0f);
-  write_imagef (bb, (int2){y,z}, 1.0f);
-  write_imagef (sa, (int2){y,z}, 0.0f);
-  write_imagef (sb, (int2){y,z}, 0.0f);
-}
-
-   
    
 inline float lightsheetfun( const float lambda,
                             const float intensity,
@@ -55,7 +32,7 @@ inline float lightsheetfun( const float lambda,
 }   
    
                                 
-__kernel void propagate(   __read_only    image3d_t  scattermap,
+__kernel void propagate(   __read_only    image3d_t  scatterphantom,
                            __write_only   image3d_t  lightmap,
                            __read_only    image2d_t  binput,
                            __write_only   image2d_t  boutput,
@@ -66,6 +43,10 @@ __kernel void propagate(   __read_only    image3d_t  scattermap,
                            const          float      zoffset,
                            const          float      lambda,
                            const          float      intensity,
+                           const          float      scatterconstant,                           
+                           const          float      scatterloss,
+                           const          float      sigmamin,
+                           const          float      sigmamax,
                            const          float      w0,
                            const          float      lsheight,
                            const          float      lspx,
@@ -88,9 +69,9 @@ __kernel void propagate(   __read_only    image3d_t  scattermap,
   const float4 lmdim = (float4){(float)lmwidth,(float)lmheight,(float)lmdepth, 1.0f};
   const float4 ilmdim = 1.0f/lmdim;
  
-  const int smwidth  = get_image_width(scattermap);
-  const int smheight = get_image_height(scattermap);
-  const int smdepth  = get_image_depth(scattermap);
+  const int smwidth  = get_image_width(scatterphantom);
+  const int smheight = get_image_height(scatterphantom);
+  const int smdepth  = get_image_depth(scatterphantom);
   const float4 smdim = (float4){(float)smwidth,(float)smheight,(float)smdepth, 1.0f};
 
   
@@ -125,13 +106,13 @@ __kernel void propagate(   __read_only    image3d_t  scattermap,
   const float oldballisticratio =  read_imagef(binput, normsampler, dvec+(float2){y,z}/lmdim.yz).x;
  
   // scattering map value at voxel: 
-  const float scattermapvalue = read_imagef(scattermap, normsampler, pos).x;
+  const float scattermapvalue = read_imagef(scatterphantom, normsampler, pos).x;
   
-  // local loss from ballistic light to scattered light: (1 -> no loss, 0 -> max loss)
-  const float loss = native_exp2(-(DECAY/lmwidth)*scattermapvalue);
+  // local loss from ballistic light to scattered light: (0 -> no loss, 1 -> max loss)
+  const float loss = 1.0f-native_exp2(-(scatterconstant/lmwidth)*scattermapvalue);
   
   // updated ballistic ratio:
-  const float ballisticratio = oldballisticratio*loss;
+  const float ballisticratio = oldballisticratio*(1.0f-loss);
   
   // [WRITE IMAGE] update ballistic light ratio map:
   write_imagef (boutput, (int2){y,z}, ballisticratio);
@@ -140,10 +121,10 @@ __kernel void propagate(   __read_only    image3d_t  scattermap,
   const float ballistic = ballistic0 * ballisticratio;
   
   // amount of ballistic light transfered to scattering at current voxel:
-  const float transferredlight = (1-loss)*oldballisticratio*ballistic0;
+  const float transferredlight = loss*oldballisticratio*ballistic0;
   
   // scattering sigma has a min and a part modulated by density of scattering media:
-  const float sigma = SIGMAMIN + (1-loss)*SIGMAMOD;
+  const float sigma = sigmamin + loss*(sigmamax-sigmamin);
   
   // [READ IMAGE] collect light from previous plane that diffused to current voxel:
   // Note: turns out its slower to do separable-diffusion, because of the image cache - 
@@ -164,7 +145,7 @@ __kernel void propagate(   __read_only    image3d_t  scattermap,
   previouslyscattered *= 1.0f/((2*KS+1)*(2*KS+1)*sigma+(1-sigma));
   
   // we add the light that was locally transfered from ballistic to scattered:
-  const float scattered = previouslyscattered + transferredlight;
+  const float scattered = scatterloss*previouslyscattered + transferredlight;
   
   // [WRITE IMAGE] update diffused light map:
   write_imagef (soutput, (int2){y,z}, scattered);

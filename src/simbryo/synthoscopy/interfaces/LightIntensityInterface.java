@@ -12,7 +12,7 @@ public interface LightIntensityInterface
    * Returns wavelength used for calculations. Normalized units (within [0,1]) are used.
    * @return returns wavelength in normalizd coordinates.
    */
-  float getLightLambda();
+  float getLightWavelength();
 
   /**
    * Sets wavelength in normalized coordinates.

@@ -1,6 +1,6 @@
 package simbryo.particles;
 
-import java.util.SplittableRandom;
+import java.util.concurrent.ThreadLocalRandom;
 
 import simbryo.particles.forcefield.ForceFieldInterface;
 import simbryo.particles.neighborhood.NeighborhoodGrid;
@@ -26,8 +26,6 @@ public class ParticleSystem implements ParticleSystemInterface
   protected final DoubleBufferingFloatArray mRadii;
 
   private final NeighborhoodGrid mNeighborhood;
-
-  private SplittableRandom mRandom = new SplittableRandom();
 
   /**
    * Creates a particle system with a give number of dimensions, number of
@@ -278,20 +276,22 @@ public class ParticleSystem implements ParticleSystemInterface
     final float[] lVelocities = mVelocities.getCurrentArray();
     final float[] lRadii = mRadii.getCurrentArray();
 
+    ThreadLocalRandom lRandom = ThreadLocalRandom.current();
+    
     for (int d = 0; d < lDimension; d++)
     {
       float lPositionNoiseValue =
-                                (float) ((mRandom.nextDouble() - 0.5)
+                                (float) ((lRandom.nextDouble() - 0.5)
                                          * 2 * pPositionNoise);
       float lVelocityNoiseValue =
-                                (float) ((mRandom.nextDouble() - 0.5)
+                                (float) ((lRandom.nextDouble() - 0.5)
                                          * 2 * pVelocityNoise);
       lPositions[pParticleId * lDimension + d] += lPositionNoiseValue;
 
       lVelocities[pParticleId * lDimension + d] +=
                                                 lVelocityNoiseValue;
     }
-    float lRadiusNoiseValue = (float) ((mRandom.nextDouble() - 0.5)
+    float lRadiusNoiseValue = (float) ((lRandom.nextDouble() - 0.5)
                                        * 2 * pVelocityNoise);
     lRadii[pParticleId] += lRadiusNoiseValue;
   }
@@ -390,6 +390,8 @@ public class ParticleSystem implements ParticleSystemInterface
     final float[] lVelocitiesWrite = mVelocities.getWriteArray();
     final float[] lRadiiRead = mRadii.getReadArray();
 
+    ThreadLocalRandom lRandom = ThreadLocalRandom.current();
+    
     for (int id = 0; id < mNumberOfParticles; id++)
     {
       for (int d = 0; d < lDimension; d++)
@@ -400,14 +402,14 @@ public class ParticleSystem implements ParticleSystemInterface
         if (lPositionsRead[i] < lRadius)
         {
           lPositionsWrite[i] = (float) (lRadius
-                                        + mRandom.nextDouble(-pNoise,
+                                        + lRandom.nextDouble(-pNoise,
                                                              pNoise));
           lVelocitiesWrite[i] = -pDampening * lVelocitiesRead[i];
         }
         else if (lPositionsRead[i] > 1 - lRadius)
         {
           lPositionsWrite[i] = (float) (1 - lRadius
-                                        + mRandom.nextDouble(-pNoise,
+                                        + lRandom.nextDouble(-pNoise,
                                                              pNoise));
           lVelocitiesWrite[i] = -pDampening * lVelocitiesRead[i];
         }
@@ -431,6 +433,8 @@ public class ParticleSystem implements ParticleSystemInterface
     final float[] lVelocitiesRead = mVelocities.getReadArray();
     final float[] lVelocitiesWrite = mVelocities.getWriteArray();
 
+    ThreadLocalRandom lRandom = ThreadLocalRandom.current();
+    
     for (int id = 0; id < mNumberOfParticles; id++)
     {
       for (int d = 0; d < lDimension; d++)
@@ -439,7 +443,7 @@ public class ParticleSystem implements ParticleSystemInterface
 
         lVelocitiesWrite[i] = (float) (lVelocitiesRead[i]
                                        + pAmount
-                                         * mRandom.nextDouble(-1, 1));
+                                         * lRandom.nextDouble(-1, 1));
       }
     }
 

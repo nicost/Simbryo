@@ -1,5 +1,7 @@
 package simbryo.dynamics.tissue.embryo;
 
+import java.io.Serializable;
+
 import simbryo.dynamics.tissue.TissueDynamics;
 import simbryo.dynamics.tissue.TissueDynamicsInterface;
 import simbryo.particles.isosurf.IsoSurfaceInterface;
@@ -11,18 +13,25 @@ import simbryo.particles.isosurf.IsoSurfaceInterface;
  */
 public class EmbryoDynamics extends TissueDynamics implements
                             TissueDynamicsInterface,
-                            HasSurface
+                            HasSurface,
+                            Serializable
 {
+  private static final long serialVersionUID = 1L;
+
   private IsoSurfaceInterface mEmbryoSurface;
 
   /**
    * Instanciates embryo dynamics given a collision force, drag coefficient, max
    * number of particles per grid cell, and grid dimensions.
    * 
-   * @param pCollisionForce collision force
-   * @param pDrag drag coefficient
-   * @param pMaxNumberOfParticlesPerGridCell max number of particles per grid cell
-   * @param pGridDimensions grid dimensions
+   * @param pCollisionForce
+   *          collision force
+   * @param pDrag
+   *          drag coefficient
+   * @param pMaxNumberOfParticlesPerGridCell
+   *          max number of particles per grid cell
+   * @param pGridDimensions
+   *          grid dimensions
    */
   public EmbryoDynamics(float pCollisionForce,
                         float pDrag,
@@ -48,5 +57,7 @@ public class EmbryoDynamics extends TissueDynamics implements
   {
     mEmbryoSurface = pEmbryoSurface;
   }
+
+
 
 }

@@ -1,5 +1,7 @@
 package simbryo.dynamics.tissue.embryo.zoo;
 
+import java.io.Serializable;
+
 import simbryo.dynamics.tissue.cellprop.CellProperty;
 import simbryo.dynamics.tissue.cellprop.HasPolarity;
 import simbryo.dynamics.tissue.cellprop.VectorCellProperty;
@@ -15,7 +17,7 @@ import simbryo.particles.isosurf.impl.Ellipsoid;
  *
  * @author royer
  */
-public class Drosophila extends EmbryoDynamics implements HasPolarity
+public class Drosophila extends EmbryoDynamics implements HasPolarity, Serializable
 {
 
   private static final float cCellDivisionRadiusShrinkage =
@@ -253,5 +255,7 @@ public class Drosophila extends EmbryoDynamics implements HasPolarity
 
     mInsideEllipseForceField.setForceIntensity(lForce);
   }
+
+
 
 }

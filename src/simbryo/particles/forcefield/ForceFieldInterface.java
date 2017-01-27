@@ -1,5 +1,7 @@
 package simbryo.particles.forcefield;
 
+import java.io.Serializable;
+
 import simbryo.particles.ParticleSystem;
 
 /**
@@ -7,7 +9,7 @@ import simbryo.particles.ParticleSystem;
  *
  * @author royer
  */
-public interface ForceFieldInterface
+public interface ForceFieldInterface extends Serializable
 {
 
   /**

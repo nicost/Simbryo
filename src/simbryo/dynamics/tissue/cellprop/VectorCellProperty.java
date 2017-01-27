@@ -11,6 +11,7 @@ import simbryo.dynamics.tissue.TissueDynamics;
  */
 public class VectorCellProperty extends CellProperty
 {
+  private static final long serialVersionUID = 1L;
 
   /**
    * Instantiates a vector cell property for given tissue dynamics and

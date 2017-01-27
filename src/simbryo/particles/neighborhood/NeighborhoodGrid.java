@@ -1,5 +1,6 @@
 package simbryo.particles.neighborhood;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
 import simbryo.util.vectorinc.VectorInc;
@@ -11,8 +12,10 @@ import simbryo.util.vectorinc.VectorInc;
  *
  * @author royer
  */
-public class NeighborhoodGrid
+public class NeighborhoodGrid implements Serializable
 {
+  private static final long serialVersionUID = 1L;
+
   private final static float cEpsilon = 1e-6f;
 
   private final int mDimension;

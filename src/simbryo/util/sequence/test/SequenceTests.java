@@ -6,9 +6,17 @@ import org.junit.Test;
 
 import simbryo.util.sequence.Sequence;
 
+/**
+ * Sequence tests
+ *
+ * @author royer
+ */
 public class SequenceTests
 {
 
+  /**
+   * Test
+   */
   @Test
   public void test()
   {

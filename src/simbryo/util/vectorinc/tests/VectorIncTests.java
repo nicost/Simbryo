@@ -8,9 +8,17 @@ import org.junit.Test;
 
 import simbryo.util.vectorinc.VectorInc;
 
+/**
+ * Vector incrementation tests
+ *
+ * @author royer
+ */
 public class VectorIncTests
 {
 
+  /**
+   * Test zero min
+   */
   @Test
   public void testZeroMin()
   {
@@ -36,6 +44,9 @@ public class VectorIncTests
 
   }
 
+  /**
+   * Test non-xero min
+   */
   @Test
   public void testNonZeroMin()
   {

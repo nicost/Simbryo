@@ -22,18 +22,27 @@ public abstract class ClearCLIlluminationOpticsBase extends
   protected ClearCLImage mLightMapImage;
 
   /**
-   * Instanciates a ClearCL powered illumination optics base class given a
-   * ClearCL context, and light map image dimensions.
+   * Instanciates a ClearCL powered illumination optics base class given the
+   * wavelength of light, the light intensity, ClearCL context, and the light
+   * map image dimensions.
    * 
    * @param pContext
    *          ClearCL context
+   * @param pWavelengthInNormUnits
+   *          light's wavelength
+   * @param pLightIntensity
+   *          light's intensity
    * @param pLightMapDimensions
    *          light map image dimensions
    */
   public ClearCLIlluminationOpticsBase(final ClearCLContext pContext,
+                                       float pWavelengthInNormUnits,
+                                       float pLightIntensity,
                                        long... pLightMapDimensions)
   {
-    super(pLightMapDimensions);
+    super(pWavelengthInNormUnits,
+          pLightIntensity,
+          pLightMapDimensions);
 
     mContext = pContext;
 
@@ -59,6 +68,7 @@ public abstract class ClearCLIlluminationOpticsBase extends
   {
     // not doing anything here, derived classes must actually cmpute something
     // into mLightMapImage
+    mLightMapImage.notifyListenersOfChange(mContext.getDefaultQueue());
     return mLightMapImage;
   }
 

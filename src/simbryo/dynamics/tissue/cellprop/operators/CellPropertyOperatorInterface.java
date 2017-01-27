@@ -1,15 +1,20 @@
 package simbryo.dynamics.tissue.cellprop.operators;
 
+import java.io.Serializable;
+
 import simbryo.dynamics.tissue.TissueDynamics;
 import simbryo.dynamics.tissue.cellprop.CellProperty;
 
 /**
- * Cell property operators can modify the values of a set of properties over time.
+ * Cell property operators can modify the values of a set of properties over
+ * time.
  *
  * @author royer
- * @param <CP> cell property type
+ * @param <CP>
+ *          cell property type
  */
 public interface CellPropertyOperatorInterface<CP extends CellProperty>
+                                              extends Serializable
 {
 
   /**

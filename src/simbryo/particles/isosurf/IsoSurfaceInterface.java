@@ -1,11 +1,13 @@
 package simbryo.particles.isosurf;
 
+import java.io.Serializable;
+
 /**
  * Iso-surfaces
  *
  * @author royer
  */
-public interface IsoSurfaceInterface
+public interface IsoSurfaceInterface extends Serializable
 {
 
   /**

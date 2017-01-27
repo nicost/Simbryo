@@ -1,5 +1,7 @@
 package simbryo.util;
 
+import java.io.Serializable;
+
 /**
  * Instances of this class implement a double-buffering scheme for float arrays.
  * Two arrays are maintained: a read and write array, a method is provided to
@@ -8,14 +10,16 @@ package simbryo.util;
  *
  * @author royer
  */
-public class DoubleBufferingFloatArray
+public class DoubleBufferingFloatArray implements Serializable
 {
+  private static final long serialVersionUID = 1L;
+ 
   private float[] mReadArray, mWriteArray;
 
   /**
    * Initialize the two arrays with a given fixed size.
    * 
-   * @param pLength
+   * @param pLength length of array
    */
   public DoubleBufferingFloatArray(int pLength)
   {
@@ -26,7 +30,7 @@ public class DoubleBufferingFloatArray
   /**
    * Allocates the two arrays with a (new) length.
    * 
-   * @param pLength
+   * @param pLength length of array
    */
   public void allocateArrays(int pLength)
   {

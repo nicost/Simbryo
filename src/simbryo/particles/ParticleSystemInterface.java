@@ -1,5 +1,7 @@
 package simbryo.particles;
 
+import java.io.Serializable;
+
 import simbryo.particles.forcefield.ForceFieldInterface;
 import simbryo.particles.neighborhood.NeighborhoodGrid;
 import simbryo.util.DoubleBufferingFloatArray;
@@ -9,7 +11,7 @@ import simbryo.util.DoubleBufferingFloatArray;
  *
  * @author royer
  */
-public interface ParticleSystemInterface
+public interface ParticleSystemInterface extends Serializable
 {
 
   /**

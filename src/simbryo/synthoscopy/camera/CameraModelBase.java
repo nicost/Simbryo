@@ -1,7 +1,5 @@
 package simbryo.synthoscopy.camera;
 
-import simbryo.synthoscopy.OpticsBase;
-
 /**
  * Camera model base class providing common fields and methods required by all
  * implementors of the camera model interface
@@ -9,7 +7,7 @@ import simbryo.synthoscopy.OpticsBase;
  * @param <I> type of image used to store and process camera images
  * @author royer
  */
-public abstract class CameraModelBase<I> extends OpticsBase<I>
+public abstract class CameraModelBase<I> 
                                      implements
                                      CameraModelInterface<I>
 {

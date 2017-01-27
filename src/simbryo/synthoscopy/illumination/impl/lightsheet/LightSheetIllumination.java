@@ -29,32 +29,46 @@ public class LightSheetIllumination extends
 
   protected ClearCLImage mBallisticLightImageA, mBallisticLightImageB,
       mScatteredLightImageA, mScatteredLightImageB;
-  protected ClearCLKernel mInitializeLightSheetKernel,
-      mPropagateLightSheetKernel;
+  protected ClearCLKernel mPropagateLightSheetKernel;
 
   protected Vector3f mLightSheetPosition, mLightSheetAxisVector,
       mLightSheetNormalVector;
 
-  private float mLightSheetThetaInRad, mLightSheetHeigth;
+  private float mLightSheetThetaInRad, mLightSheetHeigth,
+      mScatterConstant, mScatterLoss, mSigmaMin, mSigmaMax;
 
   /**
    * Instanciates a light sheet illumination optics class given a ClearCL
-   * context, and light map image dimensions
+   * context, the wavelength of light, the light intensity, and light map image
+   * dimensions
    * 
    * @param pContext
    *          OpenCL context
+   * @param pWavelengthInNormUnits
+   *          light's wavelength
+   * @param pLightIntensity
+   *          light's intensity
    * @param pLightMapDimensions
    *          light map dimensions in voxels
    * @throws IOException
    *           thrown if kernels cannot be read
    */
   public LightSheetIllumination(ClearCLContext pContext,
+                                float pWavelengthInNormUnits,
+                                float pLightIntensity,
                                 long... pLightMapDimensions) throws IOException
   {
-    super(pContext, pLightMapDimensions);
+    super(pContext,
+          pWavelengthInNormUnits,
+          pLightIntensity,
+          pLightMapDimensions);
 
-    mLightSheetThetaInRad = 0.04f;
-    mLightSheetHeigth = 0.5f;
+    setLightSheetThetaInDeg(2);
+    setLightSheetHeigth(0.5f);
+    setScatterConstant(100.0f);
+    setScatterLoss(0.01f);
+    setSigmaMin(0.5f);
+    setSigmaMax(1.0f);
 
     setupProgramAndKernels();
 
@@ -81,6 +95,122 @@ public class LightSheetIllumination extends
     mLightSheetPosition = new Vector3f(0f, 0f, 0.5f);
     mLightSheetAxisVector = new Vector3f(1.0f, 0, 0);
     mLightSheetNormalVector = new Vector3f(0, 0, 1.0f);
+  }
+
+  /**
+   * Returns scattering constant. The bigger the constant the more light gets
+   * transfered from ballistic to scattering.
+   * 
+   * @return scattering constant
+   */
+  public float getScatterConstant()
+  {
+    return mScatterConstant;
+  }
+
+  /**
+   * Setseturns scattering constant. The bigger the constant the more light gets
+   * transfered from ballistic to scattering.
+   * 
+   * @param pScatterConstant
+   *          new scattering constant
+   */
+  public void setScatterConstant(float pScatterConstant)
+  {
+    mScatterConstant = pScatterConstant;
+  }
+
+  /**
+   * Returns the scattering loss. This is the proportion of scattered light
+   * (value within [0,1]) that gets lost per voxel.
+   * 
+   * @return scattering loss
+   */
+  public float getScatterLoss()
+  {
+    return mScatterLoss;
+  }
+
+  /**
+   * Sets the scattering loss. This is the proportion of scattered light (value
+   * within [0,1]) that gets lost per voxel.
+   * 
+   * @param pScatterLoss scattering loss
+   */
+  public void setScatterLoss(float pScatterLoss)
+  {
+    mScatterLoss = pScatterLoss;
+  }
+
+  /**
+   * Returns the minimal sigma value. The min sigma value represents the
+   * dispersion of already scattered light as it propagates _even_ in the
+   * absence of scattering material.
+   * 
+   * @return current min sigma value
+   */
+  public float getSigmaMin()
+  {
+    return mSigmaMin;
+  }
+
+  /**
+   * Sets the minimal sigma value. The min sigma value represents the
+   * dispersion of already scattered light as it propagates _even_ in the
+   * absence of scattering material.
+   * 
+   * @param pSigmaMin
+   *          new min sigma value
+   */
+  public void setSigmaMin(float pSigmaMin)
+  {
+    mSigmaMin = pSigmaMin;
+  }
+
+  /**
+   * Returns the maximal sigma value. The actual sigma value per voxel will be
+   * modulated by (maxsigma-minsigm) basd on the actual scattering phantom value
+   * (which are values within [0,1], 0-> min scattering, 1 -> max scattering)
+   * 
+   * @return current max sigma value
+   */
+  public float getSigmaMax()
+  {
+    return mSigmaMax;
+  }
+
+  /**
+   * Sets the maximal sigma value. The actual sigma value per vocel will be
+   * modulated by (maxsigma-minsigm) basd on the actual scattering phantom value
+   * (which are values within [0,1], 0-> min scattering, 1 -> max scattering)
+   * 
+   * @param pSigmaMax
+   *          new max sigma value
+   */
+  public void setSigmaMax(float pSigmaMax)
+  {
+    mSigmaMax = pSigmaMax;
+  }
+
+  /**
+   * Returns lightsheet height in normalized units.
+   * 
+   * @return light sheet height in normalized units.
+   */
+  public float getLightSheetHeigth()
+  {
+    return mLightSheetHeigth;
+  }
+
+  /**
+   * Sets the lightsheet height in normalized units.
+   * 
+   * @param pLightSheetHeigth
+   *          light sheet height in normalized units.
+   */
+  public void setLightSheetHeigth(float pLightSheetHeigth)
+  {
+    mLightSheetHeigth = pLightSheetHeigth;
   }
 
   /**
@@ -120,29 +250,8 @@ public class LightSheetIllumination extends
 
   private float getSpotSizeAtNeck()
   {
-    return (float) (getLightLambda()
+    return (float) (getLightWavelength()
                     / (Math.PI * getLightSheetThetaInRad()));
-  }
-
-  /**
-   * Returns lightsheet height in normalized units.
-   * 
-   * @return light sheet height in normalized units.
-   */
-  public float getLightSheetHeigth()
-  {
-    return mLightSheetHeigth;
-  }
-
-  /**
-   * Sets the lightsheet height in normalized units.
-   * 
-   * @param pLightSheetHeigth
-   *          light sheet height in normalized units.
-   */
-  public void setLightSheetHeigth(float pLightSheetHeigth)
-  {
-    mLightSheetHeigth = pLightSheetHeigth;
   }
 
   /**
@@ -310,19 +419,20 @@ public class LightSheetIllumination extends
     lProgram.addSource(LightSheetIllumination.class,
                        "kernel/LightSheetIllumination.cl");
 
-    lProgram.addDefine("MAXNEI", 0);
-
     lProgram.buildAndLog();
 
-    mInitializeLightSheetKernel = lProgram.createKernel("initialize");
     mPropagateLightSheetKernel = lProgram.createKernel("propagate");
   }
 
   /**
-   * Renders the light map for a given scattering phantom image and the position in z (normalized coordinates) of the light map.
+   * Renders the light map for a given scattering phantom image and the position
+   * in z (normalized coordinates) of the light map.
    * 
-   * @param pScatteringPhantomImage scattering phantom
-   * @param pZCenterOffset z offset in normalized coordinates of the center plane of the lightmap stack relative to the phantom.
+   * @param pScatteringPhantomImage
+   *          scattering phantom
+   * @param pZCenterOffset
+   *          z offset in normalized coordinates of the center plane of the
+   *          lightmap stack relative to the phantom.
    * @return light map image (same as returned by getLightMapImage() )
    */
   public ClearCLImage render(ClearCLImage pScatteringPhantomImage,
@@ -383,7 +493,7 @@ public class LightSheetIllumination extends
     mPropagateLightSheetKernel.setGlobalSizes(getHeight(),
                                               getDepth());
 
-    mPropagateLightSheetKernel.setArgument("scattermap",
+    mPropagateLightSheetKernel.setArgument("scatterphantom",
                                            pScatteringPhantomImage);
     mPropagateLightSheetKernel.setArgument("lightmap",
                                            mLightMapImage);
@@ -415,10 +525,20 @@ public class LightSheetIllumination extends
                                                       - pZDepth / 2);
 
     mPropagateLightSheetKernel.setArgument("lambda",
-                                           getLightLambda());
+                                           getLightWavelength());
 
     mPropagateLightSheetKernel.setArgument("intensity",
                                            getLightIntensity());
+
+    mPropagateLightSheetKernel.setArgument("scatterconstant",
+                                           getScatterConstant());
+
+    mPropagateLightSheetKernel.setArgument("scatterloss",
+                                           1.0f - getScatterLoss());
+
+    mPropagateLightSheetKernel.setArgument("sigmamin", getSigmaMin());
+
+    mPropagateLightSheetKernel.setArgument("sigmamax", getSigmaMax());
 
     mPropagateLightSheetKernel.setArgument("w0", getSpotSizeAtNeck());
 
@@ -449,7 +569,7 @@ public class LightSheetIllumination extends
 
     // pBallisticLightImageB.notifyListenersOfChange(mContext.getDefaultQueue());
     // pScatteredLightImageB.notifyListenersOfChange(mContext.getDefaultQueue());
-    mLightMapImage.notifyListenersOfChange(mContext.getDefaultQueue());
+
   }
 
   private void initializeLightSheet(ClearCLImage pBallisticLightImageA,
@@ -457,27 +577,11 @@ public class LightSheetIllumination extends
                                     ClearCLImage pScatteredLightImageA,
                                     ClearCLImage pScatteredLightImageB)
   {
-    /*
+
     pBallisticLightImageA.fill(1.0f, false);
     pBallisticLightImageB.fill(1.0f, false);
     pScatteredLightImageA.fill(0.0f, true);
     pScatteredLightImageB.fill(0.0f, true);
-    /**/
-
-    mInitializeLightSheetKernel.setGlobalOffsets(0, 0);
-    mInitializeLightSheetKernel.setGlobalSizes(getHeight(),
-                                               getDepth());
-
-    mInitializeLightSheetKernel.setArgument("ba",
-                                            pBallisticLightImageA);
-    mInitializeLightSheetKernel.setArgument("bb",
-                                            pBallisticLightImageB);
-    mInitializeLightSheetKernel.setArgument("sa",
-                                            pScatteredLightImageA);
-    mInitializeLightSheetKernel.setArgument("sb",
-                                            pScatteredLightImageB);
-
-    mInitializeLightSheetKernel.run(false);
   }
 
   private void swapLightImages()

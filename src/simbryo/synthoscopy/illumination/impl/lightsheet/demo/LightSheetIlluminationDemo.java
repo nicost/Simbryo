@@ -60,6 +60,7 @@ public class LightSheetIlluminationDemo
                                                                                    lPhantomDepth);
 
         Drosophila lDrosophila = new Drosophila(16, lGridDimensions);
+        //lDrosophila.open3DViewer();
         lDrosophila.simulationSteps(1000, 1);
 
         DrosophilaHistoneFluorescence lDrosoFluo =
@@ -72,6 +73,8 @@ public class LightSheetIlluminationDemo
 
         LightSheetIllumination lLightSheetIllumination =
                                                        new LightSheetIllumination(lContext,
+                                                                                  0.006f,
+                                                                                  1f,
                                                                                   lPhantomWidth/4,
                                                                                   lPhantomHeight/4,
                                                                                   31L);

@@ -1,20 +1,27 @@
 package simbryo.util.timing;
 
+/**
+ * This utility class can sync a loop to a given period.
+ *
+ * @author royer
+ */
 public class Timming
 {
   private volatile Long mLastTime;
 
-  public Timming()
+  /**
+   * Syncs at given period. the number of nanoseconds exceeded is returned.
+   * 
+   * @param pPeriodInMilliseconds period in milliseconds
+   * @return number of milliseconds that the period exceeded.
+   */
+  public long syncAtPeriod(double pPeriodInMilliseconds)
   {
+    long lDeadline = 0;
 
-  }
-
-  public void syncAtPeriod(double pPeriodInMilliseconds)
-  {
     if (mLastTime != null)
     {
-      long lDeadline = (long) (mLastTime
-                               + (pPeriodInMilliseconds * 1.e6));
+      lDeadline = (long) (mLastTime + (pPeriodInMilliseconds * 1.e6));
 
       while (System.nanoTime() < lDeadline)
       {
@@ -29,5 +36,7 @@ public class Timming
     }
 
     mLastTime = System.nanoTime();
+
+    return (long) (lDeadline == 0 ? 0 : (mLastTime - lDeadline)*1e-6);
   }
 }
