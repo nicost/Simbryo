@@ -1,6 +1,6 @@
 package simbryo.synthoscopy;
 
-import simbryo.synthoscopy.camera.CameraModelInterface;
+import simbryo.synthoscopy.camera.CameraRendererInterface;
 import simbryo.synthoscopy.detection.DetectionOpticsInterface;
 import simbryo.synthoscopy.illumination.IlluminationOpticsInterface;
 import simbryo.synthoscopy.interfaces.ImageWidthHeightInterface;
@@ -34,7 +34,7 @@ public interface OpticsRendererInterface<I> extends ImageWidthHeightInterface, L
    * @param pCameraModel camera model
    */
   @SuppressWarnings("unchecked")
-  void addCameraModel(CameraModelInterface<I>... pCameraModel);
+  void addCameraModel(CameraRendererInterface<I>... pCameraModel);
   
 
   /**

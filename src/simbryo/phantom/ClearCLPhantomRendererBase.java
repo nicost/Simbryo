@@ -61,7 +61,7 @@ public abstract class ClearCLPhantomRendererBase extends
     mStackDimensions[1] = mLocalSizeY * lGridDimensions[1];
     mStackDimensions[2] = mLocalSizeZ * lGridDimensions[2];
 
-    mImage.fillZero(true);
+    mImage.fillZero(true, false);
   }
 
   @Override

@@ -3,7 +3,7 @@ package simbryo.synthoscopy;
 import java.util.ArrayList;
 
 import simbryo.phantom.PhantomRendererInterface;
-import simbryo.synthoscopy.camera.CameraModelInterface;
+import simbryo.synthoscopy.camera.CameraRendererInterface;
 import simbryo.synthoscopy.detection.DetectionOpticsInterface;
 import simbryo.synthoscopy.illumination.IlluminationOpticsInterface;
 
@@ -25,7 +25,7 @@ public abstract class OpticsRendererBase<I> implements
                                                                          new ArrayList<>();
   private ArrayList<DetectionOpticsInterface<I>> mDetectionOpticsList =
                                                                    new ArrayList<>();
-  private ArrayList<CameraModelInterface<I>> mCameraModelList =
+  private ArrayList<CameraRendererInterface<I>> mCameraModelList =
                                                            new ArrayList<>();
 
   /**
@@ -72,9 +72,9 @@ public abstract class OpticsRendererBase<I> implements
 
   @SafeVarargs
   @Override
-  public final void addCameraModel(CameraModelInterface<I>... pCameraModels)
+  public final void addCameraModel(CameraRendererInterface<I>... pCameraModels)
   {
-    for (CameraModelInterface<I> lCameraModel : pCameraModels)
+    for (CameraRendererInterface<I> lCameraModel : pCameraModels)
     {
       mCameraModelList.add(lCameraModel);
     }

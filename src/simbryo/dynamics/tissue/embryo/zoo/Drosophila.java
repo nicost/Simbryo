@@ -19,7 +19,8 @@ import simbryo.particles.isosurf.impl.Ellipsoid;
  */
 public class Drosophila extends EmbryoDynamics implements HasPolarity, Serializable
 {
-
+  private static final long serialVersionUID = 1L;
+  
   private static final float cCellDivisionRadiusShrinkage =
                                                           (float) Math.pow(0.5f,
                                                                            1.0f / 2);

@@ -3,7 +3,7 @@ package simbryo.synthoscopy.illumination;
 import clearcl.ClearCLContext;
 import clearcl.ClearCLImage;
 import clearcl.enums.ImageChannelDataType;
-import clearcl.viewer.ClearCLImageViewer;
+import simbryo.synthoscopy.ClearCLOpticsBase;
 
 /**
  * Ilumination optics base class for illumination optics computation based on
@@ -12,14 +12,12 @@ import clearcl.viewer.ClearCLImageViewer;
  * @author royer
  */
 public abstract class ClearCLIlluminationOpticsBase extends
-                                                    IlluminationOpticsBase<ClearCLImage>
+                                                    ClearCLOpticsBase
                                                     implements
                                                     IlluminationOpticsInterface<ClearCLImage>,
                                                     AutoCloseable
 {
 
-  protected ClearCLContext mContext;
-  protected ClearCLImage mLightMapImage;
 
   /**
    * Instanciates a ClearCL powered illumination optics base class given the
@@ -40,60 +38,36 @@ public abstract class ClearCLIlluminationOpticsBase extends
                                        float pLightIntensity,
                                        long... pLightMapDimensions)
   {
-    super(pWavelengthInNormUnits,
+    super(pContext,
+          pWavelengthInNormUnits,
           pLightIntensity,
           pLightMapDimensions);
 
     mContext = pContext;
 
-    mLightMapImage =
+    mImage =
                    mContext.createSingleChannelImage(ImageChannelDataType.Float,
                                                      getWidth(),
                                                      getHeight(),
                                                      getDepth());
 
-    mLightMapImage.fillZero(true);
+    mImage.fillZero(true, false);
   }
 
   @Override
   public ClearCLImage getLightMapImage()
   {
-    return mLightMapImage;
+    return mImage;
   }
 
   @Override
-  public ClearCLImage render(ClearCLImage pScatteringPhantomImage,
-                             float pZCenterOffset,
-                             float pZDepth)
+  public ClearCLImage render(ClearCLImage pScatteringPhantomImage)
   {
     // not doing anything here, derived classes must actually cmpute something
     // into mLightMapImage
-    mLightMapImage.notifyListenersOfChange(mContext.getDefaultQueue());
-    return mLightMapImage;
+    mImage.notifyListenersOfChange(mContext.getDefaultQueue());
+    return mImage;
   }
 
-  @Override
-  public void clear()
-  {
-    mLightMapImage.fillZero(true);
-  }
-
-  @Override
-  public void close()
-  {
-    mLightMapImage.close();
-  }
-
-  /**
-   * Opens viewer for the internal image
-   * 
-   * @return viewer
-   */
-  public ClearCLImageViewer openViewer()
-  {
-    final ClearCLImageViewer lViewImage =
-                                        ClearCLImageViewer.view(mLightMapImage);
-    return lViewImage;
-  }
 
 }

@@ -83,24 +83,15 @@ public class LightSheetIlluminationDemo
         lLightSheetIllumination.setLightSheetPosition(0.5f,
                                                       0.5f,
                                                       0.5f);
-        
-        //lLightSheetIllumination.setLightSheetNormalVector(0.0f, 0.0f, 1.0f);
-        //lLightSheetIllumination.setLightSheetAxisVector(1.0f, 0.3f, 0.0f);
-        
         lLightSheetIllumination.setOrientationWithAnglesInDegrees(0, 0, 0);
         lLightSheetIllumination.setLightSheetThetaInDeg(3.0f);
+        lLightSheetIllumination.setZCenterOffset(0.5f);
+        lLightSheetIllumination.setDefaultZDepth(lDrosoFluo.getPhantomImage());
         
-        
-        System.out.println("axis   vector:"+lLightSheetIllumination.getLightSheetAxisVector()  );
-        System.out.println("normal vector:"+lLightSheetIllumination.getLightSheetNormalVector());
-        
-
-
         //lDrosoFluo.getPhantomImage().fillZero(true);
 
         ElapsedTime.measure("renderlightsheet",
-                            () -> lLightSheetIllumination.render(lDrosoFluo.getPhantomImage(),
-                                                                 0.5f));
+                            () -> lLightSheetIllumination.render(lDrosoFluo.getPhantomImage()));
 
         ClearCLImageViewer lOpenViewer =
                                        lLightSheetIllumination.openViewer();

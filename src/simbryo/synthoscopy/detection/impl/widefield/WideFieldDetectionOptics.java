@@ -5,6 +5,8 @@ import static java.lang.Math.min;
 
 import java.io.IOException;
 
+import javax.vecmath.Vector3f;
+
 import clearcl.ClearCLContext;
 import clearcl.ClearCLImage;
 import clearcl.ClearCLKernel;
@@ -26,13 +28,17 @@ public class WideFieldDetectionOptics extends
   protected ClearCLImage mImageTemp;
 
   protected ClearCLKernel mCollectPairKernel, mCollectSingleKernel,
-      mDefocusBlurKernel, mDetectionScatteringKernel;
+      mDefocusBlurKernel, mScatterBlurKernel;
 
-  private float mSigma, mSmoothDefocusTransitionPoint;
+  private float mDefocusSigma, mSmoothDefocusTransitionPoint,
+      mZFocusPosition, mZFocusDepth, mScatterSigmaMin,
+      mScatterSigmaMax, mScatterSamplingDeltaZ;
+
+  private Vector3f mDetectionDirection = new Vector3f();
 
   /**
    * Instanciates a light sheet illumination optics class given a ClearCL
-   * context, and light map image dimensions
+   * context, and detection image dimensions
    * 
    * @param pContext
    *          OpenCL context
@@ -40,27 +46,62 @@ public class WideFieldDetectionOptics extends
    *          lights' wavelength
    * @param pLightIntensity
    *          light's intensity
-   * @param pLightMapDimensions
-   *          light map dimensions in voxels
+   * @param pImageDimensions
+   *          detection image dimensions in voxels
    * @throws IOException
    *           thrown if kernels cannot be read
    */
   public WideFieldDetectionOptics(ClearCLContext pContext,
                                   float pWavelengthInNormUnits,
                                   float pLightIntensity,
-                                  long... pLightMapDimensions) throws IOException
+                                  long... pImageDimensions) throws IOException
   {
     super(pContext,
           pWavelengthInNormUnits,
           pLightIntensity,
-          pLightMapDimensions);
+          pImageDimensions);
 
     setSigma(1.0f);
-    setSmoothDefocusTransitionPoint(4.0f/512);
+    setSmoothDefocusTransitionPoint(4.0f / 512);
+    setDetectionDirectionVector(0, 0, +1);
+    setScatterSigmaMin(0.0001f);
+    setScatterSigmaMax(0.04f);
+    setScatterSamplingDeltaZ(0.01f);
 
     setupProgramAndKernels();
     mImageTemp = pContext.createImage(mImage);
     clearImages(true);
+  }
+
+  /**
+   * Sets detection direction vector. Inputs are automatically normalized.
+   * 
+   * @param pX
+   *          x coordinate
+   * @param pY
+   *          y coordinate
+   * @param pZ
+   *          z coordinate
+   */
+  public void setDetectionDirectionVector(float pX,
+                                          float pY,
+                                          float pZ)
+  {
+    mDetectionDirection.x = pX;
+    mDetectionDirection.y = pY;
+    mDetectionDirection.z = pZ;
+
+    mDetectionDirection.normalize();
+  }
+
+  /**
+   * Returns detection direction vector.
+   * 
+   * @return normal vector
+   */
+  public Vector3f getDetectionDirectionVector()
+  {
+    return mDetectionDirection;
   }
 
   /**
@@ -72,18 +113,18 @@ public class WideFieldDetectionOptics extends
    */
   public float getSigma()
   {
-    return mSigma;
+    return mDefocusSigma;
   }
 
   /**
    * Sets the sigma parameter value.
    * 
-   * @param pSigma
+   * @param pDefocusSigma
    *          sigma
    */
-  public void setSigma(float pSigma)
+  public void setSigma(float pDefocusSigma)
   {
-    mSigma = pSigma;
+    mDefocusSigma = pDefocusSigma;
   }
 
   /**
@@ -112,6 +153,136 @@ public class WideFieldDetectionOptics extends
     mSmoothDefocusTransitionPoint = pSmoothDefocusTransitionPoint;
   }
 
+  /**
+   * Returns the z focus position in normalized coordinates relative to the
+   * fluorescence phantom.
+   * 
+   * @return lightmap z center position relative to fluorescence phantom
+   */
+  public float getZFocusPosition()
+  {
+    return mZFocusPosition;
+  }
+
+  /**
+   * Sets the z focus position in normalized coordinates relative to the
+   * fluorescence phantom
+   *
+   * @param pZFocusPosition
+   *          z focus position relative to fluorescence phantom (normalized
+   *          coordinates within [0,1])
+   */
+  public void setZFocusPosition(float pZFocusPosition)
+  {
+    mZFocusPosition = pZFocusPosition;
+  }
+
+  /**
+   * Return the z focus depth in normalized coordinates relative to the
+   * fluorescence phantom .
+   * 
+   * @return z focus depth relative to fluorescence phantom
+   */
+  public float getZFocusDepth()
+  {
+    return mZFocusDepth;
+  }
+
+  /**
+   * Sets the focus depth in normalized coordinates relative to the fluorescence
+   * phantom .
+   * 
+   * @param pZFocusDepth
+   *          lightmap depth relative to scatter phantom
+   */
+  public void setZFocusDepth(float pZFocusDepth)
+  {
+    mZFocusDepth = pZFocusDepth;
+  }
+
+  /**
+   * Sets the default depth of the lightmap stack relative to the scatter
+   * phantom in normalized coordinates. This default value is such that each
+   * plane of the lightmap corresponds to a single plane of the scatter phantom.
+   *
+   * @param pFluorescencePhantomImage
+   *          fluorescence phantom
+   * @param pLightMapImage
+   *          lightmap
+   * 
+   */
+  public void setDefaultZDepth(ClearCLImage pFluorescencePhantomImage,
+                               ClearCLImage pLightMapImage)
+  {
+    mZFocusDepth = (float) pLightMapImage.getDepth()
+                   / pFluorescencePhantomImage.getDepth();
+  }
+
+  /**
+   * Returns the min sigma for detection scattering.
+   * 
+   * @return min sigma
+   */
+  public float getScatterSigmaMin()
+  {
+    return mScatterSigmaMin;
+  }
+
+  /**
+   * Sets the min sigma for detection scattering.
+   * 
+   * @param pScatterSigmaMin
+   *          min sigma
+   */
+  public void setScatterSigmaMin(float pScatterSigmaMin)
+  {
+    mScatterSigmaMin = pScatterSigmaMin;
+  }
+
+  /**
+   * Returns the max sigma for detection scattering.
+   * 
+   * @return max sigma
+   */
+  public float getScatterSigmaMax()
+  {
+    return mScatterSigmaMax;
+  }
+
+  /**
+   * Sets the max sigma for detection scattering.
+   * 
+   * @param pScatterSigmaMax
+   *          max sigma
+   */
+  public void setScatterSigmaMax(float pScatterSigmaMax)
+  {
+    mScatterSigmaMax = pScatterSigmaMax;
+  }
+
+  /**
+   * Returns scatter Z sampling delta. this is the step size in normalized
+   * coordinates by which to sample scattering on the way out to the detector.
+   * 
+   * @return scatter sampling delta z
+   */
+  public float getScatterSamplingDeltaZ()
+  {
+    return mScatterSamplingDeltaZ;
+  }
+
+  /**
+   * Sets scatter Z sampling delta. this is the step size in normalized
+   * coordinates by which to sample scattering on the way out to the detector.
+   * 
+   * @param pScatterSamplingDeltaZ
+   *          scatter sampling delta z
+   */
+  public void setScatterSamplingDeltaZ(float pScatterSamplingDeltaZ)
+  {
+    mScatterSamplingDeltaZ = pScatterSamplingDeltaZ;
+  }
+
   protected void setupProgramAndKernels() throws IOException
   {
     ClearCLProgram lProgram = mContext.createProgram();
@@ -124,46 +295,21 @@ public class WideFieldDetectionOptics extends
     mCollectPairKernel = lProgram.createKernel("collectpair");
     mCollectSingleKernel = lProgram.createKernel("collectsingle");
     mDefocusBlurKernel = lProgram.createKernel("defocusblur");
-    // mDetectionScatteringKernel = lProgram.createKernel("scatter");
-  }
-
-  /**
-   * Renders the light map for a given scattering phantom image and the position
-   * in z (normalized coordinates) of the light map.
-   * 
-   * @param pFluorescencePhantomImage
-   *          fluorescent phantom
-   * @param pLightMapImage
-   *          light map
-   * @param pZCenterOffset
-   *          z offset in normalized coordinates of the center plane of the
-   *          lightmap stack relative to the phantom.
-   * @return light map image (same as returned by getLightMapImage() )
-   */
-  public ClearCLImage render(ClearCLImage pFluorescencePhantomImage,
-                             ClearCLImage pLightMapImage,
-                             float pZCenterOffset)
-  {
-    float lZDepth = (float) pLightMapImage.getDepth()
-                    / pFluorescencePhantomImage.getDepth();
-    return render(pFluorescencePhantomImage,
-                  pLightMapImage,
-                  pZCenterOffset,
-                  lZDepth);
+    mScatterBlurKernel = lProgram.createKernel("scatterblur");
   }
 
   @Override
   public ClearCLImage render(ClearCLImage pFluorescencePhantomImage,
-                             ClearCLImage pLightMapImage,
-                             float pZPosition,
-                             float pZDepth)
+                             ClearCLImage pScatteringPhantomImage,
+                             ClearCLImage pLightMapImage)
   {
     clearImages(false);
 
     setInvariantKernelParameters(pFluorescencePhantomImage,
+                                 pScatteringPhantomImage,
                                  pLightMapImage,
-                                 pZPosition,
-                                 pZDepth);
+                                 mZFocusPosition,
+                                 mZFocusDepth);
 
     int lFluorescencePhantomDepth =
                                   (int) pFluorescencePhantomImage.getDepth();
@@ -177,12 +323,14 @@ public class WideFieldDetectionOptics extends
     {
       float lDefocusDepthInNormCoordinates = ((float) zi
                                               / lLightMapHalfDepth)
-                                             * 0.5f * pZDepth;
+                                             * 0.5f * mZFocusDepth;
 
-      float lPhantomZ1 = pZPosition - lDefocusDepthInNormCoordinates
+      float lPhantomZ1 = mZFocusPosition
+                         - lDefocusDepthInNormCoordinates
                          + 0.5f / lFluorescencePhantomDepth;
 
-      float lPhantomZ2 = pZPosition + lDefocusDepthInNormCoordinates
+      float lPhantomZ2 = mZFocusPosition
+                         + lDefocusDepthInNormCoordinates
                          + 0.5f / lFluorescencePhantomDepth;
 
       float lLightMapZ1 = ((float) (lLightMapHalfDepth - zi)
@@ -205,19 +353,43 @@ public class WideFieldDetectionOptics extends
                      * smootherstep(0.0f,
                                     getSmoothDefocusTransitionPoint(),
                                     lDefocusDepthInNormCoordinates);/**/
-      
-      System.out.println("SIGMA: "+lSigma);
+
+      System.out.println("SIGMA: " + lSigma);
 
       defocusBlur(lImageB, lImageA, lSigma, false);
     }
 
-    float lPhantomZ = pZPosition + 0.5f / lFluorescencePhantomDepth;
+    float lPhantomZ = mZFocusPosition
+                      + 0.5f / lFluorescencePhantomDepth;
 
     float lLightMapZ = 0.5f + 0.5f / lLightMapDepth;
 
-    collectSingle(lImageA, lImageB, lPhantomZ, lLightMapZ, true);
+    collectSingle(lImageA, lImageB, lPhantomZ, lLightMapZ, false);
 
-    return getDetectionImage();
+    
+    Vector3f lDirection = getDetectionDirectionVector();
+    float zfocus = getZFocusPosition();
+    float zexit = lDirection.z > 0 ? 1f : 0f;
+    float dz =
+             (lDirection.z > 0 ? 1 : -1) * getScatterSamplingDeltaZ();
+    for (float z = zfocus; z <= zexit; z += dz)
+    {
+      scatterBlur(pScatteringPhantomImage,
+                  lImageB,
+                  lImageA,
+                  z,
+                  z + dz >= zexit);
+
+      // do not swap for last loop:
+      //if (z + dz <= zexit)
+      {
+        ClearCLImage lTemp = lImageA;
+        lImageA = lImageB;
+        lImageB = lTemp;
+      }
+    }/**/
+
+    return super.render(pFluorescencePhantomImage, pScatteringPhantomImage, pLightMapImage);
   }
 
   /**
@@ -243,6 +415,7 @@ public class WideFieldDetectionOptics extends
   }
 
   private void setInvariantKernelParameters(ClearCLImage pFluoPhantomImage,
+                                            ClearCLImage pScatterPhantomImage,
                                             ClearCLImage pLightMapImage,
                                             float pZPosition,
                                             float pZDepth)
@@ -260,12 +433,17 @@ public class WideFieldDetectionOptics extends
 
     mDefocusBlurKernel.setGlobalOffsets(0, 0);
     mDefocusBlurKernel.setGlobalSizes(getWidth(), getHeight());
+
+    mScatterBlurKernel.setGlobalOffsets(0, 0);
+    mScatterBlurKernel.setGlobalSizes(getWidth(), getHeight());
+    mScatterBlurKernel.setArgument("scatterphantom",
+                                   pScatterPhantomImage);
   }
 
   private void clearImages(boolean pBlocking)
   {
-    mImage.fill(0.0f, false);
-    mImageTemp.fill(0.0f, pBlocking);
+    mImage.fill(0.0f, false, false);
+    mImageTemp.fill(0.0f, pBlocking, false);
   }
 
   private void collectPair(ClearCLImage pImageInput,
@@ -285,7 +463,7 @@ public class WideFieldDetectionOptics extends
 
     mCollectPairKernel.run(pWaitToFinish);
 
-    pImageOutput.notifyListenersOfChange(mContext.getDefaultQueue());
+    // pImageOutput.notifyListenersOfChange(mContext.getDefaultQueue());
   }
 
   private void collectSingle(ClearCLImage pImageInput,
@@ -301,7 +479,7 @@ public class WideFieldDetectionOptics extends
 
     mCollectSingleKernel.run(pWaitToFinish);
 
-    pImageOutput.notifyListenersOfChange(mContext.getDefaultQueue());
+    // pImageOutput.notifyListenersOfChange(mContext.getDefaultQueue());
   }
 
   private void defocusBlur(ClearCLImage pImageInput,
@@ -315,7 +493,24 @@ public class WideFieldDetectionOptics extends
 
     mDefocusBlurKernel.run(pWaitToFinish);
 
-    pImageOutput.notifyListenersOfChange(mContext.getDefaultQueue());
+    // pImageOutput.notifyListenersOfChange(mContext.getDefaultQueue());
+  }
+
+  private void scatterBlur(ClearCLImage pScatterPhantom,
+                           ClearCLImage pImageInput,
+                           ClearCLImage pImageOutput,
+                           float pZ,
+                           boolean pWaitToFinish)
+  {
+    mScatterBlurKernel.setArgument("imagein", pImageInput);
+    mScatterBlurKernel.setArgument("imageout", pImageOutput);
+    mScatterBlurKernel.setArgument("nz", pZ);
+    mScatterBlurKernel.setArgument("sigmamin", getScatterSigmaMin());
+    mScatterBlurKernel.setArgument("sigmamax", getScatterSigmaMax());
+
+    mScatterBlurKernel.run(pWaitToFinish);
+
+    // pImageOutput.notifyListenersOfChange(mContext.getDefaultQueue());
   }
 
   @Override

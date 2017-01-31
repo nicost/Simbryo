@@ -35,7 +35,8 @@ public class LightSheetIllumination extends
       mLightSheetNormalVector;
 
   private float mLightSheetThetaInRad, mLightSheetHeigth,
-      mScatterConstant, mScatterLoss, mSigmaMin, mSigmaMax;
+      mScatterConstant, mScatterLoss, mSigmaMin, mSigmaMax,
+      mZCenterOffset, mZDepth;
 
   /**
    * Instanciates a light sheet illumination optics class given a ClearCL
@@ -135,7 +136,8 @@ public class LightSheetIllumination extends
    * Sets the scattering loss. This is the proportion of scattered light (value
    * within [0,1]) that gets lost per voxel.
    * 
-   * @param pScatterLoss scattering loss
+   * @param pScatterLoss
+   *          scattering loss
    */
   public void setScatterLoss(float pScatterLoss)
   {
@@ -155,9 +157,9 @@ public class LightSheetIllumination extends
   }
 
   /**
-   * Sets the minimal sigma value. The min sigma value represents the
-   * dispersion of already scattered light as it propagates _even_ in the
-   * absence of scattering material.
+   * Sets the minimal sigma value. The min sigma value represents the dispersion
+   * of already scattered light as it propagates _even_ in the absence of
+   * scattering material.
    * 
    * @param pSigmaMin
    *          new min sigma value
@@ -379,6 +381,65 @@ public class LightSheetIllumination extends
   }
 
   /**
+   * Returns the z center position of the lightmap relative to the scatter
+   * phantom in normalized coordinates.
+   * 
+   * @return lightmap z center position relative to scatter phantom
+   */
+  public float getZCenterOffset()
+  {
+    return mZCenterOffset;
+  }
+
+  /**
+   * Sets the z center position of the lightmap relative to the scatter phantom
+   * in normalized coordinates.
+   * 
+   * @param pZCenterOffset
+   *          lightmap z center position relative to scatter phantom
+   */
+  public void setZCenterOffset(float pZCenterOffset)
+  {
+    mZCenterOffset = pZCenterOffset;
+  }
+
+  /**
+   * Return the depth of the lightmap stack relative to the scatter phantom in
+   * normalized coordinates.
+   * 
+   * @return lightmap depth relative to scatter phantom
+   */
+  public float getZDepth()
+  {
+    return mZDepth;
+  }
+
+  /**
+   * Sets the depth of the lightmap stack relative to the scatter phantom in
+   * normalized coordinates.
+   * 
+   * @param pZDepth
+   *          lightmap depth relative to scatter phantom
+   */
+  public void setZDepth(float pZDepth)
+  {
+    mZDepth = pZDepth;
+  }
+
+  /**
+   * Sets the default depth of the lightmap stack relative to the scatter
+   * phantom in normalized coordinates. This default value is such that each
+   * plane of the lightmap corresponds to a single plane of the scatter phantom.
+   * 
+   * @param pScatteringPhantomImage
+   *          scattering phantom
+   */
+  public void setDefaultZDepth(ClearCLImage pScatteringPhantomImage)
+  {
+    mZDepth = (float) getDepth() / pScatteringPhantomImage.getDepth();
+  }
+
+  /**
    * Sets the axis and normal lightsheet vectors from the three angles (alpha,
    * beta, gamma) in radians. the alpha angle rotates along x, the beta angle
    * along y, and the gamma angle around z.
@@ -424,29 +485,8 @@ public class LightSheetIllumination extends
     mPropagateLightSheetKernel = lProgram.createKernel("propagate");
   }
 
-  /**
-   * Renders the light map for a given scattering phantom image and the position
-   * in z (normalized coordinates) of the light map.
-   * 
-   * @param pScatteringPhantomImage
-   *          scattering phantom
-   * @param pZCenterOffset
-   *          z offset in normalized coordinates of the center plane of the
-   *          lightmap stack relative to the phantom.
-   * @return light map image (same as returned by getLightMapImage() )
-   */
-  public ClearCLImage render(ClearCLImage pScatteringPhantomImage,
-                             float pZCenterOffset)
-  {
-    float lZDepth = (float) getDepth()
-                    / pScatteringPhantomImage.getDepth();
-    return render(pScatteringPhantomImage, pZCenterOffset, lZDepth);
-  }
-
   @Override
-  public ClearCLImage render(ClearCLImage pScatteringPhantomImage,
-                             float pZCenterOffset,
-                             float pZDepth)
+  public ClearCLImage render(ClearCLImage pScatteringPhantomImage)
   {
     initializeLightSheet(mBallisticLightImageA,
                          mBallisticLightImageB,
@@ -454,8 +494,8 @@ public class LightSheetIllumination extends
                          mScatteredLightImageB);
 
     setInvariantKernelParameters(pScatteringPhantomImage,
-                                 pZCenterOffset,
-                                 pZDepth);
+                                 getZCenterOffset(),
+                                 getZDepth());
 
     for (int i = 0; i < getWidth(); i++)
     {
@@ -480,9 +520,7 @@ public class LightSheetIllumination extends
       swapLightImages();
     }
 
-    return super.render(pScatteringPhantomImage,
-                        pZCenterOffset,
-                        pZDepth);
+    return super.render(pScatteringPhantomImage);
   }
 
   private void setInvariantKernelParameters(ClearCLImage pScatteringPhantomImage,
@@ -496,7 +534,7 @@ public class LightSheetIllumination extends
     mPropagateLightSheetKernel.setArgument("scatterphantom",
                                            pScatteringPhantomImage);
     mPropagateLightSheetKernel.setArgument("lightmap",
-                                           mLightMapImage);
+                                           getLightMapImage());
     mPropagateLightSheetKernel.setArgument("lspx",
                                            mLightSheetPosition.x);
     mPropagateLightSheetKernel.setArgument("lspy",
@@ -578,10 +616,10 @@ public class LightSheetIllumination extends
                                     ClearCLImage pScatteredLightImageB)
   {
 
-    pBallisticLightImageA.fill(1.0f, false);
-    pBallisticLightImageB.fill(1.0f, false);
-    pScatteredLightImageA.fill(0.0f, true);
-    pScatteredLightImageB.fill(0.0f, true);
+    pBallisticLightImageA.fill(1.0f, false, false);
+    pBallisticLightImageB.fill(1.0f, false, false);
+    pScatteredLightImageA.fill(0.0f, false, false);
+    pScatteredLightImageB.fill(0.0f, true, false);
   }
 
   private void swapLightImages()

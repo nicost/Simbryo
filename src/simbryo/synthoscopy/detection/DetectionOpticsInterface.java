@@ -24,15 +24,13 @@ public interface DetectionOpticsInterface<I>
    * Renders the light map for a given scattering phantom image and position and dimension along z of the lightmap. 
    * 
    * @param pFluorescencePhantomImage fluorescence phantom
+   * @param pScatteringPhantomImage scattering phantom
    * @param pLightMapImage lightmap image
-   * @param pZPosition z offset in normalized coordinates of the center plane of the lightmap stack relative to the phantom.
-   * @param pZDepth z depth in normalized coordinates of the lightmap stack relative to the phantom.
-   * @return light map image (same as returned by getLightMapImage() )
+   * @return fluorescence image (same as returned by getLightMapImage() )
    */
   I render(ClearCLImage pFluorescencePhantomImage,
-           ClearCLImage pLightMapImage,
-           float pZPosition,
-           float pZDepth);
+           ClearCLImage pScatteringPhantomImage,
+           ClearCLImage pLightMapImage);
 
   /**
    * Clears the detection image

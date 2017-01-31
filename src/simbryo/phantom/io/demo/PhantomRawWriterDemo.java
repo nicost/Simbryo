@@ -1,7 +1,6 @@
 package simbryo.phantom.io.demo;
 
 import java.io.File;
-import java.io.IOException;
 
 import org.junit.Test;
 
@@ -27,10 +26,10 @@ public class PhantomRawWriterDemo
 
   /**
    * Demo 
-   * @throws IOException NA
+   * @throws Exception 
    */
   @Test
-  public void demo() throws IOException
+  public void demo() throws Exception
   {
     /*String lUserHome = System.getProperty("user.home");
     File lDownloadFolder = new File(lUserHome + "/Downloads/");
@@ -68,9 +67,8 @@ public class PhantomRawWriterDemo
                                                                                  lHeight,
                                                                                  lDepth);
 
-      PhantomRawWriter lPhantomRawWriter = new PhantomRawWriter(100, 0);
+      PhantomRawWriter lPhantomRawWriter = new PhantomRawWriter(NativeTypeEnum.Byte, 100, 0);
       lPhantomRawWriter.setOverwrite(false);
-      lPhantomRawWriter.setDataType(NativeTypeEnum.Byte);
 
       int lStart = 8500;
       int lEnd   = 15000;
@@ -104,6 +102,7 @@ public class PhantomRawWriterDemo
         }
       }
 
+      lPhantomRawWriter.close();
       lDrosoFluo.close();
 
     }
