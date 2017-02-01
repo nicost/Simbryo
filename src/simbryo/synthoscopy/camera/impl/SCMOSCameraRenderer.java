@@ -28,8 +28,8 @@ public class SCMOSCameraRenderer extends ClearCLCameraRendererBase
 
   private int mXMin, mXMax, mYMin, mYMax;
 
-  private float mPhotonNoise, mOffset, mGain, mOffsetNoise,
-      mGainNoise, mOffsetBias, mGainBias;
+  private float mShotNoise, mOffset, mGain, mOffsetNoise, mGainNoise,
+      mOffsetBias, mGainBias;
 
   /**
    * Instanciates a light sheet illumination optics class given a ClearCL
@@ -56,13 +56,13 @@ public class SCMOSCameraRenderer extends ClearCLCameraRendererBase
           pLightIntensity,
           pMaxCameraImageDimensions);
 
-    mPhotonNoise = 0.05f;
-    mOffset = 97.0f;
-    mGain = 200.0f;
-    mOffsetBias = 2.0f;
-    mGainBias = 0.06f;
-    mOffsetNoise = 3f;
-    mGainNoise = 0.06f;
+    setShotNoise(0.03f);
+    setOffset(97.0f);
+    setGain(200.0f);
+    setOffsetBias(1.0f);
+    setGainBias(0.05f);
+    setOffsetNoise(1.0f);
+    setGainNoise(0.04f);
 
     mXMin = 0;
     mXMax = (int) pMaxCameraImageDimensions[0];
@@ -72,6 +72,165 @@ public class SCMOSCameraRenderer extends ClearCLCameraRendererBase
     ensureImagesAllocated();
     setupProgramAndKernels();
     clearImages(true);
+  }
+
+  /**
+   * Returns shot noise parameter.
+   * 
+   * @return shot noise parameter
+   */
+  public float getShotNoise()
+  {
+    return mShotNoise;
+  }
+
+  /**
+   * Sets shot noise parameter. This parameter should be a floating point number
+   * within [0,1].
+   * 
+   * @param pShotNoise
+   *          shot noise parameter within [0,1]
+   */
+  public void setShotNoise(float pShotNoise)
+  {
+    mShotNoise = pShotNoise;
+  }
+
+  /**
+   * Returns signal amplification offset.
+   * 
+   * @return signal amplification offset.
+   */
+  public float getOffset()
+  {
+    return mOffset;
+  }
+
+  /**
+   * Sets signal amplification offset. This is a in y=ax+b where x is the
+   * fluorescence signal and y is the resulting electronic-amplified signal.
+   * 
+   * @param pOffset
+   *          signal amplification offset.
+   */
+  public void setOffset(float pOffset)
+  {
+    mOffset = pOffset;
+  }
+
+  /**
+   * Returns signal amplification gain.
+   * 
+   * @return signal amplification gain.
+   */
+  public float getGain()
+  {
+    return mGain;
+  }
+
+  /**
+   * Sets signal amplification gain. This is a in y=ax+b where x is the
+   * fluorescence signal and y is the resulting electronic-amplified signal.
+   * 
+   * @param pGain
+   *          signal amplification gain.
+   */
+  public void setGain(float pGain)
+  {
+    mGain = pGain;
+  }
+
+  /**
+   * Returns signal amplification offset noise amplitude.
+   * 
+   * @return signal amplification offset noise amplitude.
+   */
+  public float getOffsetNoise()
+  {
+    return mOffsetNoise;
+  }
+
+  /**
+   * Sets signal amplification offset noise amplitude. Offset noise is modeled
+   * as a χ^2(k=1) (Chi-square distribution with 1 degree of freedom)
+   * 
+   * @param pOffsetNoise
+   *          signal amplification offset noise amplitude
+   */
+  public void setOffsetNoise(float pOffsetNoise)
+  {
+    mOffsetNoise = pOffsetNoise;
+  }
+
+  /**
+   * Returns signal amplification gain noise amplitude.
+   * 
+   * @return signal amplification gain noise amplitude.
+   */
+  public float getGainNoise()
+  {
+    return mGainNoise;
+  }
+
+  /**
+   * Sets signal amplification gain noise amplitude. Offset gain is as a
+   * zero-mean Gaussian distribution of given amplitude. The gain is modulated
+   * additively by the noise.
+   * 
+   * @param pGainNoise
+   *          signal amplification offset noise amplitude
+   */
+  public void setGainNoise(float pGainNoise)
+  {
+    mGainNoise = pGainNoise;
+  }
+
+  /**
+   * Returns the offset bias amplitude
+   * 
+   * @return offset bias amplitude
+   */
+  public float getOffsetBias()
+  {
+    return mOffsetBias;
+  }
+
+  /**
+   * Sets the offset bias amplitude. Each pixel of the detector has a
+   * non-time-varying noise component for the electronic offset which only
+   * varies across pixels. This noise is modeled as a zero-mean Gaussian of
+   * given amplitude.
+   * 
+   * @param pOffsetBias
+   *          offset bias amplitude
+   */
+  public void setOffsetBias(float pOffsetBias)
+  {
+    mOffsetBias = pOffsetBias;
+  }
+
+  /**
+   * Returns the offset bias amplitude. Each pixel of the detector has a
+   * non-time-varying noise component for the electronic gain which only varies
+   * across pixels. This noise is modeled as a zero-mean Gaussian of given
+   * amplitude.
+   * 
+   * @return offset bias amplitude
+   */
+  public float getGainBias()
+  {
+    return mGainBias;
+  }
+
+  /**
+   * Sets the gain bias amplitude
+   * 
+   * @param pGainBias
+   *          gain bias amplitude
+   */
+  public void setGainBias(float pGainBias)
+  {
+    mGainBias = pGainBias;
   }
 
   /**
@@ -240,13 +399,13 @@ public class SCMOSCameraRenderer extends ClearCLCameraRendererBase
     mNoiseKernel.setArgument("imagein", pImageInput);
     mNoiseKernel.setArgument("imageout", pImageOutput);
     mNoiseKernel.setArgument("timeindex", mTimeIndex);
-    mNoiseKernel.setArgument("photonnoise", mPhotonNoise);
-    mNoiseKernel.setArgument("offset", mOffset);
-    mNoiseKernel.setArgument("gain", mGain);
-    mNoiseKernel.setArgument("offsetbias", mOffsetBias);
-    mNoiseKernel.setArgument("gainbias", mGainBias);
-    mNoiseKernel.setArgument("offsetnoise", mOffsetNoise);
-    mNoiseKernel.setArgument("gainnoise", mGainNoise);
+    mNoiseKernel.setArgument("shotnoise", getShotNoise());
+    mNoiseKernel.setArgument("offset", getOffset());
+    mNoiseKernel.setArgument("gain", getGain());
+    mNoiseKernel.setArgument("offsetbias", getOffsetBias());
+    mNoiseKernel.setArgument("gainbias", getGainBias());
+    mNoiseKernel.setArgument("offsetnoise", getOffsetNoise());
+    mNoiseKernel.setArgument("gainnoise", getGainNoise());
 
     mNoiseKernel.run(pWaitToFinish);
   }
