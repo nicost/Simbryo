@@ -16,6 +16,8 @@ import simbryo.util.geom.GeometryUtils;
 public class NematicOrderOperator extends
                                   OperatorBase<VectorCellProperty>
 {
+  private static final long serialVersionUID = 1L;
+  
   private float mCouplingConstant;
   private int[] mNeighboorsArray;
   private float mNeighborhoodRadiusDilationFactor;

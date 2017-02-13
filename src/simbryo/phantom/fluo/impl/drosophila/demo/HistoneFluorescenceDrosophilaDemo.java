@@ -14,7 +14,6 @@ import clearcl.util.ElapsedTime;
 import clearcl.viewer.ClearCLImageViewer;
 import javafx.scene.control.Slider;
 import simbryo.dynamics.tissue.embryo.zoo.Drosophila;
-import simbryo.phantom.ClearCLPhantomRendererUtils;
 import simbryo.phantom.fluo.impl.drosophila.DrosophilaHistoneFluorescence;
 import simbryo.util.timing.Timming;
 
@@ -56,14 +55,12 @@ public class HistoneFluorescenceDrosophilaDemo
         ClearCLContext lContext = lFastestGPUDevice.createContext())
     {
 
-      int[] lGridDimensions =
-                            ClearCLPhantomRendererUtils.getOptimalGridDimensions(lFastestGPUDevice,
-                                                                                 cWidth,
-                                                                                 cHeight,
-                                                                                 cDepth);
-
-
-      Drosophila lDrosophila = new Drosophila(16, lGridDimensions);
+      Drosophila lDrosophila =
+                             Drosophila.getDeveloppedEmbryo(14,
+                                                            cWidth,
+                                                            cHeight,
+                                                            cDepth,
+                                                            lFastestGPUDevice);
 
       System.out.println("grid size:"
                          + Arrays.toString(lDrosophila.getGridDimensions()));
@@ -77,8 +74,6 @@ public class HistoneFluorescenceDrosophilaDemo
                                                                                  cHeight,
                                                                                  cDepth);
 
-      
-      
       ClearCLImageViewer lOpenViewer = lDrosoFluo.openViewer();
       Slider lZSlider = lOpenViewer.getZSlider();
 
@@ -91,7 +86,7 @@ public class HistoneFluorescenceDrosophilaDemo
       while (lOpenViewer.isShowing() && !lAbort)
       {
         // System.out.println("i=" + i);
-        lTimming.syncAtPeriod(1);
+        lTimming.syncAtPeriod(5000);
 
         ElapsedTime.measure(i % cDisplayPeriod == 0,
                             "dynamics",

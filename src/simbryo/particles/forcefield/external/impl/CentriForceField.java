@@ -12,6 +12,7 @@ import simbryo.particles.forcefield.external.ExternalForceFieldInterface;
 public class CentriForceField extends ExternalForceFieldBase
                               implements ExternalForceFieldInterface
 {
+  private static final long serialVersionUID = 1L;
 
   private float[] mCenter;
 
@@ -20,8 +21,7 @@ public class CentriForceField extends ExternalForceFieldBase
    * center. if the the force intensity is positive then it is a centripetal
    * force, otherwise it is a centrifugal force.
    * 
-   * @param pForceIntensity
-   *          force intensity
+   * @param pForceIntensity force intensity
    * @param pCenter
    *          force field center
    */
@@ -32,6 +32,7 @@ public class CentriForceField extends ExternalForceFieldBase
 
   }
 
+  @SuppressWarnings("unused")
   @Override
   public void applyForceField(int pBeginId,
                               int pEndId,

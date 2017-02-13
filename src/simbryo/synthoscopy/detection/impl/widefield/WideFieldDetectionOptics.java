@@ -290,6 +290,7 @@ public class WideFieldDetectionOptics extends
     lProgram.addSource(WideFieldDetectionOptics.class,
                        "kernel/WideFieldDetection.cl");
 
+    lProgram.addBuildOptionAllMathOpt();
     lProgram.buildAndLog();
 
     mCollectPairKernel = lProgram.createKernel("collectpair");
@@ -354,7 +355,7 @@ public class WideFieldDetectionOptics extends
                                     getSmoothDefocusTransitionPoint(),
                                     lDefocusDepthInNormCoordinates);/**/
 
-      System.out.println("SIGMA: " + lSigma);
+      //System.out.println("SIGMA: " + lSigma);
 
       defocusBlur(lImageB, lImageA, lSigma, false);
     }

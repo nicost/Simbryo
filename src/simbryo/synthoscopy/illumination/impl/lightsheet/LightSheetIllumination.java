@@ -480,6 +480,7 @@ public class LightSheetIllumination extends
     lProgram.addSource(LightSheetIllumination.class,
                        "kernel/LightSheetIllumination.cl");
 
+    lProgram.addBuildOptionAllMathOpt();
     lProgram.buildAndLog();
 
     mPropagateLightSheetKernel = lProgram.createKernel("propagate");

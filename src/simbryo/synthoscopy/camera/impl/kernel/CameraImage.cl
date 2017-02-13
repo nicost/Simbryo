@@ -48,10 +48,10 @@ __kernel void camnoise(   __read_only    image2d_t  imagein,
   const int x = get_global_id(0); 
   const int y = get_global_id(1);
   
-  
+  // generating some entropy (its noise_xy and not noi_sexy ;-):
   const unsigned int noisexy1  = rnguint2(x,y);
   const unsigned int noisexy2  = rnguint1(noisexy1);
-  const unsigned int noisexyt1 = rnguint3(x,y,timeindex);
+  const unsigned int noisexyt1 = rnguint1(noisexy2+timeindex);
   const unsigned int noisexyt2 = rnguint1(noisexyt1);
   const unsigned int noisexyt3 = rnguint1(noisexyt2);
   
@@ -61,18 +61,16 @@ __kernel void camnoise(   __read_only    image2d_t  imagein,
   const float noisexyt2f = rngfloat(noisexyt2);
   const float noisexyt3f = rngfloat(noisexyt3);
   
-  const float fluovalue = read_imagef(imagein, intsampler, (int2){x,y}).x;
+  const float fluovalue        = read_imagef(imagein, intsampler, (int2){x,y}).x;
   
-  const float shotnoisevalue = shotnoise*native_sqrt(fluovalue)*fast_normal(noisexyt1f);
+  const float shotnoisevalue   = shotnoise*native_sqrt(fluovalue)*clampedcauchy(noisexyt1f,9);
   
-  const float offsetbiasvalue = offsetbias*fast_normal(noisexy1f);
+  const float offsetbiasvalue  = offsetbias*clampedcauchy(noisexy1f,9);
+  const float gainbiasvalue    = gainbias*clampedcauchy(noisexy2f,9);
   
-  const float gainbiasvalue = gainbias*fast_normal(noisexy2f);
-  
-  const float offsetnoisetemp  = fast_normal(noisexyt2f);
+  const float offsetnoisetemp  = clampedcauchy(noisexyt2f,9);
   const float offsetnoisevalue = offsetnoise*offsetnoisetemp*offsetnoisetemp*rngsign1(noisexyt1);
-  
-  const float gainnoisevalue   = gainnoise*fast_normal(noisexyt3f);
+  const float gainnoisevalue   = gainnoise*clampedcauchy(noisexyt3f,9);
   
   float detectorvalue = offset + offsetbiasvalue + offsetnoisevalue + gain*(1+gainbiasvalue+gainnoisevalue)*(shotnoisevalue+fluovalue);    
   

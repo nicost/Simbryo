@@ -8,6 +8,8 @@ package simbryo.particles.isosurf;
  */
 public abstract class IsoSurfaceBase implements IsoSurfaceInterface
 {
+  private static final long serialVersionUID = 1L;
+  
   protected final int mDimension;
 
   protected int mIndex;

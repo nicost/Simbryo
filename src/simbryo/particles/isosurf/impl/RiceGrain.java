@@ -16,6 +16,7 @@ import simbryo.particles.isosurf.IsoSurfaceInterface;
 public class RiceGrain extends Ellipsoid
                        implements IsoSurfaceInterface
 {
+  private static final long serialVersionUID = 1L;
 
   private float x, y, z;
   private float a, b, c;

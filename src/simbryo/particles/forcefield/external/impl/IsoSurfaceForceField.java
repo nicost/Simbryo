@@ -14,10 +14,15 @@ import simbryo.particles.isosurf.IsoSurfaceInterface;
 public class IsoSurfaceForceField extends ExternalForceFieldBase
                                   implements
                                   ExternalForceFieldInterface
-{
+{  private static final long serialVersionUID = 1L;
 
   private IsoSurfaceInterface mIsoSurfaceInterface;
 
+  /**
+   * Instanciates an iso-surface force field
+   * @param pForceIntensity force intensity
+   * @param pIsoSurfaceInterface iso-surface 
+   */
   public IsoSurfaceForceField(float pForceIntensity,
                               IsoSurfaceInterface pIsoSurfaceInterface)
   {
@@ -25,6 +30,7 @@ public class IsoSurfaceForceField extends ExternalForceFieldBase
     mIsoSurfaceInterface = pIsoSurfaceInterface;
   }
 
+  @SuppressWarnings("unused")
   @Override
   public void applyForceField(int pBeginId,
                               int pEndId,

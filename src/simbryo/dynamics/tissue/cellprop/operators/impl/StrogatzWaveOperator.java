@@ -22,6 +22,8 @@ import simbryo.util.geom.GeometryUtils;
  */
 public class StrogatzWaveOperator extends OperatorBase<CellProperty>
 {
+  private static final long serialVersionUID = 1L;
+
   private float mCouplingConstant;
 
   private int[] mNeighboorsArray;
@@ -191,7 +193,7 @@ public class StrogatzWaveOperator extends OperatorBase<CellProperty>
       return 0;
   }
 
-  public float eventHook(boolean pEvent,
+  protected float eventHook(boolean pEvent,
                          int pId,
                          float[] pPositions,
                          float[] pVelocities,

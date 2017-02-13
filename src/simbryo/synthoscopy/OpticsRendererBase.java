@@ -17,6 +17,7 @@ public abstract class OpticsRendererBase<I> implements
                                          OpticsRendererInterface<I>
 {
 
+  @SuppressWarnings("unused")
   private PhantomRendererInterface<I> mPhantomRenderer;
   
   private float mLambda;

@@ -13,6 +13,8 @@ public abstract class ExternalForceFieldBase extends ForceFieldBase
                                              ExternalForceFieldInterface
 {
 
+  private static final long serialVersionUID = 1L;
+
   /**
    * Constructs an external force field with given force intensity.
    * 

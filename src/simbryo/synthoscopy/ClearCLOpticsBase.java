@@ -49,11 +49,18 @@ public abstract class ClearCLOpticsBase extends
   protected ClearCLContext mContext;
   protected ClearCLImage mImage;
 
+  /**
+   * Returns image
+   * @return image
+   */
   public ClearCLImage getImage()
   {
     return mImage;
   }
 
+  /**
+   * Clears image
+   */
   public void clear()
   {
     mImage.fillZero(true, false);

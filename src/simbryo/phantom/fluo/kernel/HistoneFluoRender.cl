@@ -2,6 +2,7 @@
 
 #include [OCLlib] "noise/noise.cl"
 
+
 float autofluo(float3 dim, float3 voxelpos, sampler_t sampler, __read_only image3d_t  perlin, int timeindex );
 
 

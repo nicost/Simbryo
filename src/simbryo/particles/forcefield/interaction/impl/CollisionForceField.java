@@ -17,6 +17,7 @@ public class CollisionForceField extends InteractionForceFieldBase
                                  implements
                                  InteractionForceFieldInterface
 {
+  private static final long serialVersionUID = 1L;
 
   private static final float cGapCorrectionFactor = 0.95f;
 
@@ -49,6 +50,7 @@ public class CollisionForceField extends InteractionForceFieldBase
     mForbidOverlap = pForbidOverlap;
   }
 
+  @SuppressWarnings("unused")
   @Override
   public void applyForceField(int pBeginId,
                               int pEndId,

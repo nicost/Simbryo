@@ -17,6 +17,8 @@ public class SurfaceGradientOperator extends
                                      OperatorBase<VectorCellProperty>
 {
 
+  private static final long serialVersionUID = 1L;
+
   /**
    * Constructs a Surface gradient operator.
    * 

@@ -6,11 +6,19 @@ import java.util.Arrays;
 
 import org.junit.Test;
 
-import simbryo.util.mergeset.MergeSet;
+import simbryo.util.mergeset.FastArraySet;
 
-public class MergeSetTests
+/**
+ * 
+ *
+ * @author royer
+ */
+public class FastArraySetTests
 {
 
+  /**
+   * Test full array
+   */
   @Test
   public void testFullArray()
   {
@@ -22,7 +30,7 @@ public class MergeSetTests
 
     int[] lSet1u2 = new int[lSet1.length + lSet2.length];
 
-    final int lLength = MergeSet.merge(lSet1, lSet2, lSet1u2);
+    final int lLength = FastArraySet.merge(lSet1, lSet2, lSet1u2);
 
     // System.out.println("lLength=" + lLength);
     // System.out.println(Arrays.toString(lSet1u2));
@@ -40,6 +48,9 @@ public class MergeSetTests
 
   }
 
+  /**
+   * Test range array
+   */
   @Test
   public void testRangeArray()
   {
@@ -51,7 +62,7 @@ public class MergeSetTests
 
     int[] lSet1u2 = new int[lSet1.length + lSet2.length];
 
-    final int lLength = MergeSet.merge(lSet1,
+    final int lLength = FastArraySet.merge(lSet1,
                                        4,
                                        3,
                                        lSet2,
@@ -76,6 +87,9 @@ public class MergeSetTests
 
   }
 
+  /**
+   * tests minus-one terminated array.
+   */
   @Test
   public void testMinusOneTerminatedArray()
   {
@@ -88,7 +102,7 @@ public class MergeSetTests
     int[] lSet1u2 = new int[lSet1.length + lSet2.length];
 
     final int lLength =
-                      MergeSet.merge(lSet1, 4, lSet2, 3, lSet1u2, 1);
+                      FastArraySet.merge(lSet1, 4, lSet2, 3, lSet1u2, 1);
 
     System.out.println("lLength=" + lLength);
     System.out.println(Arrays.toString(lSet1u2));

@@ -13,10 +13,12 @@ public abstract class InteractionForceFieldBase extends ForceFieldBase
                                                 InteractionForceFieldInterface
 {
 
+  private static final long serialVersionUID = 1L;
+
   /**
    * Constructs an interaction force field of given force intensity.
    * 
-   * @param pForceIntensity
+   * @param pForceIntensity force intensity
    */
   public InteractionForceFieldBase(float pForceIntensity)
   {

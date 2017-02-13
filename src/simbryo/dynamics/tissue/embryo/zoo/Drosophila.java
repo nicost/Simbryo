@@ -1,7 +1,10 @@
 package simbryo.dynamics.tissue.embryo.zoo;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 
+import clearcl.ClearCLDevice;
 import simbryo.dynamics.tissue.cellprop.CellProperty;
 import simbryo.dynamics.tissue.cellprop.HasPolarity;
 import simbryo.dynamics.tissue.cellprop.VectorCellProperty;
@@ -11,16 +14,19 @@ import simbryo.dynamics.tissue.embryo.EmbryoDynamics;
 import simbryo.particles.forcefield.ForceFieldInterface;
 import simbryo.particles.forcefield.external.impl.OneSidedIsoSurfaceForceField;
 import simbryo.particles.isosurf.impl.Ellipsoid;
+import simbryo.phantom.ClearCLPhantomRendererUtils;
+import simbryo.util.serialization.SerializationUtilities;
 
 /**
  * Drosophila melanogster embryo (First 14 divisions).
  *
  * @author royer
  */
-public class Drosophila extends EmbryoDynamics implements HasPolarity, Serializable
+public class Drosophila extends EmbryoDynamics
+                        implements HasPolarity, Serializable
 {
   private static final long serialVersionUID = 1L;
-  
+
   private static final float cCellDivisionRadiusShrinkage =
                                                           (float) Math.pow(0.5f,
                                                                            1.0f / 2);
@@ -95,6 +101,8 @@ public class Drosophila extends EmbryoDynamics implements HasPolarity, Serializa
     mStrogatzOscillator =
                         new StrogatzWaveOperator(0.001f, 0.01f, 0.1f)
                         {
+                          private static final long serialVersionUID =
+                                                                     1L;
 
                           @Override
                           public float eventHook(boolean pEvent,
@@ -257,6 +265,53 @@ public class Drosophila extends EmbryoDynamics implements HasPolarity, Serializa
     mInsideEllipseForceField.setForceIntensity(lForce);
   }
 
+  /**
+   * Returns a cached embryo dynamics state. Phantom widths, heuights and depth
+   * are provided to optimize the grid size.
+   * 
+   * @param pDivisionTime
+   *          time in cell-division time
+   * @param pPhantomWidth
+   *          phantom width
+   * @param pPhantomHeight
+   *          phantom height
+   * @param pPhantomDepth
+   *          phantom depth
+   * @param pGPUDevice
+   *          GPU device
+   * @return Drosohila dynamics at given state.
+   * @throws IOException
+   *           exception if problem savin/loading saved dynamics state
+   */
+  public static Drosophila getDeveloppedEmbryo(float pDivisionTime,
+                                               int pPhantomWidth,
+                                               int pPhantomHeight,
+                                               int pPhantomDepth,
+                                               ClearCLDevice pGPUDevice) throws IOException
+  {
+    File lTempDirectory =
+                        new File(System.getProperty("java.io.tmpdir"));
+    File lCachedEmbryoDynamicsFile =
+                                   new File(lTempDirectory,
+                                            Drosophila.class.getSimpleName());
+    Drosophila lDrosophila =
+                           SerializationUtilities.loadFromFile(Drosophila.class,
+                                                               lCachedEmbryoDynamicsFile);
 
+    if (lDrosophila == null)
+    {
+      int[] lGridDimensions =
+                            ClearCLPhantomRendererUtils.getOptimalGridDimensions(pGPUDevice,
+                                                                                 pPhantomWidth,
+                                                                                 pPhantomHeight,
+                                                                                 pPhantomDepth);
+
+      lDrosophila = new Drosophila(16, lGridDimensions);
+      lDrosophila.simulationSteps((int) (pDivisionTime * 1000), 1);
+      SerializationUtilities.saveToFile(lDrosophila,
+                                        lCachedEmbryoDynamicsFile);
+    }
+    return lDrosophila;
+  }
 
 }

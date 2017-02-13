@@ -18,6 +18,7 @@ public class RepulsionForceField extends InteractionForceFieldBase
                                  implements
                                  InteractionForceFieldInterface
 {
+  private static final long serialVersionUID = 1L;
 
   private int mNumberOfInteractionPartners;
 
@@ -39,6 +40,7 @@ public class RepulsionForceField extends InteractionForceFieldBase
     mNumberOfInteractionPartners = pNumberOfInteractionPartners;
   }
 
+  @SuppressWarnings("unused")
   @Override
   public void applyForceField(int pBeginId,
                               int pEndId,

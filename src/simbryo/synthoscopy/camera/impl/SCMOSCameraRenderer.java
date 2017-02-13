@@ -338,6 +338,7 @@ public class SCMOSCameraRenderer extends ClearCLCameraRendererBase
     lProgram.addSource(SCMOSCameraRenderer.class,
                        "kernel/CameraImage.cl");
 
+    lProgram.addBuildOptionAllMathOpt();
     lProgram.buildAndLog();
 
     mUpscaleKernel = lProgram.createKernel("upscale");

@@ -16,6 +16,8 @@ import simbryo.util.DoubleBufferingFloatArray;
  */
 public class ParticleSystem implements ParticleSystemInterface
 {
+  private static final long serialVersionUID = 1L;
+  
   private final int mDimension;
   private final int mMaxNumberOfParticles;
   private final int mMaxNumberOfParticlesPerGridCell;

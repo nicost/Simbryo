@@ -7,7 +7,8 @@ package simbryo.particles.isosurf.impl;
  */
 public class Sphere extends Ellipsoid
 {
-
+  private static final long serialVersionUID = 1L;
+  
   /**
    * Instanciates a sphere with given radius and center parameters.
    * 

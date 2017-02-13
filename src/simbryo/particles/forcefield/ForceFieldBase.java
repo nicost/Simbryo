@@ -7,12 +7,15 @@ package simbryo.particles.forcefield;
  */
 public abstract class ForceFieldBase implements ForceFieldInterface
 {
+  private static final long serialVersionUID = 1L;
+
   protected volatile float mForceIntensity;
 
   /**
    * Constructs a force field with a given force intensity.
    * 
    * @param pForceIntensity
+   *          force intensity
    */
   public ForceFieldBase(float pForceIntensity)
   {

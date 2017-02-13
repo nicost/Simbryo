@@ -196,6 +196,7 @@ public abstract class HistoneFluorescence extends
     lProgram.addDefine("NUCLEITEXTURECONTRAST",
                        getNucleiTextureContrast());
 
+    lProgram.addBuildOptionAllMathOpt();
     lProgram.buildAndLog();
     // System.out.println(lProgram.getSourceCode());
     
@@ -410,7 +411,6 @@ public abstract class HistoneFluorescence extends
     mPositionsBuffer.close();
     mRadiiBuffer.close();
     mPerlinNoiseImage.close();
-    mRenderKernel.close();
   }
 
 }

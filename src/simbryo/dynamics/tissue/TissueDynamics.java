@@ -22,6 +22,7 @@ import simbryo.util.sequence.Sequence;
 public class TissueDynamics extends ParticleSystem
                             implements TissueDynamicsInterface
 {
+  private static final long serialVersionUID = 1L;
 
   protected static final int cMaximumNumberOfCells = 100000;
   protected static final float V = 0.0001f;

@@ -15,6 +15,9 @@ import javafx.application.Platform;
 @SuppressWarnings("restriction")
 public class JavaFXUtil
 {
+  /**
+   * Initializes JavaFX
+   */
   public static void init()
   {
     PlatformImpl.startup(() -> {

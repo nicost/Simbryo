@@ -12,13 +12,12 @@ import simbryo.particles.isosurf.IsoSurfaceInterface;
  * @author royer
  */
 public class OneSidedIsoSurfaceForceField extends
-                                           ExternalForceFieldBase
-                                           implements
-                                           ExternalForceFieldInterface
+                                          ExternalForceFieldBase
+                                          implements
+                                          ExternalForceFieldInterface
 {
+  private static final long serialVersionUID = 1L;
 
-  private volatile float mRadius;
-  private float[] mCenterAndAxis;
   private boolean mZeroInside;
   private boolean mConstraintWithRadius;
 
@@ -40,11 +39,12 @@ public class OneSidedIsoSurfaceForceField extends
    *          if true, the radius of the particles is taken into account.
    * @param pForceIntensity
    *          force intensity
+   * @param pIsoSurfaceInterface iso-surface
    */
   public OneSidedIsoSurfaceForceField(boolean pZeroInside,
-                                       boolean pConstraintWithRadius,
-                                       float pForceIntensity,
-                                       IsoSurfaceInterface pIsoSurfaceInterface)
+                                      boolean pConstraintWithRadius,
+                                      float pForceIntensity,
+                                      IsoSurfaceInterface pIsoSurfaceInterface)
   {
     super(pForceIntensity);
     mZeroInside = pZeroInside;
@@ -52,6 +52,7 @@ public class OneSidedIsoSurfaceForceField extends
     mIsoSurfaceInterface = pIsoSurfaceInterface;
   }
 
+  @SuppressWarnings("unused")
   @Override
   public void applyForceField(int pBeginId,
                               int pEndId,

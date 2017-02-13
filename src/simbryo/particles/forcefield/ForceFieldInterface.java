@@ -27,7 +27,7 @@ public interface ForceFieldInterface extends Serializable
    *          force intensity
    */
   void setForceIntensity(float pForce);
-  
+
   /**
    * Applies the nD force field to particles within a given range of ids (begin
    * inclusive, end exclusive). the positions, velocities and radii of the
@@ -39,12 +39,9 @@ public interface ForceFieldInterface extends Serializable
    *          particle id range beginning inclusive
    * @param pEndId
    *          particle id range end exclusive
-   * @param pPositions
-   *          positions
-   * @param pVelocities
-   *          velocities
-   * @param pRadii
-   *          radii
+   * @param pParticleSystem
+   *          parrticle system
+   * 
    */
   void applyForceField(int pBeginId,
                        int pEndId,

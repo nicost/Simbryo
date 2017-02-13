@@ -1,11 +1,8 @@
 
+#include [OCLlib] "noise/noisetexture.cl"
+
 float rngfloat1(uint x);
 
-
-
-#define AUTOSHARPNESS 10.0f
-#define AUTOBACKGROUND 0.5f
-#define AUTOYOLK 0.25f 
 
 
 inline float autofluo(float3 dim, float3 voxelpos, sampler_t sampler, __read_only image3d_t  perlin, int timeindex )
@@ -18,23 +15,19 @@ inline float autofluo(float3 dim, float3 voxelpos, sampler_t sampler, __read_onl
   
   const float insdistance = fmax(0.0f,-distance);
   
-  const float insmask = native_recip(1.0f+native_exp2(100.0f*(-insdistance)))-0.5f ;
+  const float insmask = smoothstep(0.00f, 0.001f, insdistance);
 
-  const float npnx = rngfloat1((2654435789*1)^timeindex);
-  const float npny = rngfloat1((2654435789*2)^timeindex);
-  const float npnz = rngfloat1((2654435789*3)^timeindex);
-  const float4 npn = (float4){npnx,npny,npnz,0.0f};
+  if(insmask==0.0f)
+    return 0.0f;
 
-  const float4 noisepos       = (float4){5.0f*normpos.x+7.1f*normpos.y-3.2f*normpos.z*npnx,
-                                         5.0f*normpos.y-7.3f*normpos.z+3.5f*normpos.x*npny,
-                                         5.0f*normpos.z+7.7f*normpos.x-3.8f*normpos.y*npnz, 0.0f};
-  const float noiseval        = read_imagef(perlin, sampler, noisepos).x;
-
-  const float autoyolk1       = native_recip(1.0f+native_exp2(100.0f*(0.1f-insdistance)));
-  const float autoyolk2       = native_recip(1.0f+fabs(pown(25.0f*(insdistance-0.12f),3)));
-  const float autoyolk        = autoyolk1+autoyolk2;
+  const float4 noisepos       = (float4){normpos.x,normpos.y,normpos.z, 0.0f};
+  //const float noiseval        = read_imagef(perlin, sampler, noisepos).x;
+  const float noiseval        = fbm3(1, 250.0f*noisepos.xyz ,6);
   
-  const float autofluo = insmask * (AUTOBACKGROUND*(1.0f+0.3f*noiseval) + AUTOYOLK*autoyolk);
+
+  const float autoyolk       = 0.07f+0.8f*smoothstep(0.04f, 0.1f, insdistance)*(1-0.8f*smoothstep(0.1f, 0.15f, insdistance));
+  
+  const float autofluo = insmask * autoyolk * (0.3f+0.7f*noiseval);
 
   return autofluo;
 }

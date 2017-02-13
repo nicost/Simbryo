@@ -1,7 +1,25 @@
 package simbryo.util.geom;
 
+/**
+ * Geometry utils
+ *
+ * @author royer
+ */
 public class GeometryUtils
 {
+  /**
+   * Computes distance between two vectors stored in one contiguous array.
+   * 
+   * @param pDimension
+   *          vector dimension
+   * @param pPositions
+   *          array
+   * @param pIdu
+   *          first vector id
+   * @param pIdv
+   *          second vector id
+   * @return distance
+   */
   public static float computeDistance(int pDimension,
                                       float[] pPositions,
                                       int pIdu,
@@ -13,6 +31,20 @@ public class GeometryUtils
                                                     pIdv));
   }
 
+  /**
+   * Computes the squared distance between two vectors stored in one contiguous
+   * array.
+   * 
+   * @param pDimension
+   *          vector dimension
+   * @param pPositions
+   *          array
+   * @param pIdu
+   *          first vector id
+   * @param pIdv
+   *          second vector id
+   * @return distance
+   */
   public static float computeSquaredDistance(int pDimension,
                                              float[] pPositions,
                                              int pIdu,
@@ -33,6 +65,23 @@ public class GeometryUtils
     return lDistance;
   }
 
+  /**
+   * Detects bounding box collisions.
+   * 
+   * @param pDimension
+   *          vector dimensions
+   * @param pPositions
+   *          array of vectors
+   * @param pR1
+   *          first radius
+   * @param pR2
+   *          second radius
+   * @param pIdu
+   *          first vector id
+   * @param pIdv
+   *          second vector id
+   * @return true if bounding boxes collide
+   */
   public static boolean detectBoundingBoxCollision(int pDimension,
                                                    float[] pPositions,
                                                    float pR1,

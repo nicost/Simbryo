@@ -13,5 +13,6 @@ import simbryo.dynamics.tissue.cellprop.CellProperty;
 public abstract class OperatorBase<CP extends CellProperty> implements
                                   CellPropertyOperatorInterface<CP>
 {
+  private static final long serialVersionUID = 1L;
   // nothing yet
 }

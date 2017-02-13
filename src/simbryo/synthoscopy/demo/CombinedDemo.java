@@ -14,12 +14,11 @@ import clearcl.io.RawWriter;
 import clearcl.util.ElapsedTime;
 import clearcl.viewer.ClearCLImageViewer;
 import simbryo.dynamics.tissue.embryo.zoo.Drosophila;
-import simbryo.phantom.ClearCLPhantomRendererUtils;
 import simbryo.phantom.fluo.impl.drosophila.DrosophilaHistoneFluorescence;
+import simbryo.phantom.scatter.impl.drosophila.DrosophilaScatteringPhantom;
 import simbryo.synthoscopy.camera.impl.SCMOSCameraRenderer;
 import simbryo.synthoscopy.detection.impl.widefield.WideFieldDetectionOptics;
 import simbryo.synthoscopy.illumination.impl.lightsheet.LightSheetIllumination;
-import simbryo.util.serialization.SerializationUtilities;
 
 /**
  * Light sheet illumination demo
@@ -50,10 +49,10 @@ public class CombinedDemo
       int lPhantomHeight = lPhantomWidth;
       int lPhantomDepth = lPhantomWidth;
 
-      int lMaxCameraImageWidth = 4 * 512;
-      int lMaxCameraImageHeight = 4 * 512;
+      int lMaxCameraImageWidth = 2 * 512;
+      int lMaxCameraImageHeight = 2 * 512;
 
-      ElapsedTime.sStandardOutput = true;
+      // ElapsedTime.sStandardOutput = true;
 
       ClearCLBackendInterface lBestBackend =
                                            ClearCLBackends.getBestBackend();
@@ -64,38 +63,33 @@ public class CombinedDemo
           ClearCLContext lContext = lFastestGPUDevice.createContext())
       {
 
-        File lTempDirectory =
-                            new File(System.getProperty("java.io.tmpdir"));
-        File lCachedEmbryoDynamicsFile =
-                                       new File(lTempDirectory,
-                                                this.getClass()
-                                                    .getSimpleName());
         Drosophila lDrosophila =
-                               SerializationUtilities.loadFromFile(Drosophila.class,
-                                                                   lCachedEmbryoDynamicsFile);
+                               Drosophila.getDeveloppedEmbryo(14,
+                                                              lPhantomWidth,
+                                                              lPhantomHeight,
+                                                              lPhantomDepth,
+                                                              lFastestGPUDevice);
 
-        if (lDrosophila == null)
-        {
-          int[] lGridDimensions =
-                                ClearCLPhantomRendererUtils.getOptimalGridDimensions(lFastestGPUDevice,
-                                                                                     lPhantomWidth,
-                                                                                     lPhantomHeight,
-                                                                                     lPhantomDepth);
+        DrosophilaHistoneFluorescence lDrosophilaFluorescencePhantom =
+                                                                     new DrosophilaHistoneFluorescence(lContext,
+                                                                                                       lDrosophila,
+                                                                                                       lPhantomWidth,
+                                                                                                       lPhantomHeight,
+                                                                                                       lPhantomDepth);
 
-          lDrosophila = new Drosophila(16, lGridDimensions);
-          lDrosophila.simulationSteps(14000, 1);
-          SerializationUtilities.saveToFile(lDrosophila,
-                                            lCachedEmbryoDynamicsFile);
-        }
+        /*ClearCLImageViewer lFluoPhantomViewer = lDrosoFluo.openViewer();/**/
 
-        DrosophilaHistoneFluorescence lDrosoFluo =
-                                                 new DrosophilaHistoneFluorescence(lContext,
-                                                                                   lDrosophila,
-                                                                                   lPhantomWidth,
-                                                                                   lPhantomHeight,
-                                                                                   lPhantomDepth);
+        DrosophilaScatteringPhantom lDrosophilaScatteringPhantom =
+                                                                 new DrosophilaScatteringPhantom(lContext,
+                                                                                                 lDrosophila,
+                                                                                                 lDrosophilaFluorescencePhantom,
+                                                                                                 lPhantomWidth / 4,
+                                                                                                 lPhantomHeight / 4,
+                                                                                                 lPhantomDepth / 4);
 
-        /*ClearCLImageViewer lPhantomViewer = lDrosoFluo.openViewer();/**/
+        @SuppressWarnings("unused")
+        ClearCLImageViewer lScatterPhantomViewer =
+                                                 lDrosophilaScatteringPhantom.openViewer();/**/
 
         LightSheetIllumination lLightSheetIllumination =
                                                        new LightSheetIllumination(lContext,
@@ -124,35 +118,39 @@ public class CombinedDemo
                                                                          lMaxCameraImageHeight);
 
         // lSCMOSCameraRenderer.setROI(512, 3*512, 512, 2048-512);
-        lSCMOSCameraRenderer.setCenteredROI(800, 1600);
+        lSCMOSCameraRenderer.setCenteredROI(lMaxCameraImageWidth / 1,
+                                            lMaxCameraImageHeight / 1);
 
         ClearCLImageViewer lCameraImageViewer =
                                               lSCMOSCameraRenderer.openViewer();
 
-        lDrosoFluo.clear();
-        lDrosoFluo.render();
-        
+        lDrosophilaFluorescencePhantom.clear();
+        lDrosophilaFluorescencePhantom.render();
+
+        lDrosophilaScatteringPhantom.clear();
+        lDrosophilaScatteringPhantom.render();
+
         RawWriter lRawWriter = new RawWriter();
         lRawWriter.setOverwrite(true);
-        File lDesktopFolder =
-                            new File(System.getProperty("user.home")
-                                     + "/Desktop/data");
+        File lDesktopFolder = new File(System.getProperty("user.home")
+                                       + "/Desktop/data");
         lDesktopFolder.mkdirs();
 
         int i = 0;
-        float x = 0.35f, y = 0.5f, z = 0.35f, zl = 0.35f, h = 0.99f;
+        float x = 0.35f, y = 0.5f, z = 0.35f, zl = 0.35f, h = 0.3f;
         float alpha = 0, beta = 0, gamma = 0, theta = 2;
+        boolean lWriteFile = false;
 
         while (/*lPhantomViewer.isShowing()
                || /*lLightSheetViewer.isShowing()
                ||/**/ /*lDetectionViewer.isShowing()
                       ||/**/ lCameraImageViewer.isShowing())
         {
-          // z += 0.001f;
-          // if (z >= 0.355f)
-          // z = 0.345f;
+          y += 0.001f;
+          if (y >= 1f)
+            y = 0.0f;
 
-          z = 0.64f;
+          z = 0.5f;
           zl = z;
 
           // alpha += 0.1;
@@ -178,18 +176,18 @@ public class CombinedDemo
                                                                     gamma);
           lLightSheetIllumination.setLightSheetThetaInDeg(theta);
           lLightSheetIllumination.setZCenterOffset(z);
-          lLightSheetIllumination.setDefaultZDepth(lDrosoFluo.getPhantomImage());
+          lLightSheetIllumination.setDefaultZDepth(lDrosophilaFluorescencePhantom.getPhantomImage());
 
           lWideFieldDetectionOptics.setZFocusPosition(z);
-          lWideFieldDetectionOptics.setDefaultZDepth(lDrosoFluo.getPhantomImage(),
+          lWideFieldDetectionOptics.setDefaultZDepth(lDrosophilaFluorescencePhantom.getPhantomImage(),
                                                      lLightSheetIllumination.getLightMapImage());
 
           ElapsedTime.measure("renderlightsheet",
-                              () -> lLightSheetIllumination.render(lDrosoFluo.getPhantomImage()));
+                              () -> lLightSheetIllumination.render(lDrosophilaScatteringPhantom.getPhantomImage()));
 
           ElapsedTime.measure("renderdetection",
-                              () -> lWideFieldDetectionOptics.render(lDrosoFluo.getPhantomImage(),
-                                                                     lDrosoFluo.getPhantomImage(),
+                              () -> lWideFieldDetectionOptics.render(lDrosophilaFluorescencePhantom.getPhantomImage(),
+                                                                     lDrosophilaScatteringPhantom.getPhantomImage(),
                                                                      lLightSheetIllumination.getLightMapImage()));
 
           ElapsedTime.measure("rendercameraimage",
@@ -197,12 +195,13 @@ public class CombinedDemo
 
           Thread.sleep(1);
 
-          
-          File lRawFile = new File(lDesktopFolder,
-                                   String.format("file%d.raw", i));
-          lRawWriter.write(lSCMOSCameraRenderer.getImage(),
-                           lRawFile);
-         
+          if (lWriteFile)
+          {
+            File lRawFile = new File(lDesktopFolder,
+                                     String.format("file%d.raw", i));
+            lRawWriter.write(lSCMOSCameraRenderer.getImage(),
+                             lRawFile);
+          }
 
           i++;
         }
@@ -211,7 +210,8 @@ public class CombinedDemo
         lSCMOSCameraRenderer.close();
         lWideFieldDetectionOptics.close();
         lLightSheetIllumination.close();
-        lDrosoFluo.close();
+        lDrosophilaScatteringPhantom.close();
+        lDrosophilaFluorescencePhantom.close();
 
       }
     }

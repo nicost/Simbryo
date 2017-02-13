@@ -162,6 +162,7 @@ public abstract class ClearCLPhantomRendererBase extends
   public void close()
   {
     mImage.close();
+    mRenderKernel.close();
   }
 
 }
