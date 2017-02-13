@@ -2,6 +2,7 @@ package simbryo.phantom;
 
 import static java.lang.Math.floor;
 import static java.lang.Math.min;
+import static java.lang.Math.toIntExact;
 
 import clearcl.ClearCLDevice;
 
@@ -14,11 +15,34 @@ public abstract class ClearCLPhantomRendererUtils
 {
 
   /**
-   * Returns optimal grid dimensions for a given OpenCL device and stack dimensions.
+   * Returns optimal grid dimensions for a given OpenCL device and stack
+   * dimensions.
    *
    * 
-   * @param pDevice ClearCL device
-   * @param pStackDimensions stack dimensions
+   * @param pDevice
+   *          ClearCL device
+   * @param pStackDimensionsLong
+   *          stack dimensions
+   * @return array of grid dimensions
+   */
+  public static int[] getOptimalGridDimensions(ClearCLDevice pDevice,
+                                               long... pStackDimensionsLong)
+  {
+    int[] lStackDimensionsInteger = new int[pStackDimensionsLong.length];
+    for (int i = 0; i < lStackDimensionsInteger.length; i++)
+      lStackDimensionsInteger[i] = (int) toIntExact(pStackDimensionsLong[i]);
+    return getOptimalGridDimensions(pDevice, lStackDimensionsInteger);
+  }
+
+  /**
+   * Returns optimal grid dimensions for a given OpenCL device and stack
+   * dimensions.
+   *
+   * 
+   * @param pDevice
+   *          ClearCL device
+   * @param pStackDimensions
+   *          stack dimensions
    * @return array of grid dimensions
    */
   public static int[] getOptimalGridDimensions(ClearCLDevice pDevice,
@@ -28,9 +52,11 @@ public abstract class ClearCLPhantomRendererUtils
     int[] lGridDimensions = new int[lDimension];
 
     long lMaxWorkGroupSize = pDevice.getMaxWorkGroupSize();
-    
-    int lMaxGridDim = (int) floor(min(8,Math.pow(lMaxWorkGroupSize, 1.0/3)));
-    
+
+    int lMaxGridDim = (int) floor(min(8,
+                                      Math.pow(lMaxWorkGroupSize,
+                                               1.0 / 3)));
+
     for (int d = 0; d < lDimension; d++)
     {
       lGridDimensions[d] = pStackDimensions[d] / lMaxGridDim;

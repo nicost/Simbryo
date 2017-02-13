@@ -166,7 +166,7 @@ public class TissueDynamics extends ParticleSystem
       applyForceField(mCollisionForceField);
       intergrateEuler();
       enforceBounds(Db);
-      updateNeighborhoodCells();
+      updateNeighborhoodGrid();
       mTimeStepIndex++;
       mSequence.step(pDeltaTime);
     }

@@ -17,7 +17,7 @@ import simbryo.util.DoubleBufferingFloatArray;
 public class ParticleSystem implements ParticleSystemInterface
 {
   private static final long serialVersionUID = 1L;
-  
+
   private final int mDimension;
   private final int mMaxNumberOfParticles;
   private final int mMaxNumberOfParticlesPerGridCell;
@@ -47,29 +47,29 @@ public class ParticleSystem implements ParticleSystemInterface
                         float pMinRradius,
                         float pTypicalRadius)
   {
-    this(
-         32 + getOptimalMaxNumberOfParticlesPerGridCell(pDimension,
-                                                        pMaxNumberOfParticles,
-                                                        pMinRradius,
-                                                        pTypicalRadius),
+    this(32
+         + getOptimalMaxNumberOfParticlesPerGridCell(pDimension,
+                                                     pMaxNumberOfParticles,
+                                                     pMinRradius,
+                                                     pTypicalRadius),
          pMaxNumberOfParticles,
          getOptimalGridDimensions(pDimension,
-                            pMaxNumberOfParticles,
-                            pTypicalRadius));
+                                  pMaxNumberOfParticles,
+                                  pTypicalRadius));
   }
 
   private static int[] getOptimalGridDimensions(int pDimension,
-                                        int pMaxNumberOfParticles,
-                                        float pTypicalRadius)
+                                                int pMaxNumberOfParticles,
+                                                float pTypicalRadius)
   {
     int lOptimalGridSize =
                          (int) Math.max(4,
                                         1 / (2 * 2 * pTypicalRadius));
-    
+
     int[] lGridDimensions = new int[pDimension];
-    
-    for(int d=0; d<pDimension; d++)
-      lGridDimensions[d]=lOptimalGridSize;
+
+    for (int d = 0; d < pDimension; d++)
+      lGridDimensions[d] = lOptimalGridSize;
 
     return lGridDimensions;
   }
@@ -79,12 +79,13 @@ public class ParticleSystem implements ParticleSystemInterface
                                                                float pMinRradius,
                                                                float pTypicalRadius)
   {
-    int[] lOptimalGridDimensions = getOptimalGridDimensions(pDimension,
-                                              pMaxNumberOfParticles,
-                                              pTypicalRadius);
+    int[] lOptimalGridDimensions =
+                                 getOptimalGridDimensions(pDimension,
+                                                          pMaxNumberOfParticles,
+                                                          pTypicalRadius);
 
     int lVolume = 1;
-    for(int d=0; d<pDimension; d++)
+    for (int d = 0; d < pDimension; d++)
       lVolume *= lOptimalGridDimensions[d];
 
     float lCellVolume = 1.0f / lVolume;
@@ -99,12 +100,15 @@ public class ParticleSystem implements ParticleSystemInterface
   }
 
   /**
-   * Constructs a particle system with a given grid size,
-   * max number of particles and particles per cell.
+   * Constructs a particle system with a given grid size, max number of
+   * particles and particles per cell.
    * 
-   * @param pMaxNumberOfParticlesPerGridCell max number of particles per grid cell 
-   * @param pMaxNumberOfParticles max number of particles
-   * @param pGridDimensions grid dimensions
+   * @param pMaxNumberOfParticlesPerGridCell
+   *          max number of particles per grid cell
+   * @param pMaxNumberOfParticles
+   *          max number of particles
+   * @param pGridDimensions
+   *          grid dimensions
    */
   public ParticleSystem(int pMaxNumberOfParticlesPerGridCell,
                         int pMaxNumberOfParticles,
@@ -126,13 +130,11 @@ public class ParticleSystem implements ParticleSystemInterface
                                        pGridDimensions);
   }
 
-
   @Override
   public DoubleBufferingFloatArray getPositions()
   {
     return mPositions;
   }
-
 
   @Override
   public DoubleBufferingFloatArray getVelocities()
@@ -140,13 +142,11 @@ public class ParticleSystem implements ParticleSystemInterface
     return mVelocities;
   }
 
-
   @Override
   public DoubleBufferingFloatArray getRadii()
   {
     return mRadii;
   }
-
 
   @Override
   public NeighborhoodGrid getNeighborhoodGrid()
@@ -154,13 +154,11 @@ public class ParticleSystem implements ParticleSystemInterface
     return mNeighborhood;
   }
 
-
   @Override
   public int getNumberOfParticles()
   {
     return mNumberOfParticles;
   }
-
 
   @Override
   public int getMaxNumberOfParticles()
@@ -168,13 +166,11 @@ public class ParticleSystem implements ParticleSystemInterface
     return mMaxNumberOfParticles;
   }
 
-
   @Override
   public int getMaxNumberOfParticlesPerGridCell()
   {
     return mMaxNumberOfParticlesPerGridCell;
   }
-
 
   @Override
   public int getDimension()
@@ -182,20 +178,17 @@ public class ParticleSystem implements ParticleSystemInterface
     return mDimension;
   }
 
-
   @Override
   public int[] getGridDimensions()
   {
     return getNeighborhoodGrid().getGridDimensions();
   }
 
-
   @Override
   public float getRadius(int pParticleId)
   {
     return mRadii.getCurrentArray()[pParticleId];
   }
-
 
   @Override
   public int addParticle(float... pPosition)
@@ -220,7 +213,6 @@ public class ParticleSystem implements ParticleSystemInterface
     return lParticleId;
   }
 
-
   @Override
   public void removeParticle(int pParticleId)
   {
@@ -228,7 +220,6 @@ public class ParticleSystem implements ParticleSystemInterface
     copyParticle(lLastParticleId, pParticleId);
     mNumberOfParticles--;
   }
-
 
   @Override
   public void copyParticle(int pSourceParticleId,
@@ -254,7 +245,6 @@ public class ParticleSystem implements ParticleSystemInterface
     lRadii[pDestinationParticleId] = lRadii[pSourceParticleId];
   }
 
-
   @Override
   public int cloneParticle(int pSourceParticleId, float pNoiseFactor)
   {
@@ -265,7 +255,6 @@ public class ParticleSystem implements ParticleSystemInterface
     addNoiseToParticle(lNewParticleId, pNoiseFactor, 0, 0);
     return lNewParticleId;
   }
-
 
   @Override
   public void addNoiseToParticle(int pParticleId,
@@ -279,7 +268,7 @@ public class ParticleSystem implements ParticleSystemInterface
     final float[] lRadii = mRadii.getCurrentArray();
 
     ThreadLocalRandom lRandom = ThreadLocalRandom.current();
-    
+
     for (int d = 0; d < lDimension; d++)
     {
       float lPositionNoiseValue =
@@ -298,7 +287,6 @@ public class ParticleSystem implements ParticleSystemInterface
     lRadii[pParticleId] += lRadiusNoiseValue;
   }
 
-
   @Override
   public void setPosition(int pParticleId, float... pParticlePosition)
   {
@@ -309,7 +297,6 @@ public class ParticleSystem implements ParticleSystemInterface
       lPositions[i + d] = pParticlePosition[d];
     }
   }
-
 
   @Override
   public void setVelocity(int pParticleId, float... pVelocity)
@@ -322,7 +309,6 @@ public class ParticleSystem implements ParticleSystemInterface
     }
   }
 
-
   @Override
   public void setRadius(int pParticleId, float pRadius)
   {
@@ -330,18 +316,20 @@ public class ParticleSystem implements ParticleSystemInterface
     lRadii[pParticleId] = pRadius;
   }
 
-
   @Override
-  public void updateNeighborhoodCells()
+  public void updateNeighborhoodGrid()
   {
-    getNeighborhoodGrid().clear();
-    float[] lPositions = mPositions.getCurrentArray();
-    float[] lRadii = mRadii.getCurrentArray();
-    getNeighborhoodGrid().update(lPositions,
-                                 lRadii,
-                                 mNumberOfParticles);
+    updateNeighborhoodGrid(getNeighborhoodGrid());
   }
 
+  @Override
+  public void updateNeighborhoodGrid(NeighborhoodGrid pNeighborhoodGrid)
+  {
+    pNeighborhoodGrid.clear();
+    float[] lPositions = mPositions.getCurrentArray();
+    float[] lRadii = mRadii.getCurrentArray();
+    pNeighborhoodGrid.update(lPositions, lRadii, mNumberOfParticles);
+  }
 
   @Override
   public void repelAround(float pFactor,
@@ -374,13 +362,11 @@ public class ParticleSystem implements ParticleSystemInterface
 
   }
 
-
   @Override
   public void enforceBounds(float pDampening)
   {
     enforceBounds(pDampening, 1e-6f);
   }
-
 
   @Override
   public void enforceBounds(float pDampening, float pNoise)
@@ -393,7 +379,7 @@ public class ParticleSystem implements ParticleSystemInterface
     final float[] lRadiiRead = mRadii.getReadArray();
 
     ThreadLocalRandom lRandom = ThreadLocalRandom.current();
-    
+
     for (int id = 0; id < mNumberOfParticles; id++)
     {
       for (int d = 0; d < lDimension; d++)
@@ -427,7 +413,6 @@ public class ParticleSystem implements ParticleSystemInterface
     mVelocities.swap();
   }
 
-
   @Override
   public void addBrownianMotion(float pAmount)
   {
@@ -436,7 +421,7 @@ public class ParticleSystem implements ParticleSystemInterface
     final float[] lVelocitiesWrite = mVelocities.getWriteArray();
 
     ThreadLocalRandom lRandom = ThreadLocalRandom.current();
-    
+
     for (int id = 0; id < mNumberOfParticles; id++)
     {
       for (int d = 0; d < lDimension; d++)
@@ -452,13 +437,11 @@ public class ParticleSystem implements ParticleSystemInterface
     mVelocities.swap();
   }
 
-
   @Override
   public void applyForce(float... pForce)
   {
     applyForce(0, getNumberOfParticles(), pForce);
   }
-
 
   @Override
   public void applyForce(int pBeginId, int pEndId, float... pForce)
@@ -477,13 +460,11 @@ public class ParticleSystem implements ParticleSystemInterface
     mVelocities.swap();
   }
 
-
   @Override
   public void applyForceField(ForceFieldInterface pForceField)
   {
     applyForceField(pForceField, 0, getNumberOfParticles());
   }
-
 
   @Override
   public void applyForceField(ForceFieldInterface pForceField,
@@ -492,7 +473,6 @@ public class ParticleSystem implements ParticleSystemInterface
   {
     pForceField.applyForceField(0, getNumberOfParticles(), this);
   }
-
 
   @Override
   public void intergrateEuler()
@@ -513,7 +493,6 @@ public class ParticleSystem implements ParticleSystemInterface
     mPositions.swap();
 
   }
-
 
   @Override
   public void intergrateTrapezoidal()
@@ -539,7 +518,6 @@ public class ParticleSystem implements ParticleSystemInterface
 
   }
 
-
   @Override
   public int copyPositions(float[] pPositionsCopy)
   {
@@ -548,7 +526,6 @@ public class ParticleSystem implements ParticleSystemInterface
     return mNumberOfParticles;
   }
 
-
   @Override
   public int copyVelocities(float[] pVelocitiesCopy)
   {
@@ -556,7 +533,6 @@ public class ParticleSystem implements ParticleSystemInterface
                                    mNumberOfParticles * mDimension);
     return mNumberOfParticles;
   }
-
 
   @Override
   public int copyRadii(float[] pRadiiCopy)

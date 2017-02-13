@@ -47,7 +47,7 @@ public class Organoid extends EmbryoDynamics
       setTargetRadius(lId, getRadius(lId));
     }
 
-    updateNeighborhoodCells();
+    updateNeighborhoodGrid();
 
     mCentriForceField =
                       new CentriForceField(Fpetal, 0.5f, 0.5f, 0.5f);

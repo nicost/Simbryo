@@ -116,7 +116,8 @@ __kernel void hisrender(   __write_only    image3d_t  image,
       const float d      = fast_length(relvoxposac) + eccentricity; 
       const float noisyd = d + NUCLEIROUGHNESS*levelnoise;
       
-      const float level      =  native_recip(1.0f+native_exp2(NUCLEISHARPNESS*(noisyd-nucleiradiusvoxels)));
+      //const float level      =  native_recip(1.0f+native_exp2(NUCLEISHARPNESS*(noisyd-nucleiradiusvoxels)));
+      const float level      =  1.0f-smoothstep(nucleiradiusvoxels,nucleiradiusvoxels*(2.0f-NUCLEISHARPNESS), noisyd);
       const float noisylevel =  (1.0f+NUCLEITEXTURECONTRAST*levelnoise)*level;
        
       value += noisylevel;

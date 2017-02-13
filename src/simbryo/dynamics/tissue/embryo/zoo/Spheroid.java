@@ -51,7 +51,7 @@ public class Spheroid extends EmbryoDynamics
       setTargetRadius(lId, getRadius(lId));
     }
 
-    updateNeighborhoodCells();
+    updateNeighborhoodGrid();
 
     mForceField = new IsoSurfaceForceField(Fpetal, getSurface());
   }

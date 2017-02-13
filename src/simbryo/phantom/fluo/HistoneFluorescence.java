@@ -16,7 +16,9 @@ import coremem.util.Size;
 import simbryo.dynamics.tissue.TissueDynamics;
 import simbryo.dynamics.tissue.TissueDynamicsInterface;
 import simbryo.dynamics.tissue.cellprop.HasPolarity;
+import simbryo.particles.neighborhood.NeighborhoodGrid;
 import simbryo.phantom.ClearCLPhantomRendererBase;
+import simbryo.phantom.ClearCLPhantomRendererUtils;
 import simbryo.phantom.PhantomRendererInterface;
 import simbryo.textures.noise.FractalNoise;
 import simbryo.textures.noise.SimplexNoise;
@@ -42,6 +44,8 @@ public abstract class HistoneFluorescence extends
       mNucleiTextureContrast;
   private boolean mHasPolarity;
 
+  private NeighborhoodGrid mNeighborhoodGrid;
+
   /**
    * Instantiates a histone fluorescence renderer for a given OpenCL context,
    * tissue dynamics, and stack dimensions.
@@ -61,9 +65,10 @@ public abstract class HistoneFluorescence extends
   {
     this(pContext,
          pTissueDynamics,
+         16,
          0.004f,
-         10f,
-         0.8f,
+         0.95f,
+         0.5f,
          0.75f,
          1e-2f,
          pStackDimensions);
@@ -77,6 +82,10 @@ public abstract class HistoneFluorescence extends
    *          OpenCL context
    * @param pTissueDynamics
    *          tissue dynamics
+   * @param pMaxParticlesPerGridCell
+   *          max number of particles/nuclei/cells per work group. This depends
+   *          on the density of the cells and on the capabilities of the OpenCL
+   *          device.
    * @param pNucleiRadius
    *          nuclei radius
    * @param pNucleiSharpness
@@ -94,6 +103,7 @@ public abstract class HistoneFluorescence extends
    */
   public HistoneFluorescence(ClearCLContext pContext,
                              TissueDynamicsInterface pTissueDynamics,
+                             int pMaxParticlesPerGridCell,
                              float pNucleiRadius,
                              float pNucleiSharpness,
                              float pNucleiRoughness,
@@ -126,6 +136,13 @@ public abstract class HistoneFluorescence extends
     mRenderKernel.setArgument("polarities", mPolaritiesBuffer);
     mRenderKernel.setArgument("radii", mRadiiBuffer);
     mRenderKernel.setArgument("perlin", mPerlinNoiseImage);
+
+    int[] lGridDimensions =
+                          ClearCLPhantomRendererUtils.getOptimalGridDimensions(pContext.getDevice(),
+                                                                               pStackDimensions);
+
+    mNeighborhoodGrid = new NeighborhoodGrid(pMaxParticlesPerGridCell,
+                                             lGridDimensions);
 
   }
 
@@ -199,7 +216,7 @@ public abstract class HistoneFluorescence extends
     lProgram.addBuildOptionAllMathOpt();
     lProgram.buildAndLog();
     // System.out.println(lProgram.getSourceCode());
-    
+
     mRenderKernel = lProgram.createKernel("hisrender");
   }
 
@@ -214,8 +231,6 @@ public abstract class HistoneFluorescence extends
    *           thrown if source code canot be read.
    */
   public abstract void addAutoFluoFunctionSourceCode(ClearCLProgram pClearCLProgram) throws IOException;
-
-
 
   private void setupNoiseBuffers(ClearCLContext pContext) throws IOException
   {
@@ -247,10 +262,11 @@ public abstract class HistoneFluorescence extends
     final int lDimension = getTissue().getDimension();
     final int lNumberOfCells = getTissue().getMaxNumberOfParticles();
 
+    getTissue().updateNeighborhoodGrid(mNeighborhoodGrid);
+
     ElapsedTime.measure("data copy", () -> {
 
-      mNeighboorsMemory.copyFrom(getTissue().getNeighborhoodGrid()
-                                            .getArray());
+      mNeighboorsMemory.copyFrom(mNeighborhoodGrid.getArray());
 
       mPositionsMemory.copyFrom(getTissue().getPositions()
                                            .getCurrentArray(),
@@ -354,7 +370,8 @@ public abstract class HistoneFluorescence extends
   /**
    * Sets nuclei sharpness
    * 
-   * @param pNucleiSharpness nuclei sharpness
+   * @param pNucleiSharpness
+   *          nuclei sharpness
    */
   public void setNucleiSharpness(float pNucleiSharpness)
   {

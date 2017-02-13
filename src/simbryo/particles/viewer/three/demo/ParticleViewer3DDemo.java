@@ -68,7 +68,7 @@ public class ParticleViewer3DDemo
     // lParticleSystem.setRadius(1, 0.06f);
     // lParticleSystem.setPosition(1, 0.55f, 0.45f);
 
-    lParticleSystem.updateNeighborhoodCells();
+    lParticleSystem.updateNeighborhoodGrid();
 
     // System.out.println(Arrays.toString(lParticleSystem.getVelocities()));
 
@@ -90,7 +90,7 @@ public class ParticleViewer3DDemo
         lParticleSystem.applyForce(0f, cGravityForce, 0f);
       lParticleSystem.intergrateEuler();
       lParticleSystem.enforceBounds(cCollisionVelocityLoss);
-      lParticleSystem.updateNeighborhoodCells();
+      lParticleSystem.updateNeighborhoodGrid();
 
       /*float lMouseX = (float) (lParticleViewer3D.getMouseX());
       float lMouseY = (float) (lParticleViewer3D.getMouseY());/**/

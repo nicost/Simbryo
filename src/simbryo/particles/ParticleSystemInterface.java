@@ -172,10 +172,20 @@ public interface ParticleSystemInterface extends Serializable
   void setRadius(int pParticleId, float pRadius);
 
   /**
-   * Updates neighborhood cells. Important: make sure that the particles are
-   * entirely contained within [0,1]^d.
+   * Updates builtin default neighborhood grid. Important: make sure that the
+   * particles are entirely contained within [0,1]^d.
    */
-  void updateNeighborhoodCells();
+  void updateNeighborhoodGrid();
+
+  /**
+   * Updates neighborhood grid with particles in this particle system.
+   * Important: make sure that the particles are entirely contained within
+   * [0,1]^d.
+   * 
+   * @param pNeighborhoodGrid
+   *          neighborhood grid
+   */
+  public void updateNeighborhoodGrid(NeighborhoodGrid pNeighborhoodGrid);
 
   /**
    * Apply a centrifugal force around a point (X,Y)

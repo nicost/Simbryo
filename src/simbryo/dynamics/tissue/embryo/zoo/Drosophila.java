@@ -14,7 +14,6 @@ import simbryo.dynamics.tissue.embryo.EmbryoDynamics;
 import simbryo.particles.forcefield.ForceFieldInterface;
 import simbryo.particles.forcefield.external.impl.OneSidedIsoSurfaceForceField;
 import simbryo.particles.isosurf.impl.Ellipsoid;
-import simbryo.phantom.ClearCLPhantomRendererUtils;
 import simbryo.util.serialization.SerializationUtilities;
 
 /**
@@ -84,7 +83,7 @@ public class Drosophila extends EmbryoDynamics
       setTargetRadius(lId, getRadius(lId));
     }
 
-    updateNeighborhoodCells();
+    updateNeighborhoodGrid();
 
     mOutsideEllipseForceField =
                               new OneSidedIsoSurfaceForceField(true,
@@ -300,13 +299,8 @@ public class Drosophila extends EmbryoDynamics
 
     if (lDrosophila == null)
     {
-      int[] lGridDimensions =
-                            ClearCLPhantomRendererUtils.getOptimalGridDimensions(pGPUDevice,
-                                                                                 pPhantomWidth,
-                                                                                 pPhantomHeight,
-                                                                                 pPhantomDepth);
 
-      lDrosophila = new Drosophila(16, lGridDimensions);
+      lDrosophila = new Drosophila(64, 16, 16, 16);
       lDrosophila.simulationSteps((int) (pDivisionTime * 1000), 1);
       SerializationUtilities.saveToFile(lDrosophila,
                                         lCachedEmbryoDynamicsFile);

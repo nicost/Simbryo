@@ -32,7 +32,7 @@ public class ParticleSystemTests
     lParticleSystem.setRadius(0, 0.1f);
     lParticleSystem.setRadius(1, 0.1f);
 
-    lParticleSystem.updateNeighborhoodCells();
+    lParticleSystem.updateNeighborhoodGrid();
     
   }
 

@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 
+import org.apache.commons.lang.SerializationException;
 import org.apache.commons.lang.SerializationUtils;
 
 /**
@@ -42,7 +43,8 @@ public class SerializationUtilities
    * Retrieves embryo dynamics saved to a file. if the file does not exist this
    * method returns null.
    * 
-   * @param pClass class of object retrieved.
+   * @param pClass
+   *          class of object retrieved.
    * @param pFile
    *          file
    * @return embryo dynamics
@@ -50,7 +52,8 @@ public class SerializationUtilities
    *           thrown if problem occurs while reading file
    */
   @SuppressWarnings("unchecked")
-  public static <O extends Serializable> O loadFromFile(Class<O> pClass, File pFile) throws IOException
+  public static <O extends Serializable> O loadFromFile(Class<O> pClass,
+                                                        File pFile) throws IOException
   {
     if (!pFile.exists())
       return null;
@@ -58,6 +61,10 @@ public class SerializationUtilities
         FileInputStream lFileInputStream = new FileInputStream(pFile))
     {
       return ((O) SerializationUtils.deserialize(lFileInputStream));
+    }
+    catch (SerializationException e)
+    {
+      return null;
     }
     catch (FileNotFoundException e)
     {

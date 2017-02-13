@@ -91,7 +91,7 @@ public class Collider extends Application
         // lParticleSystem.setRadius(1, 0.06f);
         // lParticleSystem.setPosition(1, 0.55f, 0.45f);
 
-        lParticleSystem.updateNeighborhoodCells();
+        lParticleSystem.updateNeighborhoodGrid();
 
         // System.out.println(Arrays.toString(lParticleSystem.getVelocities()));
 
@@ -102,7 +102,7 @@ public class Collider extends Application
           lTimming.syncAtPeriod(1);
 
           // lParticleSystem.repelAround(lMouseX, lMouseY, 0.00001f);
-          lParticleSystem.updateNeighborhoodCells();
+          lParticleSystem.updateNeighborhoodGrid();
           lParticleSystem.applyForceField(lCollisionForceField);
           if (cGravityForce > 0)
             lParticleSystem.applyForce(0f, cGravityForce);
