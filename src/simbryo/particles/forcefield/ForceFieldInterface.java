@@ -33,8 +33,6 @@ public interface ForceFieldInterface extends Serializable
    * inclusive, end exclusive). the positions, velocities and radii of the
    * particles are provided as double buffered float arrays.
    * 
-   * @param pDimension
-   *          dimension
    * @param pBeginId
    *          particle id range beginning inclusive
    * @param pEndId

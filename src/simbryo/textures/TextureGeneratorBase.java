@@ -80,8 +80,8 @@ public abstract class TextureGeneratorBase implements
   /**
    * Return texture volume for given dimensions
    * 
-   * @param pDimensions
-   * @return
+   * @param pDimensions dimensions
+   * @return volume
    */
   protected int getVolume(int[] pDimensions)
   {

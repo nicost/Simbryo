@@ -26,6 +26,8 @@ public class EmbryoDynamicsTests
   {
     Drosophila lDrosophila = new Drosophila(64, 16, 16, 16);
 
+    int lNumberOfSteps = 7000;
+    
     lDrosophila.simulationSteps(7000, 1);
     
     File lTempFile = File.createTempFile("EmbryoDynamicsTests", "testSerialization");
@@ -36,7 +38,7 @@ public class EmbryoDynamicsTests
     
     Drosophila lDrosophilaLoaded = SerializationUtilities.loadFromFile(Drosophila.class, lTempFile);
     
-    assertTrue(lDrosophilaLoaded.getTimeStepIndex()==10000);
+    assertTrue(lDrosophilaLoaded.getTimeStepIndex()==lNumberOfSteps);
     
     // uncomment below to check visually:
     //ParticleViewer3D lOpen3dViewer = lDrosophilaLoaded.open3DViewer();
