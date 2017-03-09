@@ -1,19 +1,23 @@
 package simbryo.synthoscopy.camera;
 
+import javax.vecmath.Vector3f;
+
 import clearcl.ClearCLContext;
 import clearcl.ClearCLImage;
-import clearcl.enums.ImageChannelDataType;
-import simbryo.synthoscopy.ClearCLOpticsBase;
+import simbryo.synthoscopy.ClearCLSynthoscopyBase;
 
 /**
  * Camera model base class for camera models computation based on CLearCL
  *
  * @author royer
  */
-public class ClearCLCameraRendererBase extends ClearCLOpticsBase
-                                    implements
-                                    CameraRendererInterface<ClearCLImage>
+public class ClearCLCameraRendererBase extends ClearCLSynthoscopyBase
+                                       implements
+                                       CameraRendererInterface<ClearCLImage>
 {
+  protected ClearCLImage mDetectionImage;
+
+  protected Vector3f mDetectionDownUpVector = new Vector3f();
 
   /**
    * Instanciates a ClearCL powered detection optics base class given a ClearCL
@@ -21,40 +25,86 @@ public class ClearCLCameraRendererBase extends ClearCLOpticsBase
    * 
    * @param pContext
    *          ClearCL context
-   * @param pWavelengthInNormUnits
-   *          light's wavelength
-   * @param pLightIntensity
-   *          light's intesnity
    * @param pMaxCameraImageDimensions
    *          max camera image dimensions
    */
   public ClearCLCameraRendererBase(final ClearCLContext pContext,
-                                float pWavelengthInNormUnits,
-                                float pLightIntensity,
-                                long... pMaxCameraImageDimensions)
+                                   long... pMaxCameraImageDimensions)
   {
-    super(pContext,
-          pWavelengthInNormUnits,
-          pLightIntensity,
-          pMaxCameraImageDimensions);
+    super(pContext, pMaxCameraImageDimensions);
 
     mContext = pContext;
 
-    mImage =
-           mContext.createSingleChannelImage(ImageChannelDataType.Float,
-                                             pMaxCameraImageDimensions[0],
-                                             pMaxCameraImageDimensions[1]);
+  }
 
-    mImage.fillZero(true, false);
+  /**
+   * Sets detection image
+   * 
+   * @param pDetectionImage
+   *          detection image
+   */
+  public void setDetectionImage(ClearCLImage pDetectionImage)
+  {
+    if (mDetectionImage != pDetectionImage)
+    {
+      mDetectionImage = pDetectionImage;
+      mDetectionImage.addListener((q, m) -> requestUpdate());
+      requestUpdate();
+    }
+  }
+
+  /**
+   * Sets detection down-to-up vector. Inputs are automatically normalized. The
+   * down-to-up vector
+   * 
+   * @param pX
+   *          x coordinate
+   * @param pY
+   *          y coordinate
+   * @param pZ
+   *          z coordinate
+   */
+  public void setDetectionDownUpVector(float pX, float pY, float pZ)
+  {
+    mDetectionDownUpVector.x = pX;
+    mDetectionDownUpVector.y = pY;
+    mDetectionDownUpVector.z = pZ;
+
+    mDetectionDownUpVector.normalize();
+  }
+
+  /**
+   * Sets detection down-to-up vector. Inputs are automatically normalized.
+   * 
+   * @param pAxisVector
+   *          axis vector
+   * 
+   */
+  public void setDetectionDownUpVector(Vector3f pAxisVector)
+  {
+    mDetectionDownUpVector.x = pAxisVector.x;
+    mDetectionDownUpVector.y = pAxisVector.y;
+    mDetectionDownUpVector.z = pAxisVector.z;
+
+    mDetectionDownUpVector.normalize();
+  }
+
+  /**
+   * Returns detection down-to-up vector.
+   * 
+   * @return normal vector
+   */
+  public Vector3f getDetectionDownUpVector()
+  {
+    return mDetectionDownUpVector;
   }
 
   @Override
-  public ClearCLImage render(ClearCLImage pDetectionImage)
+  public void render(boolean pWaitToFinish)
   {
-    // not doing anything here, derived classes must actually cmpute something
-    // into mLightMapImage
+    // not doing anything here, derived classes must actually compute something
     mImage.notifyListenersOfChange(mContext.getDefaultQueue());
-    return mImage;
+    setUpdateNeeded(false);
   }
 
 }

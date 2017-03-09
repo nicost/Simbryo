@@ -292,7 +292,7 @@ public class Drosophila extends EmbryoDynamics
                         new File(System.getProperty("java.io.tmpdir"));
     File lCachedEmbryoDynamicsFile =
                                    new File(lTempDirectory,
-                                            Drosophila.class.getSimpleName());
+                                            Drosophila.class.getSimpleName()+pDivisionTime);
     Drosophila lDrosophila =
                            SerializationUtilities.loadFromFile(Drosophila.class,
                                                                lCachedEmbryoDynamicsFile);

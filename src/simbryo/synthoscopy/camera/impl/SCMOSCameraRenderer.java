@@ -37,26 +37,17 @@ public class SCMOSCameraRenderer extends ClearCLCameraRendererBase
    * 
    * @param pContext
    *          OpenCL context
-   * @param pWavelengthInNormUnits
-   *          lights' wavelength
-   * @param pLightIntensity
-   *          light's intensity
    * @param pMaxCameraImageDimensions
    *          max camera image dimensions in voxels
    * @throws IOException
    *           thrown if kernels cannot be read
    */
   public SCMOSCameraRenderer(ClearCLContext pContext,
-                             float pWavelengthInNormUnits,
-                             float pLightIntensity,
                              long... pMaxCameraImageDimensions) throws IOException
   {
-    super(pContext,
-          pWavelengthInNormUnits,
-          pLightIntensity,
-          pMaxCameraImageDimensions);
+    super(pContext, pMaxCameraImageDimensions);
 
-    setShotNoise(0.03f);
+    setShotNoise(0.02f);
     setOffset(97.0f);
     setGain(200.0f);
     setOffsetBias(1.0f);
@@ -93,7 +84,11 @@ public class SCMOSCameraRenderer extends ClearCLCameraRendererBase
    */
   public void setShotNoise(float pShotNoise)
   {
-    mShotNoise = pShotNoise;
+    if (mShotNoise != pShotNoise)
+    {
+      mShotNoise = pShotNoise;
+      requestUpdate();
+    }
   }
 
   /**
@@ -115,7 +110,11 @@ public class SCMOSCameraRenderer extends ClearCLCameraRendererBase
    */
   public void setOffset(float pOffset)
   {
-    mOffset = pOffset;
+    if (mOffset != pOffset)
+    {
+      mOffset = pOffset;
+      requestUpdate();
+    }
   }
 
   /**
@@ -137,7 +136,11 @@ public class SCMOSCameraRenderer extends ClearCLCameraRendererBase
    */
   public void setGain(float pGain)
   {
-    mGain = pGain;
+    if (mGain != pGain)
+    {
+      mGain = pGain;
+      requestUpdate();
+    }
   }
 
   /**
@@ -159,7 +162,11 @@ public class SCMOSCameraRenderer extends ClearCLCameraRendererBase
    */
   public void setOffsetNoise(float pOffsetNoise)
   {
-    mOffsetNoise = pOffsetNoise;
+    if (mOffsetNoise != pOffsetNoise)
+    {
+      mOffsetNoise = pOffsetNoise;
+      requestUpdate();
+    }
   }
 
   /**
@@ -182,7 +189,11 @@ public class SCMOSCameraRenderer extends ClearCLCameraRendererBase
    */
   public void setGainNoise(float pGainNoise)
   {
-    mGainNoise = pGainNoise;
+    if (mGainNoise != pGainNoise)
+    {
+      mGainNoise = pGainNoise;
+      requestUpdate();
+    }
   }
 
   /**
@@ -206,7 +217,11 @@ public class SCMOSCameraRenderer extends ClearCLCameraRendererBase
    */
   public void setOffsetBias(float pOffsetBias)
   {
-    mOffsetBias = pOffsetBias;
+    if (mOffsetBias != pOffsetBias)
+    {
+      mOffsetBias = pOffsetBias;
+      requestUpdate();
+    }
   }
 
   /**
@@ -230,7 +245,10 @@ public class SCMOSCameraRenderer extends ClearCLCameraRendererBase
    */
   public void setGainBias(float pGainBias)
   {
-    mGainBias = pGainBias;
+    if (mGainBias != pGainBias)
+    {
+      mGainBias = pGainBias;
+    }
   }
 
   /**
@@ -255,12 +273,19 @@ public class SCMOSCameraRenderer extends ClearCLCameraRendererBase
    */
   public void setROI(int pXMin, int pXMax, int pYMin, int pYMax)
   {
-    mXMin = pXMin;
-    mXMax = pXMax;
-    mYMin = pYMin;
-    mYMax = pYMax;
+    if (mXMin != pXMin || mXMax != pXMax
+        || mYMin != pYMin
+        || mYMax != pYMax)
+    {
 
-    ensureImagesAllocated();
+      mXMin = pXMin;
+      mXMax = pXMax;
+      mYMin = pYMin;
+      mYMax = pYMax;
+
+      ensureImagesAllocated();
+      requestUpdate();
+    }
   }
 
   /**
@@ -272,16 +297,15 @@ public class SCMOSCameraRenderer extends ClearCLCameraRendererBase
    * @param pHeight
    *          height of ROI
    */
+  
   public void setCenteredROI(int pWidth, int pHeight)
   {
     int lMarginX = (int) ((getMaxWidth() - pWidth) / 2);
     int lMarginY = (int) ((getMaxHeight() - pHeight) / 2);
-    mXMin = lMarginX;
-    mXMax = (int) (getMaxWidth() - lMarginX);
-    mYMin = lMarginY;
-    mYMax = (int) (getMaxHeight() - lMarginY);
-
-    ensureImagesAllocated();
+    setROI(lMarginX,
+           (int) (getMaxWidth() - lMarginX),
+           lMarginY,
+           (int) (getMaxHeight() - lMarginY));
   }
 
   @Override
@@ -346,15 +370,24 @@ public class SCMOSCameraRenderer extends ClearCLCameraRendererBase
   }
 
   @Override
-  public ClearCLImage render(ClearCLImage pDetectionImage)
+  public void render(boolean pWaitToFinish)
   {
+    if(!isUpdateNeeded())
+      return;
+    
     clearImages(false);
-    setInvariantKernelParameters(pDetectionImage);
-    upscale(pDetectionImage, mImageTemp, false);
-    noise(mImageTemp, mImage, true);
+    setInvariantKernelParameters(mDetectionImage);
+    upscale(mDetectionImage, mImageTemp, false);
+    noise(mImageTemp, mImage, pWaitToFinish);
     incrementTimeIndex();
 
-    return super.render(pDetectionImage);
+    super.render(pWaitToFinish);
+  }
+
+  private void clearImages(boolean pWaitToFinish)
+  {
+    mImageTemp.fill(0.0f, pWaitToFinish, false);
+    super.clear(false);
   }
 
   private void setInvariantKernelParameters(ClearCLImage pDetectionImage)
@@ -365,12 +398,6 @@ public class SCMOSCameraRenderer extends ClearCLCameraRendererBase
     mNoiseKernel.setGlobalOffsets(0, 0);
     mNoiseKernel.setGlobalSizes(getWidth(), getHeight());
 
-  }
-
-  private void clearImages(boolean pBlocking)
-  {
-    mImage.fill(0.0f, false, false);
-    mImageTemp.fill(0.0f, pBlocking, false);
   }
 
   private void upscale(ClearCLImage pImageInput,
