@@ -48,7 +48,6 @@ public class ClearCLCameraRendererBase extends ClearCLSynthoscopyBase
     if (mDetectionImage != pDetectionImage)
     {
       mDetectionImage = pDetectionImage;
-      mDetectionImage.addListener((q, m) -> requestUpdate());
       requestUpdate();
     }
   }
@@ -104,7 +103,7 @@ public class ClearCLCameraRendererBase extends ClearCLSynthoscopyBase
   {
     // not doing anything here, derived classes must actually compute something
     mImage.notifyListenersOfChange(mContext.getDefaultQueue());
-    setUpdateNeeded(false);
+    clearUpdate();
   }
 
 }

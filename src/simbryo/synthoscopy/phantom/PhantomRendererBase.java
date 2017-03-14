@@ -32,7 +32,6 @@ public abstract class PhantomRendererBase extends
 
   protected NeighborhoodGrid mNeighborhoodGrid;
 
-
   /**
    * Instantiates a Phantom renderer for a given OpenCL device, tissue dynamics,
    * and stack dimensions.
@@ -93,11 +92,10 @@ public abstract class PhantomRendererBase extends
   }
 
   @Override
-  public void setUpdateNeeded(boolean pUpdateNeeded)
+  public void requestUpdate()
   {
-    super.setUpdateNeeded(pUpdateNeeded);
-    if (pUpdateNeeded)
-      invalidateAll();
+    super.requestUpdate();
+    invalidateAll();
   }
 
   protected void invalidateAll()
@@ -203,8 +201,6 @@ public abstract class PhantomRendererBase extends
                                       getSignalIntensity());
     mRenderKernel.setOptionalArgument("timeindex",
                                       (int) getTissue().getTimeStepIndex());
-
-
 
     mRenderKernel.run(pWaitToFinish);
     for (int z = pZPlaneIndexBegin; z < pZPlaneIndexEnd; z++)

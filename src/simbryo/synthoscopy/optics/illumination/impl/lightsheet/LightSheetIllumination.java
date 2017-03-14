@@ -116,8 +116,6 @@ public class LightSheetIllumination extends IlluminationOpticsBase
   public void setInputImage(ClearCLImage pInputImage)
   {
     mInputImage = pInputImage;
-    if (mInputImage != null)
-      mInputImage.addListener((q, b) -> requestUpdate());
   }
 
   @Override
@@ -461,8 +459,6 @@ public class LightSheetIllumination extends IlluminationOpticsBase
     return mLightSheetNormalVector;
   }
 
- 
-
   /**
    * Sets the axis and normal lightsheet vectors from the three angles (alpha,
    * beta, gamma) in degrees. the alpha angle rotates along x, the beta angle
@@ -737,7 +733,6 @@ public class LightSheetIllumination extends IlluminationOpticsBase
                                            mLightSheetEffectiveNormalVector.y);
     mPropagateLightSheetKernel.setArgument("lsnz",
                                            mLightSheetEffectiveNormalVector.z);
-
 
     mPropagateLightSheetKernel.setArgument("lambda",
                                            getLightWavelength());

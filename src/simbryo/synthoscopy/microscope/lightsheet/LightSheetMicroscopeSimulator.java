@@ -148,7 +148,7 @@ public class LightSheetMicroscopeSimulator extends
 
   /**
    * Adds detection path. This includes widefield detection optics and a sCMOS
-   * camera
+   * camera. 
    * 
    * @param pDetectionTransformMatrix
    *          detection transform matrix
@@ -181,6 +181,9 @@ public class LightSheetMicroscopeSimulator extends
                                                                        pMaxCameraWidth,
                                                                        pMaxCameraHeight);
       lSCMOSCameraRenderer.setDetectionDownUpVector(pDownUpVector);
+      lWideFieldDetectionOptics.addUpdateListener(lSCMOSCameraRenderer);
+
+
 
       mCameraRendererList.add(lSCMOSCameraRenderer);
     }
@@ -188,6 +191,18 @@ public class LightSheetMicroscopeSimulator extends
     {
       throw new RuntimeException();
     }
+  }
+  
+  /**
+   * Must be called after all lightsheets and detection arms have been added.
+   */
+  public void buildMicroscope()
+  {
+    for (LightSheetIllumination lLightSheetIllumination : mLightSheetIlluminationList)
+      for (WideFieldDetectionOptics lWideFieldDetectionOptics : mWideFieldDetectionOpticsList)
+      {
+      lLightSheetIllumination.addUpdateListener(lWideFieldDetectionOptics);
+      }
   }
 
   /**
@@ -361,7 +376,6 @@ public class LightSheetMicroscopeSimulator extends
 
     lLightSheetIllumination.setScatteringPhantom(getPhantomParameter(PhantomParameter.Scattering));
 
-
     float lIntensity =
                      getNumberParameter(IlluminationParameter.Intensity,
                                         pLightSheetIndex).floatValue();
@@ -388,7 +402,6 @@ public class LightSheetMicroscopeSimulator extends
                                      pLightSheetIndex).floatValue();
     float theta = getNumberParameter(IlluminationParameter.Theta,
                                      pLightSheetIndex).floatValue();
-
 
     lLightSheetIllumination.setIntensity(lIntensity);
     lLightSheetIllumination.setLightWavelength(lWaveLength);
@@ -438,7 +451,6 @@ public class LightSheetMicroscopeSimulator extends
                    getNumberParameter(CameraParameter.ROIHeight,
                                       pDetectionPathIndex,
                                       lSCMOSCameraRenderer.getMaxHeight()).intValue();
-
 
     lWideFieldDetectionOptics.setFluorescencePhantomImage(lFluorescencePhantomImage);
     lWideFieldDetectionOptics.setScatteringPhantomImage(lScatteringPhantomImage);
@@ -556,7 +568,12 @@ public class LightSheetMicroscopeSimulator extends
 
       ElapsedTime.measure("rendercameraimage",
                           () -> lSCMOSCameraRenderer.render(pWaitToFinish));/**/
+      
+      lWideFieldDetectionOptics.clearUpdate();
+      lSCMOSCameraRenderer.clearUpdate();
     }
+    
+    
 
   }
 

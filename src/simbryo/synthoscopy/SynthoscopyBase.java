@@ -1,5 +1,7 @@
 package simbryo.synthoscopy;
 
+import java.util.concurrent.CopyOnWriteArraySet;
+
 /**
  * Synthoscopy base class providing common fields and methods fof synthoscopy
  * modules
@@ -9,13 +11,17 @@ package simbryo.synthoscopy;
  * @author royer
  */
 public abstract class SynthoscopyBase<I> implements
-                                     SynthoscopyInterface<I>
+                                     SynthoscopyInterface<I>,
+                                     SyntoscopyUpdatableInterface
 {
 
   private volatile float mIntensity = 1;
   private final long[] mImageDimensions;
 
   private volatile boolean mUpdateNeeded = true;
+
+  private CopyOnWriteArraySet<SyntoscopyUpdatableInterface> mUpdateListenerSet =
+                                                                                 new CopyOnWriteArraySet<>();
 
   /**
    * Instanciates a optics base class with basic optics related fields.
@@ -28,35 +34,39 @@ public abstract class SynthoscopyBase<I> implements
     mImageDimensions = pImageDimensions;
   }
 
-  /**
-   * Returns true if parameters have changed and an update is needed.
-   * 
-   * @return true if update needed
-   */
+  @Override
+  public void addUpdateListener(SyntoscopyUpdatableInterface pUpdateListener)
+  {
+    mUpdateListenerSet.add(pUpdateListener);
+  }
+
+  @Override
   public boolean isUpdateNeeded()
   {
     return mUpdateNeeded;
   }
 
-  /**
-   * Sets the 'update needed' flag
-   * 
-   * @param pUpdateNeeded
-   *          new flag state
-   */
-  public void setUpdateNeeded(boolean pUpdateNeeded)
+  @Override
+  public void requestUpdate()
+  {
+    setUpdateNeeded(true);
+    for (SyntoscopyUpdatableInterface lUpdateListener : mUpdateListenerSet)
+    {
+      lUpdateListener.requestUpdate();
+    }
+  }
+
+  @Override
+  public void clearUpdate()
+  {
+    setUpdateNeeded(false);
+  }
+
+  private void setUpdateNeeded(boolean pUpdateNeeded)
   {
     mUpdateNeeded = pUpdateNeeded;
   }
-
-  /**
-   * Requests update
-   */
-  public void requestUpdate()
-  {
-    mUpdateNeeded = true;
-  }
-
+  
   /**
    * Returns intensity
    * 
@@ -157,7 +167,7 @@ public abstract class SynthoscopyBase<I> implements
   @Override
   public void render(boolean pWaitToFinish)
   {
-    setUpdateNeeded(false);
+    clearUpdate();
   }
 
 }
