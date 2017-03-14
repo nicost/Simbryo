@@ -11,29 +11,28 @@ import javax.vecmath.Vector4f;
  */
 public class GeometryUtils
 {
-  
+
   public static void addTranslation(Matrix4f pMatrix,
                                     float pDeltaX,
                                     float pDeltaY,
                                     float pDeltaZ)
   {
-    pMatrix.m03+=pDeltaX;
-    pMatrix.m13+=pDeltaY;
-    pMatrix.m23+=pDeltaZ;
+    pMatrix.m03 += pDeltaX;
+    pMatrix.m13 += pDeltaY;
+    pMatrix.m23 += pDeltaZ;
   }
 
-  
   public static Matrix4f multiply(Matrix4f... pMatrices)
   {
     Matrix4f lMatrix = new Matrix4f();
     lMatrix.setIdentity();
-    
-    for(int i=0; i<pMatrices.length; i++)
+
+    for (int i = 0; i < pMatrices.length; i++)
     {
       Matrix4f lMatrixToMultiply = pMatrices[i];
       lMatrix.mul(lMatrixToMultiply);
     }
-        
+
     return lMatrix;
   }
 
@@ -59,7 +58,7 @@ public class GeometryUtils
     lMatrixWithoutTranslation.setTranslation(new Vector3f(0f,
                                                           0f,
                                                           0f));
-    return pointMultiplication(lMatrixWithoutTranslation,pVector);
+    return pointMultiplication(lMatrixWithoutTranslation, pVector);
   }
 
   public static float homogenousDot(Vector4f pVectorA,
@@ -123,11 +122,15 @@ public class GeometryUtils
     Matrix4f lTranslationMatrix = new Matrix4f();
     lTranslationMatrix.setIdentity();
     lTranslationMatrix.setTranslation(pRotationCenter);
-    
-    Matrix4f lTranslationMatrixInverse = new Matrix4f(lTranslationMatrix);
+
+    Matrix4f lTranslationMatrixInverse =
+                                       new Matrix4f(lTranslationMatrix);
     lTranslationMatrixInverse.invert();
 
-    Matrix4f lRotationMatrixAroundCenter = multiply(lTranslationMatrix,pRotationMatrix,lTranslationMatrixInverse);
+    Matrix4f lRotationMatrixAroundCenter =
+                                         multiply(lTranslationMatrix,
+                                                  pRotationMatrix,
+                                                  lTranslationMatrixInverse);
 
     return lRotationMatrixAroundCenter;
   }
@@ -230,8 +233,5 @@ public class GeometryUtils
 
     return true;
   }
-
-
-
 
 }

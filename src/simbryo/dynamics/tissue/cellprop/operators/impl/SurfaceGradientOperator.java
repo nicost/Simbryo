@@ -39,33 +39,33 @@ public class SurfaceGradientOperator extends
       throw new IllegalArgumentException("tissue dynamics should implement "
                                          + HasSurface.class.getSimpleName()
                                          + " interface");
-    
-    HasSurface lHasSurface = (HasSurface)pTissueDynamics;
+
+    HasSurface lHasSurface = (HasSurface) pTissueDynamics;
     IsoSurfaceInterface lSurface = lHasSurface.getSurface();
 
     final int lDimension = pTissueDynamics.getDimension();
     final VectorCellProperty lVectorCellProperty =
                                                  pVectorCellProperty[0];
-    float[] lPropertyArray = lVectorCellProperty.getArray().getCurrentArray();
+    float[] lPropertyArray = lVectorCellProperty.getArray()
+                                                .getCurrentArray();
 
-    
-    final float[] lPositions =
-        pTissueDynamics.getPositions().getCurrentArray();
+    final float[] lPositions = pTissueDynamics.getPositions()
+                                              .getCurrentArray();
 
     for (int idu = pBeginId; idu < pEndId; idu++)
     {
-      int lIndex = lDimension*idu;
+      int lIndex = lDimension * idu;
       lSurface.clear();
-      for(int d=0; d<lDimension; d++)
+      for (int d = 0; d < lDimension; d++)
       {
-        float lValue = lPositions[lIndex+d];
+        float lValue = lPositions[lIndex + d];
         lSurface.addCoordinate(lValue);
       }
-      
-      for(int d=0; d<lDimension; d++)
+
+      for (int d = 0; d < lDimension; d++)
       {
         float lValue = lSurface.getNormalizedGardient(d);
-        lPropertyArray[lIndex+d] = lValue;
+        lPropertyArray[lIndex + d] = lValue;
       }
     }
   }

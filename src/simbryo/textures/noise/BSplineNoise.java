@@ -34,7 +34,9 @@ public class BSplineNoise extends TextureGeneratorBase
 
   /**
    * Instanciates a B-Spline nosie object
-   * @param pDimension dimension
+   * 
+   * @param pDimension
+   *          dimension
    */
   public BSplineNoise(int pDimension)
   {
@@ -69,19 +71,20 @@ public class BSplineNoise extends TextureGeneratorBase
     }
     else if (getDimension() == 3)
     {
-      float lValue = (float) (cubic(pCoordinate[0]
-                                    * mCorrectionScale
+      float lValue =
+                   (float) (cubic(pCoordinate[0]
+                                  * mCorrectionScale
+                                  * getScale(0),
+                                  pCoordinate[1] * mCorrectionScale
+                                                 * getScale(1))
+                            + cubic(pCoordinate[1] * mCorrectionScale
+                                    * getScale(1),
+                                    pCoordinate[2] * mCorrectionScale
+                                                   * getScale(2))
+                            + cubic(pCoordinate[2] * mCorrectionScale
                                     * getScale(0),
-                                    pCoordinate[1] * mCorrectionScale
-                                                   * getScale(1))
-                              + cubic(pCoordinate[1] * mCorrectionScale
-                                      * getScale(1),
-                                      pCoordinate[2] * mCorrectionScale
-                                                     * getScale(2))
-                              + cubic(pCoordinate[2] * mCorrectionScale
-                                      * getScale(0),
-                                      pCoordinate[0] * mCorrectionScale
-                                                     * getScale(3)));
+                                    pCoordinate[0] * mCorrectionScale
+                                                   * getScale(3)));
       return lValue;
     }
 

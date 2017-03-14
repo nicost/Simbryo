@@ -2,8 +2,7 @@ package simbryo.synthoscopy.phantom.fluo.impl.drosophila.demo;
 
 import java.io.IOException;
 import java.util.Arrays;
-
-import org.junit.Test;
+import javafx.scene.control.Slider;
 
 import clearcl.ClearCL;
 import clearcl.ClearCLContext;
@@ -12,7 +11,9 @@ import clearcl.backend.ClearCLBackendInterface;
 import clearcl.backend.ClearCLBackends;
 import clearcl.util.ElapsedTime;
 import clearcl.viewer.ClearCLImageViewer;
-import javafx.scene.control.Slider;
+
+import org.junit.Test;
+
 import simbryo.dynamics.tissue.embryo.zoo.Drosophila;
 import simbryo.synthoscopy.phantom.fluo.impl.drosophila.DrosophilaHistoneFluorescence;
 import simbryo.util.timing.Timming;

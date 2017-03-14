@@ -1,13 +1,13 @@
 package simbryo.synthoscopy.microscope.lightsheet.demo.jfx;
 
 import java.util.concurrent.CountDownLatch;
-
-import com.sun.javafx.application.PlatformImpl;
-
 import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.control.Slider;
 import javafx.stage.Stage;
+
+import com.sun.javafx.application.PlatformImpl;
+
 import simbryo.synthoscopy.microscope.lightsheet.LightSheetMicroscopeSimulator;
 
 /**

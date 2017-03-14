@@ -18,7 +18,8 @@ public abstract class InteractionForceFieldBase extends ForceFieldBase
   /**
    * Constructs an interaction force field of given force intensity.
    * 
-   * @param pForceIntensity force intensity
+   * @param pForceIntensity
+   *          force intensity
    */
   public InteractionForceFieldBase(float pForceIntensity)
   {

@@ -8,7 +8,7 @@ public class GeometryUtilsTests
   @Test
   public void test()
   {
-    
+
   }
 
 }

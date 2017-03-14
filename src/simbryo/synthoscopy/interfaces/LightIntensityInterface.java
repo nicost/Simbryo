@@ -7,7 +7,7 @@ package simbryo.synthoscopy.interfaces;
  */
 public interface LightIntensityInterface
 {
-  
+
   /**
    * Return light intensity
    * 
@@ -21,6 +21,5 @@ public interface LightIntensityInterface
    * @param pLightIntensity
    */
   void setIntensity(float pLightIntensity);
-
 
 }

@@ -37,10 +37,7 @@ public class DrosophilaScatteringPhantom extends ScatteringPhantom
                                      DrosophilaHistoneFluorescence pDrosophilaHistoneFluorescence,
                                      long... pStackDimensions) throws IOException
   {
-    super(pContext,
-          16,
-          pDrosophila,
-          pStackDimensions);
+    super(pContext, 16, pDrosophila, pStackDimensions);
     setNoiseOverSignalRatio(0.1f);
     setSignalIntensity(0.9f);
 

@@ -53,10 +53,14 @@ public class TissueDynamics extends ParticleSystem
    * max number of particle per neighborhood cell, collision force between
    * particles, and drag.
    * 
-   * @param pCollisionForce collision force
-   * @param pDrag drag coeficient
-   * @param pMaxNumberOfParticlesPerGridCell max number of particles per grid cell
-   * @param pGridDimensions grid dimensions
+   * @param pCollisionForce
+   *          collision force
+   * @param pDrag
+   *          drag coeficient
+   * @param pMaxNumberOfParticlesPerGridCell
+   *          max number of particles per grid cell
+   * @param pGridDimensions
+   *          grid dimensions
    */
   public TissueDynamics(float pCollisionForce,
                         float pDrag,
@@ -225,7 +229,8 @@ public class TissueDynamics extends ParticleSystem
   }
 
   /**
-   * Applies a single simulation step for an operator and a set of cell properties.
+   * Applies a single simulation step for an operator and a set of cell
+   * properties.
    * 
    * @param pOperator
    *          operator
@@ -240,8 +245,8 @@ public class TissueDynamics extends ParticleSystem
   }
 
   /**
-   * Applies a single simulation step for an operator and a set of cell properties
-   * for a given range of cell ids.
+   * Applies a single simulation step for an operator and a set of cell
+   * properties for a given range of cell ids.
    * 
    * @param pBeginId
    *          begin id

@@ -272,7 +272,8 @@ public class WideFieldDetectionOptics extends DetectionOpticsBase
                                     getSmoothDefocusTransitionPoint(),
                                     lDefocusDepthInNormCoordinates);/**/
 
-      //System.out.format("defocus=%f, sigma=%f, z1=%f, z2=%f\n", lDefocusDepthInNormCoordinates, lSigma, lFocusZ1, lFocusZ2);
+      // System.out.format("defocus=%f, sigma=%f, z1=%f, z2=%f\n",
+      // lDefocusDepthInNormCoordinates, lSigma, lFocusZ1, lFocusZ2);
 
       if (inRange(lFocusZ1, 0, 1) && inRange(lFocusZ2, 0, 1))
         collectPair(lImageA, lImageB, lFocusZ1, lFocusZ2, false);
@@ -389,7 +390,7 @@ public class WideFieldDetectionOptics extends DetectionOpticsBase
                            float pFocusZ2,
                            boolean pWaitToFinish)
   {
-    //System.out.println("collectPair");
+    // System.out.println("collectPair");
     mCollectPairKernel.setArgument("imagein", pImageInput);
     mCollectPairKernel.setArgument("imageout", pImageOutput);
     mCollectPairKernel.setArgument("z1", pFocusZ1);
@@ -405,7 +406,7 @@ public class WideFieldDetectionOptics extends DetectionOpticsBase
                              float pFocusZ,
                              boolean pWaitToFinish)
   {
-    //System.out.println("collectSingle");
+    // System.out.println("collectSingle");
     mCollectSingleKernel.setArgument("imagein", pImageInput);
     mCollectSingleKernel.setArgument("imageout", pImageOutput);
     mCollectSingleKernel.setArgument("z", pFocusZ);
@@ -415,13 +416,12 @@ public class WideFieldDetectionOptics extends DetectionOpticsBase
     // pImageOutput.notifyListenersOfChange(mContext.getDefaultQueue());
   }
 
-
   private void defocusBlur(ClearCLImage pImageInput,
                            ClearCLImage pImageOutput,
                            float pSigma,
                            boolean pWaitToFinish)
   {
-    //System.out.println("defocusBlur");
+    // System.out.println("defocusBlur");
     mDefocusBlurKernel.setArgument("imagein", pImageInput);
     mDefocusBlurKernel.setArgument("imageout", pImageOutput);
     mDefocusBlurKernel.setArgument("sigma", pSigma);

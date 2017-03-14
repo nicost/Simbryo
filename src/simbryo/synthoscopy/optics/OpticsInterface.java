@@ -16,7 +16,7 @@ public interface OpticsInterface
    * @return 4x4 transform matrix (homogenous coordinates)
    */
   Matrix4f getPhantomTransformMatrix();
-  
+
   /**
    * Gets the inverse transform matrix used for accessing phantoms.
    * 

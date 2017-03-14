@@ -2,7 +2,6 @@ package simbryo.synthoscopy.microscope.lightsheet.demo.jfx;
 
 import java.util.Arrays;
 import java.util.Collection;
-
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
@@ -13,6 +12,7 @@ import javafx.scene.control.TabPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
+
 import simbryo.synthoscopy.microscope.lightsheet.LightSheetMicroscopeSimulator;
 import simbryo.synthoscopy.microscope.parameters.CameraParameter;
 import simbryo.synthoscopy.microscope.parameters.DetectionParameter;
@@ -38,7 +38,7 @@ public class LightSheetMicroscopeSimulatorPanel extends TabPane
   public LightSheetMicroscopeSimulatorPanel(LightSheetMicroscopeSimulator pSimulator)
   {
     super();
-    
+
     setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
 
     int lNumberOfLightSheets = pSimulator.getNumberOfLightSheets();
@@ -141,7 +141,7 @@ public class LightSheetMicroscopeSimulatorPanel extends TabPane
     lSlider.setBlockIncrement((lMaxValue - lMinValue) / 1000);
     lSlider.setMajorTickUnit((lMaxValue - lMinValue) / 10);
     lSlider.setMinorTickCount(10);
-    //lSlider.setSnapToTicks(true);
+    // lSlider.setSnapToTicks(true);
     lSlider.setMaxWidth(Double.MAX_VALUE);
     lSlider.setOrientation(Orientation.HORIZONTAL);
     GridPane.setHgrow(lSlider, Priority.ALWAYS);

@@ -21,7 +21,7 @@ public abstract class SynthoscopyBase<I> implements
   private volatile boolean mUpdateNeeded = true;
 
   private CopyOnWriteArraySet<SyntoscopyUpdatableInterface> mUpdateListenerSet =
-                                                                                 new CopyOnWriteArraySet<>();
+                                                                               new CopyOnWriteArraySet<>();
 
   /**
    * Instanciates a optics base class with basic optics related fields.
@@ -66,7 +66,7 @@ public abstract class SynthoscopyBase<I> implements
   {
     mUpdateNeeded = pUpdateNeeded;
   }
-  
+
   /**
    * Returns intensity
    * 

@@ -148,7 +148,7 @@ public class LightSheetMicroscopeSimulator extends
 
   /**
    * Adds detection path. This includes widefield detection optics and a sCMOS
-   * camera. 
+   * camera.
    * 
    * @param pDetectionTransformMatrix
    *          detection transform matrix
@@ -183,8 +183,6 @@ public class LightSheetMicroscopeSimulator extends
       lSCMOSCameraRenderer.setDetectionDownUpVector(pDownUpVector);
       lWideFieldDetectionOptics.addUpdateListener(lSCMOSCameraRenderer);
 
-
-
       mCameraRendererList.add(lSCMOSCameraRenderer);
     }
     catch (IOException e)
@@ -192,7 +190,7 @@ public class LightSheetMicroscopeSimulator extends
       throw new RuntimeException();
     }
   }
-  
+
   /**
    * Must be called after all lightsheets and detection arms have been added.
    */
@@ -201,7 +199,7 @@ public class LightSheetMicroscopeSimulator extends
     for (LightSheetIllumination lLightSheetIllumination : mLightSheetIlluminationList)
       for (WideFieldDetectionOptics lWideFieldDetectionOptics : mWideFieldDetectionOpticsList)
       {
-      lLightSheetIllumination.addUpdateListener(lWideFieldDetectionOptics);
+        lLightSheetIllumination.addUpdateListener(lWideFieldDetectionOptics);
       }
   }
 
@@ -568,12 +566,10 @@ public class LightSheetMicroscopeSimulator extends
 
       ElapsedTime.measure("rendercameraimage",
                           () -> lSCMOSCameraRenderer.render(pWaitToFinish));/**/
-      
+
       lWideFieldDetectionOptics.clearUpdate();
       lSCMOSCameraRenderer.clearUpdate();
     }
-    
-    
 
   }
 

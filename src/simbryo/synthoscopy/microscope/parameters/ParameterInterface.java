@@ -16,14 +16,14 @@ public interface ParameterInterface<T>
    * @return default value
    */
   T getDefaultValue();
-  
+
   /**
    * Returns the parameter default value
    * 
    * @return default value
    */
   T getMinValue();
-  
+
   /**
    * Returns the parameter default value
    * 

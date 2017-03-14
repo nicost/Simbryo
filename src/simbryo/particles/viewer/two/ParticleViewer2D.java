@@ -1,9 +1,10 @@
 package simbryo.particles.viewer.two;
 
-import clearcl.viewer.jfx.PanZoomScene;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+
+import clearcl.viewer.jfx.PanZoomScene;
 import simbryo.particles.ParticleSystem;
 import simbryo.particles.viewer.ParticleViewerInterface;
 import simbryo.util.jfx.JavaFXUtil;
@@ -173,7 +174,9 @@ public class ParticleViewer2D extends Stage
 
   /**
    * Sets the display grid flag
-   * @param pDisplayGrid true -> grid displayed, false otherwise
+   * 
+   * @param pDisplayGrid
+   *          true -> grid displayed, false otherwise
    */
   public void setDisplayGrid(boolean pDisplayGrid)
   {
@@ -182,13 +185,14 @@ public class ParticleViewer2D extends Stage
 
   /**
    * Sets the display elapsed time flag
-   * @param pDisplayElapsedTime true -> elapsed time displayed, false otherwise
+   * 
+   * @param pDisplayElapsedTime
+   *          true -> elapsed time displayed, false otherwise
    */
   public void setDisplayElapsedTime(boolean pDisplayElapsedTime)
   {
     mViewParticles2D.setDisplayElapsedTime(pDisplayElapsedTime);
   }
-
 
   @Override
   public void setDisplayRadius(boolean pDisplayRadius)

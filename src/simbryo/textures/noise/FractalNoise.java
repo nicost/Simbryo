@@ -15,10 +15,7 @@ public class FractalNoise extends TextureGeneratorBase
   private TextureGeneratorInterface mTextureGenerator;
   private float[] mFractalScales;
 
-  
   private TextureGeneratorInterface[] mTextureGenerators;
-
-
 
   /**
    * 
@@ -46,7 +43,9 @@ public class FractalNoise extends TextureGeneratorBase
       mTextureGenerators[i] = mTextureGenerator.clone();
     for (int i = 0; i < mFractalScales.length; i++)
       for (int d = 0; d < getDimension(); d++)
-        mTextureGenerators[i].setScale(d, getScale(d) * mFractalScales[i]);
+        mTextureGenerators[i].setScale(d,
+                                       getScale(d)
+                                          * mFractalScales[i]);
   }
 
   @Override
@@ -61,7 +60,6 @@ public class FractalNoise extends TextureGeneratorBase
     super.setAllScales(pScale);
     reset();
   }
-
 
   @Override
   public float sampleTexture(int... pCoordinate)

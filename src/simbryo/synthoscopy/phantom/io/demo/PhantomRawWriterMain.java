@@ -67,9 +67,9 @@ public class PhantomRawWriterMain
 
       final int[] lGridDimensions =
                                   PhantomRendererUtils.getOptimalGridDimensions(lFastestGPUDevice,
-                                                                                       lWidth,
-                                                                                       lHeight,
-                                                                                       lDepth);
+                                                                                lWidth,
+                                                                                lHeight,
+                                                                                lDepth);
 
       final Drosophila lDrosophila = new Drosophila(16,
                                                     lGridDimensions);

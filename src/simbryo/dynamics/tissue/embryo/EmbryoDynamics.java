@@ -58,6 +58,4 @@ public class EmbryoDynamics extends TissueDynamics implements
     mEmbryoSurface = pEmbryoSurface;
   }
 
-
-
 }

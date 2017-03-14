@@ -21,7 +21,8 @@ public class CentriForceField extends ExternalForceFieldBase
    * center. if the the force intensity is positive then it is a centripetal
    * force, otherwise it is a centrifugal force.
    * 
-   * @param pForceIntensity force intensity
+   * @param pForceIntensity
+   *          force intensity
    * @param pCenter
    *          force field center
    */

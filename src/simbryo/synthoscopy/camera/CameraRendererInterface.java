@@ -15,5 +15,4 @@ public interface CameraRendererInterface<I> extends
                                         ImageWidthHeightInterface
 {
 
-
 }

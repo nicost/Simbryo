@@ -14,7 +14,8 @@ public class Timming implements Serializable
   /**
    * Syncs at given period. the number of nanoseconds exceeded is returned.
    * 
-   * @param pPeriodInMilliseconds period in milliseconds
+   * @param pPeriodInMilliseconds
+   *          period in milliseconds
    * @return number of milliseconds that the period exceeded.
    */
   public long syncAtPeriod(double pPeriodInMilliseconds)
@@ -39,6 +40,7 @@ public class Timming implements Serializable
 
     mLastTime = System.nanoTime();
 
-    return (long) (lDeadline == 0 ? 0 : (mLastTime - lDeadline)*1e-6);
+    return (long) (lDeadline == 0 ? 0
+                                  : (mLastTime - lDeadline) * 1e-6);
   }
 }

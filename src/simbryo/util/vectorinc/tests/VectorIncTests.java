@@ -5,7 +5,6 @@ import static org.junit.Assert.assertEquals;
 import java.util.Arrays;
 
 import org.junit.Test;
-
 import simbryo.util.vectorinc.VectorInc;
 
 /**

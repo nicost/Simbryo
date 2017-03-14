@@ -10,8 +10,8 @@ import simbryo.synthoscopy.SynthoscopyInterface;
  *          images
  * @author royer
  */
-public interface DetectionOpticsInterface<I> extends SynthoscopyInterface<I>
+public interface DetectionOpticsInterface<I> extends
+                                         SynthoscopyInterface<I>
 {
-
 
 }

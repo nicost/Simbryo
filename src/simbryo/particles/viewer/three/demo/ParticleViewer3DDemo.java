@@ -17,7 +17,9 @@ public class ParticleViewer3DDemo
 
   private int cNumberOfParticles = 2000;
   private float cInitialVelocity = 0.0001f;
-  private float cParticlesRadius = (float) (0.25 / Math.pow(cNumberOfParticles, 0.33f));
+  private float cParticlesRadius = (float) (0.25
+                                            / Math.pow(cNumberOfParticles,
+                                                       0.33f));
   private float cParticlesMinRadius = 0.01f;
   private float cDragCoefficient = 0.99f;
   private float cCollisionVelocityLoss = 0.9f;
@@ -39,11 +41,12 @@ public class ParticleViewer3DDemo
                                                                      cDragCoefficient,
                                                                      true);
 
-    ParticleSystem lParticleSystem = new ParticleSystem(3,
-                                                        cNumberOfParticles,
-                                                        cParticlesMinRadius,
-                                                        cParticlesMinRadius + 0.5f
-                                                             * cParticlesRadius);
+    ParticleSystem lParticleSystem =
+                                   new ParticleSystem(3,
+                                                      cNumberOfParticles,
+                                                      cParticlesMinRadius,
+                                                      cParticlesMinRadius + 0.5f
+                                                                            * cParticlesRadius);
 
     for (int i = 0; i < cNumberOfParticles; i++)
     {
@@ -60,7 +63,8 @@ public class ParticleViewer3DDemo
                                   (float) (cInitialVelocity
                                            * (Math.random() - 0.5f)));
       lParticleSystem.setRadius(lId,
-                                (float) (cParticlesMinRadius + (cParticlesRadius)
+                                (float) (cParticlesMinRadius
+                                         + (cParticlesRadius)
                                          + 0.01 * Math.random())); //
     }
 

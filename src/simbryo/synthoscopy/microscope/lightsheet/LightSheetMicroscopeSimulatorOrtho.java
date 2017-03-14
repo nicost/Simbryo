@@ -96,9 +96,9 @@ public class LightSheetMicroscopeSimulatorOrtho extends
                        lMaxCameraImageWidth,
                        lMaxCameraImageHeight);
     }
-    
+
     buildMicroscope();
-    
+
   }
 
 }

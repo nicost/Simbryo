@@ -87,7 +87,8 @@ public abstract class OpticsBase extends ClearCLSynthoscopyBase
   @Override
   public void setPhantomTransformMatrix(Matrix4f pTransformMatrix)
   {
-    if (mPhantomTransformMatrix==null || !mPhantomTransformMatrix.equals(pTransformMatrix))
+    if (mPhantomTransformMatrix == null
+        || !mPhantomTransformMatrix.equals(pTransformMatrix))
     {
       mPhantomTransformMatrix = pTransformMatrix;
       requestUpdate();

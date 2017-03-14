@@ -86,11 +86,11 @@ public interface PhantomRendererInterface<I> extends
    *          begin of z plane index range
    * @param pZPlaneIndexEnd
    *          end of z plane index range
-   * @param pWaitToFinish true -> wait to finish
+   * @param pWaitToFinish
+   *          true -> wait to finish
    */
-  void render(int pZPlaneIndexBegin, int pZPlaneIndexEnd, boolean pWaitToFinish);
-
-
-
+  void render(int pZPlaneIndexBegin,
+              int pZPlaneIndexEnd,
+              boolean pWaitToFinish);
 
 }

@@ -8,8 +8,6 @@ import java.io.IOException;
 
 import javax.vecmath.Vector3f;
 
-import org.junit.Test;
-
 import clearcl.ClearCL;
 import clearcl.ClearCLContext;
 import clearcl.ClearCLDevice;
@@ -18,6 +16,9 @@ import clearcl.backend.ClearCLBackends;
 import clearcl.io.RawWriter;
 import clearcl.util.ElapsedTime;
 import clearcl.viewer.ClearCLImageViewer;
+
+import org.junit.Test;
+
 import simbryo.dynamics.tissue.embryo.zoo.Drosophila;
 import simbryo.synthoscopy.camera.impl.SCMOSCameraRenderer;
 import simbryo.synthoscopy.optics.detection.impl.widefield.WideFieldDetectionOptics;
@@ -79,7 +80,8 @@ public class SynthoscopyDemo
                                                                                                        lPhantomHeight,
                                                                                                        lPhantomDepth);
 
-        ClearCLImageViewer lFluoPhantomViewer = lDrosophilaFluorescencePhantom.openViewer();/**/
+        ClearCLImageViewer lFluoPhantomViewer =
+                                              lDrosophilaFluorescencePhantom.openViewer();/**/
 
         DrosophilaScatteringPhantom lDrosophilaScatteringPhantom =
                                                                  new DrosophilaScatteringPhantom(lContext,
@@ -118,7 +120,8 @@ public class SynthoscopyDemo
         lSCMOSCameraRenderer.setCenteredROI(lMaxCameraImageWidth / 1,
                                             lMaxCameraImageHeight / 1);
 
-        ClearCLImageViewer lCameraImageViewer = lSCMOSCameraRenderer.openViewer();/**/
+        ClearCLImageViewer lCameraImageViewer =
+                                              lSCMOSCameraRenderer.openViewer();/**/
 
         RawWriter lRawWriter = new RawWriter();
         lRawWriter.setOverwrite(true);
@@ -188,7 +191,7 @@ public class SynthoscopyDemo
           lWideFieldDetectionOptics.setIntensity(1);
           lWideFieldDetectionOptics.setLightWavelength(lLightSheetIllumination.getLightWavelength());
           lWideFieldDetectionOptics.setZFocusPosition(z);
-        
+
           lLightSheetIllumination.setScatteringPhantom(lDrosophilaScatteringPhantom.getImage());
 
           lWideFieldDetectionOptics.setFluorescencePhantomImage(lDrosophilaFluorescencePhantom.getImage());

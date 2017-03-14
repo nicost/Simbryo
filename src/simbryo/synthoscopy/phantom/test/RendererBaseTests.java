@@ -2,8 +2,6 @@ package simbryo.synthoscopy.phantom.test;
 
 import static org.junit.Assert.assertEquals;
 
-import org.junit.Test;
-
 import clearcl.ClearCL;
 import clearcl.ClearCLContext;
 import clearcl.ClearCLDevice;
@@ -11,6 +9,9 @@ import clearcl.ClearCLImage;
 import clearcl.backend.ClearCLBackendInterface;
 import clearcl.backend.ClearCLBackends;
 import coremem.ContiguousMemoryInterface;
+
+import org.junit.Test;
+
 import simbryo.dynamics.tissue.embryo.zoo.Drosophila;
 import simbryo.synthoscopy.phantom.PhantomRendererBase;
 

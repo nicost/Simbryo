@@ -9,6 +9,7 @@ import javafx.scene.Scene;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+
 import simbryo.particles.ParticleSystem;
 import simbryo.particles.viewer.ParticleViewerInterface;
 import simbryo.particles.viewer.three.groups.CameraGroup;

@@ -21,5 +21,5 @@ public interface ImageWidthHeightInterface
    * @return image height
    */
   long getHeight();
-  
+
 }

@@ -5,15 +5,18 @@ package simbryo.util.mergeset;
  *
  * @author royer
  */
-public class FastArraySet 
+public class FastArraySet
 {
 
   /**
    * Merges two sets.
    * 
-   * @param pSetA set A
-   * @param pSetB set B
-   * @param pSetAuB result: union of A and B
+   * @param pSetA
+   *          set A
+   * @param pSetB
+   *          set B
+   * @param pSetAuB
+   *          result: union of A and B
    * @return size of resulting set
    */
   public static final int merge(final int[] pSetA,
@@ -35,12 +38,18 @@ public class FastArraySet
    * arrays, and storing the result starting at some offset in the destination
    * array.
    * 
-   * @param pSetA set A
-   * @param pStartA start offset in A
-   * @param pSetB set B
-   * @param pStartB start ofset in B
-   * @param pSetAuB result: union of A and B (taking into consideration the ofsets)
-   * @param pStartAuB starting position for A union B
+   * @param pSetA
+   *          set A
+   * @param pStartA
+   *          start offset in A
+   * @param pSetB
+   *          set B
+   * @param pStartB
+   *          start ofset in B
+   * @param pSetAuB
+   *          result: union of A and B (taking into consideration the ofsets)
+   * @param pStartAuB
+   *          starting position for A union B
    * @return size of resulting set
    */
   public static final int merge(final int[] pSetA,
@@ -65,14 +74,22 @@ public class FastArraySet
    * arrays, and storing the result starting at some offset in the destination
    * array.
    * 
-   * @param pSetA set A
-   * @param pStartA start offset in A
-   * @param pLengthA length of A starting from offset
-   * @param pSetB set B
-   * @param pStartB start ofset in B
-   * @param pLengthB length of B starting from offset
-   * @param pSetAuB result: union of A and B (taking into consideration the ofsets)
-   * @param pStartAuB starting position for A union B
+   * @param pSetA
+   *          set A
+   * @param pStartA
+   *          start offset in A
+   * @param pLengthA
+   *          length of A starting from offset
+   * @param pSetB
+   *          set B
+   * @param pStartB
+   *          start ofset in B
+   * @param pLengthB
+   *          length of B starting from offset
+   * @param pSetAuB
+   *          result: union of A and B (taking into consideration the ofsets)
+   * @param pStartAuB
+   *          starting position for A union B
    * @return size of resulting set
    */
   public static final int merge(final int[] pSetA,

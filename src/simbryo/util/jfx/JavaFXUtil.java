@@ -2,10 +2,9 @@ package simbryo.util.jfx;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
+import javafx.application.Platform;
 
 import com.sun.javafx.application.PlatformImpl;
-
-import javafx.application.Platform;
 
 /**
  * Utility classes for JavaFX

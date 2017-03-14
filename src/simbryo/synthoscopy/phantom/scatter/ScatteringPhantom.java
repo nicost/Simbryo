@@ -77,5 +77,4 @@ public abstract class ScatteringPhantom extends PhantomRendererBase
     setNoiseOverSignalRatio(pNoiseOverSignalRatio);
   }
 
-
 }

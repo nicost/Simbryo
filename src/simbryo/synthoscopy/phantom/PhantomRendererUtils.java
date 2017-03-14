@@ -28,9 +28,11 @@ public abstract class PhantomRendererUtils
   public static int[] getOptimalGridDimensions(ClearCLDevice pDevice,
                                                long... pStackDimensionsLong)
   {
-    int[] lStackDimensionsInteger = new int[pStackDimensionsLong.length];
+    int[] lStackDimensionsInteger =
+                                  new int[pStackDimensionsLong.length];
     for (int i = 0; i < lStackDimensionsInteger.length; i++)
-      lStackDimensionsInteger[i] = toIntExact(pStackDimensionsLong[i]);
+      lStackDimensionsInteger[i] =
+                                 toIntExact(pStackDimensionsLong[i]);
     return getOptimalGridDimensions(pDevice, lStackDimensionsInteger);
   }
 

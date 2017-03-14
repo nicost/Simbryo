@@ -1,7 +1,5 @@
 package simbryo.textures.noise.demo;
 
-import org.junit.Test;
-
 import clearcl.ClearCL;
 import clearcl.ClearCLContext;
 import clearcl.ClearCLDevice;
@@ -10,6 +8,9 @@ import clearcl.backend.ClearCLBackendInterface;
 import clearcl.backend.ClearCLBackends;
 import clearcl.enums.ImageChannelDataType;
 import clearcl.viewer.ClearCLImageViewer;
+
+import org.junit.Test;
+
 import simbryo.textures.noise.BSplineNoise;
 import simbryo.textures.noise.FractalNoise;
 import simbryo.textures.noise.SimplexNoise;
@@ -153,7 +154,6 @@ public class FractalNoiseDemos
 
   }
 
-  
   /**
    * B-Spline 3D fractal noise demo
    */

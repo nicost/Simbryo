@@ -27,7 +27,7 @@ public class Ellipsoid extends IsoSurfaceBase
                        implements IsoSurfaceInterface
 {
   private static final long serialVersionUID = 1L;
-  
+
   protected float mRadius;
   protected float[] mCenterAndAxis;
 

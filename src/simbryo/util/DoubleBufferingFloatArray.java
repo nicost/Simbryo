@@ -13,13 +13,14 @@ import java.io.Serializable;
 public class DoubleBufferingFloatArray implements Serializable
 {
   private static final long serialVersionUID = 1L;
- 
+
   private float[] mReadArray, mWriteArray;
 
   /**
    * Initialize the two arrays with a given fixed size.
    * 
-   * @param pLength length of array
+   * @param pLength
+   *          length of array
    */
   public DoubleBufferingFloatArray(int pLength)
   {
@@ -30,7 +31,8 @@ public class DoubleBufferingFloatArray implements Serializable
   /**
    * Allocates the two arrays with a (new) length.
    * 
-   * @param pLength length of array
+   * @param pLength
+   *          length of array
    */
   public void allocateArrays(int pLength)
   {
@@ -69,7 +71,7 @@ public class DoubleBufferingFloatArray implements Serializable
   }
 
   /**
-   * Returns the previous array. 
+   * Returns the previous array.
    * 
    * @return previous array
    */
@@ -77,18 +79,20 @@ public class DoubleBufferingFloatArray implements Serializable
   {
     return mWriteArray;
   }
-  
+
   /**
    * Clears array with zeros.
-   * @param pBeginIndex begin index (inclusive)
-   * @param pEndIndex end index (exclusive)
+   * 
+   * @param pBeginIndex
+   *          begin index (inclusive)
+   * @param pEndIndex
+   *          end index (exclusive)
    */
   public void clear(int pBeginIndex, int pEndIndex)
   {
-    for(int i=pBeginIndex; i<pEndIndex; i++)
-      mWriteArray[i]=0;
+    for (int i = pBeginIndex; i < pEndIndex; i++)
+      mWriteArray[i] = 0;
   }
-  
 
   /**
    * Copies the values from the read array to the write array. This is useful if
@@ -103,8 +107,10 @@ public class DoubleBufferingFloatArray implements Serializable
    * Copies the values from the read array to the write array. This is useful if
    * you know that only a few values will be changed.
    * 
-   * @param pBeginIndex  begin index (inclusive)
-   * @param pEndIndex end index (exclusive)
+   * @param pBeginIndex
+   *          begin index (inclusive)
+   * @param pEndIndex
+   *          end index (exclusive)
    */
   public void copyDefault(int pBeginIndex, int pEndIndex)
   {
@@ -168,7 +174,5 @@ public class DoubleBufferingFloatArray implements Serializable
   {
     System.arraycopy(getCurrentArray(), 0, pArrayCopy, 0, pLength);
   }
-
-
 
 }

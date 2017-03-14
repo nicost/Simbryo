@@ -1,11 +1,11 @@
 package simbryo.particles.viewer.two;
 
 import java.util.concurrent.CountDownLatch;
-
 import javafx.application.Platform;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+
 import simbryo.particles.ParticleSystem;
 
 /**

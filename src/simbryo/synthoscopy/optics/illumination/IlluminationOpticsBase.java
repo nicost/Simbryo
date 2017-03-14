@@ -56,10 +56,9 @@ public abstract class IlluminationOpticsBase extends OpticsBase
     if (mScatteringPhantomImage != pScatteringPhantomImage)
     {
       mScatteringPhantomImage = pScatteringPhantomImage;
-      mScatteringPhantomImage.addListener((q,m)->requestUpdate());
+      mScatteringPhantomImage.addListener((q, m) -> requestUpdate());
       requestUpdate();
     }
   }
-
 
 }

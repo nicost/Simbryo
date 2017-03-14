@@ -2,8 +2,6 @@ package simbryo.synthoscopy.optics.illumination.impl.lightsheet.demo;
 
 import java.io.IOException;
 
-import org.junit.Test;
-
 import clearcl.ClearCL;
 import clearcl.ClearCLContext;
 import clearcl.ClearCLDevice;
@@ -11,6 +9,9 @@ import clearcl.backend.ClearCLBackendInterface;
 import clearcl.backend.ClearCLBackends;
 import clearcl.util.ElapsedTime;
 import clearcl.viewer.ClearCLImageViewer;
+
+import org.junit.Test;
+
 import simbryo.dynamics.tissue.embryo.zoo.Drosophila;
 import simbryo.synthoscopy.optics.illumination.impl.lightsheet.LightSheetIllumination;
 import simbryo.synthoscopy.phantom.PhantomRendererUtils;
@@ -55,12 +56,12 @@ public class LightSheetIlluminationDemo
 
         int[] lGridDimensions =
                               PhantomRendererUtils.getOptimalGridDimensions(lFastestGPUDevice,
-                                                                                   lPhantomWidth,
-                                                                                   lPhantomHeight,
-                                                                                   lPhantomDepth);
+                                                                            lPhantomWidth,
+                                                                            lPhantomHeight,
+                                                                            lPhantomDepth);
 
         Drosophila lDrosophila = new Drosophila(16, lGridDimensions);
-        //lDrosophila.open3DViewer();
+        // lDrosophila.open3DViewer();
         lDrosophila.simulationSteps(1000, 1);
 
         DrosophilaHistoneFluorescence lDrosoFluo =
@@ -73,8 +74,9 @@ public class LightSheetIlluminationDemo
 
         LightSheetIllumination lLightSheetIllumination =
                                                        new LightSheetIllumination(lContext,
-                                                                                  lPhantomWidth/4,
-                                                                                  lPhantomHeight/4,
+                                                                                  lPhantomWidth
+                                                                                            / 4,
+                                                                                  lPhantomHeight / 4,
                                                                                   31L);
 
         lLightSheetIllumination.setScatteringPhantom(lDrosoFluo.getImage());
@@ -82,10 +84,12 @@ public class LightSheetIlluminationDemo
         lLightSheetIllumination.setLightSheetPosition(0.5f,
                                                       0.5f,
                                                       0.5f);
-        lLightSheetIllumination.setOrientationWithAnglesInDegrees(0, 0, 0);
+        lLightSheetIllumination.setOrientationWithAnglesInDegrees(0,
+                                                                  0,
+                                                                  0);
         lLightSheetIllumination.setLightSheetThetaInDeg(3.0f);
-        
-        //lDrosoFluo.getPhantomImage().fillZero(true);
+
+        // lDrosoFluo.getPhantomImage().fillZero(true);
 
         ElapsedTime.measure("renderlightsheet",
                             () -> lLightSheetIllumination.render(true));

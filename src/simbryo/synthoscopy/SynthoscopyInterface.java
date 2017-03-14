@@ -3,8 +3,8 @@ package simbryo.synthoscopy;
 import coremem.ContiguousMemoryInterface;
 
 /**
- * Synthoscopy interface. Each synthoscopy module produces a 2D or 3D
- * image that is then potentially consumed by a subsequent module
+ * Synthoscopy interface. Each synthoscopy module produces a 2D or 3D image that
+ * is then potentially consumed by a subsequent module
  *
  * @param <I>
  *          type of images used to store and process illumination-side images

@@ -17,8 +17,10 @@ public class VectorCellProperty extends CellProperty
    * Instantiates a vector cell property for given tissue dynamics and
    * dimension.
    * 
-   * @param pTissueDynamics tissue dynamics
-   * @param pDimension dimension
+   * @param pTissueDynamics
+   *          tissue dynamics
+   * @param pDimension
+   *          dimension
    */
   public VectorCellProperty(TissueDynamics pTissueDynamics,
                             int pDimension)

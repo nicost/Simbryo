@@ -18,7 +18,8 @@ public abstract class ExternalForceFieldBase extends ForceFieldBase
   /**
    * Constructs an external force field with given force intensity.
    * 
-   * @param pForceIntensity force intensity
+   * @param pForceIntensity
+   *          force intensity
    */
   public ExternalForceFieldBase(float pForceIntensity)
   {

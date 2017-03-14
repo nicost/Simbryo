@@ -25,13 +25,13 @@ public enum PhantomParameter implements ParameterInterface<Void>
   {
     throw new IllegalArgumentException("No default value for phantoms");
   }
-  
+
   @Override
   public Void getMinValue()
   {
     throw new IllegalArgumentException("No default value for phantoms");
   }
-  
+
   @Override
   public Void getMaxValue()
   {

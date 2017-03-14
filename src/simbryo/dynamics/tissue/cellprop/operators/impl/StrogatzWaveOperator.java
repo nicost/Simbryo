@@ -38,9 +38,12 @@ public class StrogatzWaveOperator extends OperatorBase<CellProperty>
    * defines a percentage to dilate the size of the neighborhood around each
    * cell. A good value is for example 10% (hence 0.1).
    * 
-   * @param pIncrement increment
-   * @param pCouplingConstant coupling constant
-   * @param pNeighboorhoodRadiusDilationFactor neighborhood dilation factor
+   * @param pIncrement
+   *          increment
+   * @param pCouplingConstant
+   *          coupling constant
+   * @param pNeighboorhoodRadiusDilationFactor
+   *          neighborhood dilation factor
    */
   public StrogatzWaveOperator(float pIncrement,
                               float pCouplingConstant,
@@ -62,7 +65,8 @@ public class StrogatzWaveOperator extends OperatorBase<CellProperty>
     final int lDimension = pEmbryo.getDimension();
     final CellProperty lCellProperty = pCellProperty[0];
 
-    final NeighborhoodGrid lNeighborhood = pEmbryo.getNeighborhoodGrid();
+    final NeighborhoodGrid lNeighborhood =
+                                         pEmbryo.getNeighborhoodGrid();
     final int lMaxNumberOfParticlesPerGridCell =
                                                lNeighborhood.getMaxParticlesPerGridCell();
     final int lTotalNumberOfCells = lNeighborhood.getVolume();
@@ -92,10 +96,12 @@ public class StrogatzWaveOperator extends OperatorBase<CellProperty>
     final int[] lCellCoordMax = new int[lDimension];
     final int[] lCellCoordCurrent = new int[lDimension];
 
-    final float[] lCellPropertyArrayRead = lCellProperty.getArray()
-                                                  .getReadArray();
-    final float[] lCellPropertyArrayWrite = lCellProperty.getArray()
-                                                   .getWriteArray();
+    final float[] lCellPropertyArrayRead =
+                                         lCellProperty.getArray()
+                                                      .getReadArray();
+    final float[] lCellPropertyArrayWrite =
+                                          lCellProperty.getArray()
+                                                       .getWriteArray();
 
     for (int idu = pBeginId; idu < pEndId; idu++)
     {
@@ -132,11 +138,11 @@ public class StrogatzWaveOperator extends OperatorBase<CellProperty>
       lNewValue = (lEvent ? (int) lNewValue : lNewValue);
 
       lCellPropertyArrayWrite[idu] = eventHook(lEvent,
-                                            idu,
-                                            lPositions,
-                                            lVelocities,
-                                            lRadii,
-                                            lNewValue);
+                                               idu,
+                                               lPositions,
+                                               lVelocities,
+                                               lRadii,
+                                               lNewValue);
 
     }
 
@@ -194,11 +200,11 @@ public class StrogatzWaveOperator extends OperatorBase<CellProperty>
   }
 
   protected float eventHook(boolean pEvent,
-                         int pId,
-                         float[] pPositions,
-                         float[] pVelocities,
-                         float[] pRadii,
-                         float pNewMorphogenValue)
+                            int pId,
+                            float[] pPositions,
+                            float[] pVelocities,
+                            float[] pRadii,
+                            float pNewMorphogenValue)
   {
     return pEvent ? (int) pNewMorphogenValue : pNewMorphogenValue;
   }

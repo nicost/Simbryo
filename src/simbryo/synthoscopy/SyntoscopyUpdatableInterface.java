@@ -8,15 +8,15 @@ package simbryo.synthoscopy;
 public interface SyntoscopyUpdatableInterface
 {
 
-
   /**
-   * Requests update, will cause the image to b re-rendered at next call to render()
+   * Requests update, will cause the image to b re-rendered at next call to
+   * render()
    */
   void requestUpdate();
 
-
   /**
-   * Clears update, update not needed anymore because the image as been re-rendered
+   * Clears update, update not needed anymore because the image as been
+   * re-rendered
    */
   void clearUpdate();
 
@@ -29,9 +29,10 @@ public interface SyntoscopyUpdatableInterface
 
   /**
    * Adds an update listener. Update requests will be forwarded to this
-   * @param pUpdateListener update listener
+   * 
+   * @param pUpdateListener
+   *          update listener
    */
   void addUpdateListener(SyntoscopyUpdatableInterface pUpdateListener);
-
 
 }

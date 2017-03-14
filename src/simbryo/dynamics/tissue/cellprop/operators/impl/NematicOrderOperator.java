@@ -17,7 +17,7 @@ public class NematicOrderOperator extends
                                   OperatorBase<VectorCellProperty>
 {
   private static final long serialVersionUID = 1L;
-  
+
   private float mCouplingConstant;
   private int[] mNeighboorsArray;
   private float mNeighborhoodRadiusDilationFactor;
@@ -28,8 +28,10 @@ public class NematicOrderOperator extends
    * to dilate the size of the neighborhood around each cell. A good value is
    * for example 10% (hence 0.1).
    * 
-   * @param pCouplingConstant coupling constant
-   * @param pNeighboorhoodRadiusDilationFactor neighborhood radius dilation factor.
+   * @param pCouplingConstant
+   *          coupling constant
+   * @param pNeighboorhoodRadiusDilationFactor
+   *          neighborhood radius dilation factor.
    */
   public NematicOrderOperator(float pCouplingConstant,
                               float pNeighboorhoodRadiusDilationFactor)
@@ -48,7 +50,8 @@ public class NematicOrderOperator extends
                     VectorCellProperty... pVectorCellProperty)
   {
     final int lDimension = pEmbryo.getDimension();
-    final VectorCellProperty lVectorCellProperty = pVectorCellProperty[0];
+    final VectorCellProperty lVectorCellProperty =
+                                                 pVectorCellProperty[0];
 
     final NeighborhoodGrid lNeighborhood =
                                          pEmbryo.getNeighborhoodGrid();
@@ -95,7 +98,6 @@ public class NematicOrderOperator extends
                                                                        lCellCoordMax,
                                                                        lCellCoordCurrent);
 
-      
       for (int k = 0; k < lNumberOfNeighboors; k++)
       {
         final int idv = lNeighboors[k];

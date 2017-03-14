@@ -297,7 +297,7 @@ public class SCMOSCameraRenderer extends ClearCLCameraRendererBase
    * @param pHeight
    *          height of ROI
    */
-  
+
   public void setCenteredROI(int pWidth, int pHeight)
   {
     int lMarginX = (int) ((getMaxWidth() - pWidth) / 2);
@@ -372,9 +372,9 @@ public class SCMOSCameraRenderer extends ClearCLCameraRendererBase
   @Override
   public void render(boolean pWaitToFinish)
   {
-    if(!isUpdateNeeded())
+    if (!isUpdateNeeded())
       return;
-    
+
     clearImages(false);
     setInvariantKernelParameters(mDetectionImage);
     upscale(mDetectionImage, mImageTemp, false);

@@ -39,7 +39,8 @@ public class OneSidedIsoSurfaceForceField extends
    *          if true, the radius of the particles is taken into account.
    * @param pForceIntensity
    *          force intensity
-   * @param pIsoSurfaceInterface iso-surface
+   * @param pIsoSurfaceInterface
+   *          iso-surface
    */
   public OneSidedIsoSurfaceForceField(boolean pZeroInside,
                                       boolean pConstraintWithRadius,

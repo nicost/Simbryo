@@ -14,7 +14,7 @@ import simbryo.util.DoubleBufferingFloatArray;
 public class CellProperty implements Serializable
 {
   private static final long serialVersionUID = 1L;
- 
+
   private final TissueDynamics mEmbryo;
   private final int mDimension;
 

@@ -1,10 +1,10 @@
 package simbryo.particles.demos;
 
 import java.util.Optional;
-
 import javafx.application.Application;
 import javafx.scene.control.TextInputDialog;
 import javafx.stage.Stage;
+
 import simbryo.particles.ParticleSystem;
 import simbryo.particles.forcefield.interaction.impl.CollisionForceField;
 import simbryo.particles.viewer.two.ParticleViewer2D;
@@ -21,7 +21,8 @@ public class Collider extends Application
   private int cNumberOfParticles = 20;
   private float cInitialVelocity = 0.0000001f;
 
-  private float cRadius = (float) (0.395 / Math.sqrt(cNumberOfParticles));
+  private float cRadius = (float) (0.395
+                                   / Math.sqrt(cNumberOfParticles));
   private float cDragCoeficient = 0.99f;
   private float cBouncingVelocityLoss = 0.9f;
   private float cCollisionForce = 0.0001f;
@@ -46,7 +47,6 @@ public class Collider extends Application
       // Traditional way to get the response value.
       Optional<String> result = dialog.showAndWait();
 
-      
       result.ifPresent(name -> {
         try
         {
@@ -145,17 +145,23 @@ public class Collider extends Application
     // System.out.format("(%d,%d) -> (%g,%g) \n", i, lId, x, y);
 
     lParticleSystem.setVelocity(lId,
-                                (float) (cInitialVelocity * (Math.random() - 0.5f)),
-                                (float) (cInitialVelocity * (Math.random() - 0.5f)));
-    lParticleSystem.setRadius(lId, (float) (1e-9 + (1 * cRadius) + 0.0001f*(Math.random()-0.5f))); // 
+                                (float) (cInitialVelocity
+                                         * (Math.random() - 0.5f)),
+                                (float) (cInitialVelocity
+                                         * (Math.random() - 0.5f)));
+    lParticleSystem.setRadius(lId,
+                              (float) (1e-9 + (1 * cRadius)
+                                       + 0.0001f
+                                         * (Math.random() - 0.5f))); //
   }
-
-
 
   /**
    * Main function
-   * @param args arguments 
-   * @throws InterruptedException NA
+   * 
+   * @param args
+   *          arguments
+   * @throws InterruptedException
+   *           NA
    */
   public static void main(String[] args) throws InterruptedException
   {

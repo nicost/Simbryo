@@ -16,7 +16,8 @@ public class EmbryoDemo
 {
 
   /**
-   * @throws InterruptedException NA
+   * @throws InterruptedException
+   *           NA
    */
   @Test
   public void demoOrganoid() throws InterruptedException
@@ -38,7 +39,8 @@ public class EmbryoDemo
   }
 
   /**
-   * @throws InterruptedException NA
+   * @throws InterruptedException
+   *           NA
    */
   @Test
   public void demoSpheroid() throws InterruptedException
@@ -59,7 +61,8 @@ public class EmbryoDemo
   }
 
   /**
-   * @throws InterruptedException NA
+   * @throws InterruptedException
+   *           NA
    */
   @Test
   public void demoDrosophila() throws InterruptedException

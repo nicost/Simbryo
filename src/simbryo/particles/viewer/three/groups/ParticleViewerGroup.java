@@ -1,7 +1,6 @@
 package simbryo.particles.viewer.three.groups;
 
 import java.util.concurrent.CountDownLatch;
-
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.scene.Group;
@@ -12,6 +11,7 @@ import javafx.scene.shape.Box;
 import javafx.scene.shape.CullFace;
 import javafx.scene.shape.DrawMode;
 import javafx.scene.shape.Sphere;
+
 import simbryo.dynamics.tissue.cellprop.HasPolarity;
 import simbryo.dynamics.tissue.cellprop.VectorCellProperty;
 import simbryo.particles.ParticleSystem;
@@ -142,7 +142,6 @@ public class ParticleViewerGroup extends Group
   {
     mDisplayRadius = pDisplayRadius;
   }
-
 
   /**
    * Updates display for a given particle system.

@@ -12,7 +12,7 @@ import simbryo.particles.isosurf.impl.Sphere;
 public class Spheroid extends EmbryoDynamics
 {
   private static final long serialVersionUID = 1L;
- 
+
   protected static final float Fc = 0.0001f;
   protected static final float D = 0.9f;
 

@@ -30,7 +30,7 @@ public class NeighborhoodGrid implements Serializable
    * Constructs an instance given the maximal number of particles per cell and
    * the grid dimensions.
    * 
-
+   * 
    * @param pMaxParticlesPerCell
    *          max particles per cell
    * @param pGridDimensions
@@ -169,6 +169,7 @@ public class NeighborhoodGrid implements Serializable
 
   /**
    * Returns array.
+   * 
    * @return array
    */
   public int[] getArray()

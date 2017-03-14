@@ -15,7 +15,8 @@ public abstract class TextureGeneratorBase implements
   /**
    * Instantiates a texture generator with given dimension.
    * 
-   * @param pDimension dimension
+   * @param pDimension
+   *          dimension
    */
   public TextureGeneratorBase(int pDimension)
   {
@@ -80,7 +81,8 @@ public abstract class TextureGeneratorBase implements
   /**
    * Return texture volume for given dimensions
    * 
-   * @param pDimensions dimensions
+   * @param pDimensions
+   *          dimensions
    * @return volume
    */
   protected int getVolume(int[] pDimensions)
@@ -151,24 +153,25 @@ public abstract class TextureGeneratorBase implements
   private float[] normalize(float[] pTextureArray)
   {
     final int length = pTextureArray.length;
-    
-    float lMin=Float.POSITIVE_INFINITY, lMax=Float.NEGATIVE_INFINITY;
-    for(int i=0; i<length; i++)
+
+    float lMin = Float.POSITIVE_INFINITY,
+        lMax = Float.NEGATIVE_INFINITY;
+    for (int i = 0; i < length; i++)
     {
       float lValue = pTextureArray[i];
       lMin = Math.min(lMin, lValue);
       lMax = Math.max(lMax, lValue);
     }
-    
-    if(lMax==lMin)
+
+    if (lMax == lMin)
       return pTextureArray;
-    
-    final float a = 1f/(lMax-lMin);
+
+    final float a = 1f / (lMax - lMin);
     final float b = lMin;
-    
-    for(int i=0; i<length; i++)
-      pTextureArray[i] = a*(pTextureArray[i]-b);
-    
+
+    for (int i = 0; i < length; i++)
+      pTextureArray[i] = a * (pTextureArray[i] - b);
+
     return pTextureArray;
   }
 

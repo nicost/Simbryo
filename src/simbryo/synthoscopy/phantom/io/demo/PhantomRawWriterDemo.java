@@ -2,8 +2,6 @@ package simbryo.synthoscopy.phantom.io.demo;
 
 import java.io.File;
 
-import org.junit.Test;
-
 import clearcl.ClearCL;
 import clearcl.ClearCLContext;
 import clearcl.ClearCLDevice;
@@ -11,6 +9,9 @@ import clearcl.backend.ClearCLBackendInterface;
 import clearcl.backend.ClearCLBackends;
 import clearcl.util.ElapsedTime;
 import coremem.enums.NativeTypeEnum;
+
+import org.junit.Test;
+
 import simbryo.dynamics.tissue.embryo.zoo.Drosophila;
 import simbryo.synthoscopy.phantom.PhantomRendererUtils;
 import simbryo.synthoscopy.phantom.fluo.impl.drosophila.DrosophilaHistoneFluorescence;

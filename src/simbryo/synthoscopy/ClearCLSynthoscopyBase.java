@@ -91,7 +91,9 @@ public abstract class ClearCLSynthoscopyBase extends
   public ClearCLImageViewer openViewer()
   {
     final ClearCLImageViewer lViewImage =
-                                        ClearCLImageViewer.view(mImage, this.getClass().getSimpleName());
+                                        ClearCLImageViewer.view(mImage,
+                                                                this.getClass()
+                                                                    .getSimpleName());
     return lViewImage;
   }
 

@@ -10,6 +10,7 @@ public interface HasPolarity
 
   /**
    * Returns the polarity cell property.
+   * 
    * @return polarity property
    */
   VectorCellProperty getPolarityProperty();

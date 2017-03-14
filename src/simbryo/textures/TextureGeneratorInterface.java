@@ -60,7 +60,8 @@ public interface TextureGeneratorInterface
   float sampleTexture(int... pCoordinate);
 
   /**
-   * Clones texture 
+   * Clones texture
+   * 
    * @return returns new cloned texture.
    */
   TextureGeneratorInterface clone();

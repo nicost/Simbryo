@@ -32,8 +32,7 @@ public abstract class DetectionOpticsBase extends OpticsBase
   public DetectionOpticsBase(final ClearCLContext pContext,
                              long... pWideFieldImageDimensions)
   {
-    super(pContext,
-          pWideFieldImageDimensions);
+    super(pContext, pWideFieldImageDimensions);
 
     mContext = pContext;
 
@@ -56,7 +55,8 @@ public abstract class DetectionOpticsBase extends OpticsBase
     if (mFluorescencePhantomImage != pFluorescencePhantomImage)
     {
       mFluorescencePhantomImage = pFluorescencePhantomImage;
-      mFluorescencePhantomImage.addListener((q,m)->requestUpdate());
+      mFluorescencePhantomImage.addListener((q,
+                                             m) -> requestUpdate());
       requestUpdate();
     }
   }
@@ -72,7 +72,7 @@ public abstract class DetectionOpticsBase extends OpticsBase
     if (mScatteringPhantomImage != pScatteringPhantomImage)
     {
       mScatteringPhantomImage = pScatteringPhantomImage;
-      mScatteringPhantomImage.addListener((q,m)->requestUpdate());
+      mScatteringPhantomImage.addListener((q, m) -> requestUpdate());
       requestUpdate();
     }
   }
@@ -88,7 +88,7 @@ public abstract class DetectionOpticsBase extends OpticsBase
     if (mLightMapImage != pLightMapImage)
     {
       mLightMapImage = pLightMapImage;
-      mLightMapImage.addListener((q,m)->requestUpdate());
+      mLightMapImage.addListener((q, m) -> requestUpdate());
       requestUpdate();
     }
   }

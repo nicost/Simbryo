@@ -5,7 +5,6 @@ import static org.junit.Assert.assertEquals;
 import java.util.Arrays;
 
 import org.junit.Test;
-
 import simbryo.util.mergeset.FastArraySet;
 
 /**
@@ -63,13 +62,13 @@ public class FastArraySetTests
     int[] lSet1u2 = new int[lSet1.length + lSet2.length];
 
     final int lLength = FastArraySet.merge(lSet1,
-                                       4,
-                                       3,
-                                       lSet2,
-                                       3,
-                                       4,
-                                       lSet1u2,
-                                       1);
+                                           4,
+                                           3,
+                                           lSet2,
+                                           3,
+                                           4,
+                                           lSet1u2,
+                                           1);
 
     System.out.println("lLength=" + lLength);
     System.out.println(Arrays.toString(lSet1u2));
@@ -101,8 +100,12 @@ public class FastArraySetTests
 
     int[] lSet1u2 = new int[lSet1.length + lSet2.length];
 
-    final int lLength =
-                      FastArraySet.merge(lSet1, 4, lSet2, 3, lSet1u2, 1);
+    final int lLength = FastArraySet.merge(lSet1,
+                                           4,
+                                           lSet2,
+                                           3,
+                                           lSet1u2,
+                                           1);
 
     System.out.println("lLength=" + lLength);
     System.out.println(Arrays.toString(lSet1u2));

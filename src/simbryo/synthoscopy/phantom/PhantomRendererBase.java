@@ -108,6 +108,15 @@ public abstract class PhantomRendererBase extends
     mPlaneAlreadyDrawnTable[pZ] = false;
   }
 
+  protected boolean isValid(int pZPlaneIndexBegin,
+                            int pZPlaneIndexEnd)
+  {
+    for (int i = pZPlaneIndexBegin; i < pZPlaneIndexEnd; i++)
+      if (!mPlaneAlreadyDrawnTable[i])
+        return false;
+    return true;
+  }
+
   @Override
   public void render(boolean pWaitToFinish)
   {
@@ -137,7 +146,7 @@ public abstract class PhantomRendererBase extends
                             int pZPlaneIndexEnd,
                             boolean pWaitToFinish)
   {
-    if (!isUpdateNeeded())
+    if (!isUpdateNeeded() && isValid(pZPlaneIndexBegin, pZPlaneIndexEnd))
       return 0;
 
     int lCounter = 0;

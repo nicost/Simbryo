@@ -6,7 +6,8 @@ package simbryo.synthoscopy.microscope.parameters;
  * @author royer
  */
 @SuppressWarnings("javadoc")
-public enum IlluminationParameter implements ParameterInterface<Number>
+public enum IlluminationParameter implements
+                                  ParameterInterface<Number>
 {
  Wavelength(0.0005f, 0.0001, 0.01f),
  Intensity(10.0f, 0, 100),
@@ -22,8 +23,8 @@ public enum IlluminationParameter implements ParameterInterface<Number>
   Number mDefaultValue, mMinValue, mMaxValue;
 
   private IlluminationParameter(Number pDefaultValue,
-                                 Number pMinValue,
-                                 Number pMaxValue)
+                                Number pMinValue,
+                                Number pMaxValue)
   {
     mDefaultValue = pDefaultValue;
     mMinValue = pMinValue;

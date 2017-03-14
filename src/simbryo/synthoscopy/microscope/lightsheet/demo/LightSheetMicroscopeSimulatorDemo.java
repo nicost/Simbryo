@@ -2,14 +2,15 @@ package simbryo.synthoscopy.microscope.lightsheet.demo;
 
 import java.io.IOException;
 
-import org.junit.Test;
-
 import clearcl.ClearCL;
 import clearcl.ClearCLContext;
 import clearcl.ClearCLDevice;
 import clearcl.backend.ClearCLBackendInterface;
 import clearcl.backend.ClearCLBackends;
 import clearcl.viewer.ClearCLImageViewer;
+
+import org.junit.Test;
+
 import simbryo.dynamics.tissue.embryo.zoo.Drosophila;
 import simbryo.synthoscopy.microscope.lightsheet.LightSheetMicroscopeSimulatorOrtho;
 import simbryo.synthoscopy.microscope.parameters.PhantomParameter;
