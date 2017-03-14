@@ -1,6 +1,11 @@
+tasks.create(name: 'gitExecutableHooks') << {
+    Runtime.getRuntime().exec("chmod -R +x .git/hooks/");
+}
+
 task installGitHooks(type: Copy) {
-    from new File(rootProject.rootDir, 'gradle/pre-commit.sh')
+    from new File(rootProject.rootDir, 'pre-commit')
     into { new File(rootProject.rootDir, '.git/hooks') }
 }
 
-build.dependsOn installGitHooks
+gitExecutableHooks.dependsOn installGitHooks
+clean.dependsOn gitExecutableHooks
