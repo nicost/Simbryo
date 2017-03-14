@@ -5,6 +5,7 @@ import static java.lang.Math.min;
 
 import java.io.IOException;
 
+import clearcl.ClearCLBuffer;
 import clearcl.ClearCLContext;
 import clearcl.ClearCLImage;
 import clearcl.ClearCLKernel;
@@ -28,9 +29,8 @@ public class WideFieldDetectionOptics extends DetectionOpticsBase
       mDefocusBlurKernel, mScatterBlurKernel;
 
   private volatile float mDefocusSigma, mSmoothDefocusTransitionPoint,
-      mZFocusPosition, mZFocusDepth, mScatterSigmaMin,
-      mScatterSigmaMax, mScatterSamplingDeltaZ;
-
+      mZFocusPosition, mScatterSigmaMin, mScatterSigmaMax,
+      mScatterSamplingDeltaZ;
 
   /**
    * Instanciates a light sheet illumination optics class given a ClearCL
@@ -49,7 +49,7 @@ public class WideFieldDetectionOptics extends DetectionOpticsBase
     super(pContext, pImageDimensions);
 
     setSigma(1.0f);
-    setSmoothDefocusTransitionPoint(4.0f / 512);
+    setSmoothDefocusTransitionPoint(0.03f);
     setScatterSigmaMin(0.0001f);
     setScatterSigmaMax(0.04f);
     setScatterSamplingDeltaZ(0.01f);
@@ -58,8 +58,6 @@ public class WideFieldDetectionOptics extends DetectionOpticsBase
     mImageTemp = pContext.createImage(mImage);
     clearImages(true);
   }
-
- 
 
   /**
    * Returns the sigma parameter value. The sigma parameter controls how much
@@ -81,16 +79,20 @@ public class WideFieldDetectionOptics extends DetectionOpticsBase
    */
   public void setSigma(float pDefocusSigma)
   {
-    mDefocusSigma = pDefocusSigma;
+    if (mDefocusSigma != pDefocusSigma)
+    {
+      mDefocusSigma = pDefocusSigma;
+      requestUpdate();
+    }
   }
 
   /**
    * Returns the smooth defocus transition point. For small defocus, the image
-   * quality does not decrease proprotionaly to the defocu distance, instead
+   * quality does not decrease proportionaly to the defocus distance, instead
    * there is a 2nd order 'smoothing' that can be expplained because of the
    * shape of the 3D PSF (another way to look at it is the raleigh length of a
    * Gaussian Beam). To accound for this effect, we reduce sigma for small
-   * defocu distances
+   * defocus distances
    * 
    * @return smooth defocus transition point
    */
@@ -107,7 +109,11 @@ public class WideFieldDetectionOptics extends DetectionOpticsBase
    */
   public void setSmoothDefocusTransitionPoint(float pSmoothDefocusTransitionPoint)
   {
-    mSmoothDefocusTransitionPoint = pSmoothDefocusTransitionPoint;
+    if (mSmoothDefocusTransitionPoint != pSmoothDefocusTransitionPoint)
+    {
+      mSmoothDefocusTransitionPoint = pSmoothDefocusTransitionPoint;
+      requestUpdate();
+    }
   }
 
   /**
@@ -131,48 +137,11 @@ public class WideFieldDetectionOptics extends DetectionOpticsBase
    */
   public void setZFocusPosition(float pZFocusPosition)
   {
-    mZFocusPosition = pZFocusPosition;
-  }
-
-  /**
-   * Return the z focus depth in normalized coordinates relative to the
-   * fluorescence phantom .
-   * 
-   * @return z focus depth relative to fluorescence phantom
-   */
-  public float getZFocusDepth()
-  {
-    return mZFocusDepth;
-  }
-
-  /**
-   * Sets the focus depth in normalized coordinates relative to the fluorescence
-   * phantom .
-   * 
-   * @param pZFocusDepth
-   *          lightmap depth relative to scatter phantom
-   */
-  public void setZFocusDepth(float pZFocusDepth)
-  {
-    mZFocusDepth = pZFocusDepth;
-  }
-
-  /**
-   * Sets the default depth of the lightmap stack relative to the scatter
-   * phantom in normalized coordinates. This default value is such that each
-   * plane of the lightmap corresponds to a single plane of the scatter phantom.
-   *
-   * @param pFluorescencePhantomImage
-   *          fluorescence phantom
-   * @param pLightMapImage
-   *          lightmap
-   * 
-   */
-  public void setDefaultZDepth(ClearCLImage pFluorescencePhantomImage,
-                               ClearCLImage pLightMapImage)
-  {
-    mZFocusDepth = (float) pLightMapImage.getDepth()
-                   / pFluorescencePhantomImage.getDepth();
+    if (mZFocusPosition != pZFocusPosition)
+    {
+      mZFocusPosition = pZFocusPosition;
+      requestUpdate();
+    }
   }
 
   /**
@@ -193,7 +162,11 @@ public class WideFieldDetectionOptics extends DetectionOpticsBase
    */
   public void setScatterSigmaMin(float pScatterSigmaMin)
   {
-    mScatterSigmaMin = pScatterSigmaMin;
+    if (mScatterSigmaMin != pScatterSigmaMin)
+    {
+      mScatterSigmaMin = pScatterSigmaMin;
+      requestUpdate();
+    }
   }
 
   /**
@@ -214,7 +187,11 @@ public class WideFieldDetectionOptics extends DetectionOpticsBase
    */
   public void setScatterSigmaMax(float pScatterSigmaMax)
   {
-    mScatterSigmaMax = pScatterSigmaMax;
+    if (mScatterSigmaMax != pScatterSigmaMax)
+    {
+      mScatterSigmaMax = pScatterSigmaMax;
+      requestUpdate();
+    }
   }
 
   /**
@@ -237,7 +214,11 @@ public class WideFieldDetectionOptics extends DetectionOpticsBase
    */
   public void setScatterSamplingDeltaZ(float pScatterSamplingDeltaZ)
   {
-    mScatterSamplingDeltaZ = pScatterSamplingDeltaZ;
+    if (mScatterSamplingDeltaZ != pScatterSamplingDeltaZ)
+    {
+      mScatterSamplingDeltaZ = pScatterSamplingDeltaZ;
+      requestUpdate();
+    }
   }
 
   protected void setupProgramAndKernels() throws IOException
@@ -267,11 +248,8 @@ public class WideFieldDetectionOptics extends DetectionOpticsBase
     setInvariantKernelParameters(mFluorescencePhantomImage,
                                  mScatteringPhantomImage,
                                  mLightMapImage,
-                                 mZFocusPosition,
-                                 mZFocusDepth);
+                                 mZFocusPosition);
 
-    int lFluorescencePhantomDepth =
-                                  (int) mFluorescencePhantomImage.getDepth();
     int lLightMapDepth = (int) mLightMapImage.getDepth();
     int lLightMapHalfDepth = (lLightMapDepth - 1) / 2;
 
@@ -281,49 +259,33 @@ public class WideFieldDetectionOptics extends DetectionOpticsBase
     for (int zi = lLightMapHalfDepth; zi >= 1; zi--)
     {
       float lDefocusDepthInNormCoordinates = ((float) zi
-                                              / lLightMapHalfDepth)
-                                             * 0.5f * mZFocusDepth;
+                                              / lLightMapHalfDepth);
 
-      float lPhantomZ1 = mZFocusPosition
-                         - lDefocusDepthInNormCoordinates
-                         + 0.5f / lFluorescencePhantomDepth;
+      float lFocusZ1 =
+                     mZFocusPosition - lDefocusDepthInNormCoordinates;
 
-      float lPhantomZ2 = mZFocusPosition
-                         + lDefocusDepthInNormCoordinates
-                         + 0.5f / lFluorescencePhantomDepth;
-
-      float lLightMapZ1 = ((float) (lLightMapHalfDepth - zi)
-                           / lLightMapDepth)
-                          + 0.5f / lLightMapDepth;
-
-      float lLightMapZ2 = ((float) (lLightMapHalfDepth + zi)
-                           / lLightMapDepth)
-                          + 0.5f / lLightMapDepth;
-
-      collectPair(lImageA,
-                  lImageB,
-                  lPhantomZ1,
-                  lPhantomZ2,
-                  lLightMapZ1,
-                  lLightMapZ2,
-                  false);
+      float lFocusZ2 =
+                     mZFocusPosition + lDefocusDepthInNormCoordinates;
 
       float lSigma = getSigma()
                      * smootherstep(0.0f,
                                     getSmoothDefocusTransitionPoint(),
                                     lDefocusDepthInNormCoordinates);/**/
 
-      // System.out.println("SIGMA: " + lSigma);
+      //System.out.format("defocus=%f, sigma=%f, z1=%f, z2=%f\n", lDefocusDepthInNormCoordinates, lSigma, lFocusZ1, lFocusZ2);
 
-      defocusBlur(lImageB, lImageA, lSigma, false);
+      if (inRange(lFocusZ1, 0, 1) && inRange(lFocusZ2, 0, 1))
+        collectPair(lImageA, lImageB, lFocusZ1, lFocusZ2, false);
+      else if (inRange(lFocusZ1, 0, 1))
+        collectSingle(lImageA, lImageB, lFocusZ1, false);
+      else if (inRange(lFocusZ2, 0, 1))
+        collectSingle(lImageA, lImageB, lFocusZ2, false);
+
+      if (inRange(lFocusZ1, 0, 1) || inRange(lFocusZ2, 0, 1))
+        defocusBlur(lImageB, lImageA, lSigma, false);
     }
 
-    float lPhantomZ = mZFocusPosition
-                      + 0.5f / lFluorescencePhantomDepth;
-
-    float lLightMapZ = 0.5f + 0.5f / lLightMapDepth;
-
-    collectSingle(lImageA, lImageB, lPhantomZ, lLightMapZ, false);
+    collectSingle(lImageA, lImageB, mZFocusPosition, false);
 
     float zfocus = getZFocusPosition();
     float zexit = 1f;
@@ -346,6 +308,11 @@ public class WideFieldDetectionOptics extends DetectionOpticsBase
     } /**/
 
     super.render(pWaitToFinish);
+  }
+
+  private boolean inRange(float pValue, int pMin, int pMax)
+  {
+    return pMin <= pValue && pValue < pMax;
   }
 
   /**
@@ -373,19 +340,19 @@ public class WideFieldDetectionOptics extends DetectionOpticsBase
   private void setInvariantKernelParameters(ClearCLImage pFluoPhantomImage,
                                             ClearCLImage pScatterPhantomImage,
                                             ClearCLImage pLightMapImage,
-                                            float pZPosition,
-                                            float pZDepth)
+                                            float pZPosition)
   {
-    updateTransformBuffer();
-    
+    ClearCLBuffer lPhantomTransformMatrixBuffer =
+                                                getPhantomTransformMatrixBuffer();
+
     mCollectPairKernel.setGlobalOffsets(0, 0);
     mCollectPairKernel.setGlobalSizes(getWidth(), getHeight());
-    
+
     mCollectPairKernel.setArgument("fluophantom", pFluoPhantomImage);
     mCollectPairKernel.setArgument("lightmap", pLightMapImage);
     mCollectPairKernel.setArgument("intensity", getIntensity());
     mCollectPairKernel.setOptionalArgument("matrix",
-                                           getTransformMatrixBuffer());
+                                           lPhantomTransformMatrixBuffer);
 
     mCollectSingleKernel.setGlobalOffsets(0, 0);
     mCollectSingleKernel.setGlobalSizes(getWidth(), getHeight());
@@ -394,19 +361,19 @@ public class WideFieldDetectionOptics extends DetectionOpticsBase
     mCollectSingleKernel.setArgument("lightmap", pLightMapImage);
     mCollectSingleKernel.setArgument("intensity", getIntensity());
     mCollectSingleKernel.setOptionalArgument("matrix",
-                                             getTransformMatrixBuffer());
+                                             lPhantomTransformMatrixBuffer);
 
     mDefocusBlurKernel.setGlobalOffsets(0, 0);
     mDefocusBlurKernel.setGlobalSizes(getWidth(), getHeight());
     mDefocusBlurKernel.setOptionalArgument("matrix",
-                                           getTransformMatrixBuffer());
+                                           lPhantomTransformMatrixBuffer);
 
     mScatterBlurKernel.setGlobalOffsets(0, 0);
     mScatterBlurKernel.setGlobalSizes(getWidth(), getHeight());
     mScatterBlurKernel.setArgument("scatterphantom",
                                    pScatterPhantomImage);
     mScatterBlurKernel.setOptionalArgument("matrix",
-                                           getTransformMatrixBuffer());
+                                           lPhantomTransformMatrixBuffer);
 
   }
 
@@ -418,18 +385,15 @@ public class WideFieldDetectionOptics extends DetectionOpticsBase
 
   private void collectPair(ClearCLImage pImageInput,
                            ClearCLImage pImageOutput,
-                           float pFluoPhantomZ1,
-                           float pFluoPhantomZ2,
-                           float pLightMapZ1,
-                           float pLightMapZ2,
+                           float pFocusZ1,
+                           float pFocusZ2,
                            boolean pWaitToFinish)
   {
+    //System.out.println("collectPair");
     mCollectPairKernel.setArgument("imagein", pImageInput);
     mCollectPairKernel.setArgument("imageout", pImageOutput);
-    mCollectPairKernel.setArgument("fpz1", pFluoPhantomZ1);
-    mCollectPairKernel.setArgument("fpz2", pFluoPhantomZ2);
-    mCollectPairKernel.setArgument("lmz1", pLightMapZ1);
-    mCollectPairKernel.setArgument("lmz2", pLightMapZ2);
+    mCollectPairKernel.setArgument("z1", pFocusZ1);
+    mCollectPairKernel.setArgument("z2", pFocusZ2);
 
     mCollectPairKernel.run(pWaitToFinish);
 
@@ -438,25 +402,26 @@ public class WideFieldDetectionOptics extends DetectionOpticsBase
 
   private void collectSingle(ClearCLImage pImageInput,
                              ClearCLImage pImageOutput,
-                             float pFluoPhantomZ,
-                             float pLightMapZ,
+                             float pFocusZ,
                              boolean pWaitToFinish)
   {
+    //System.out.println("collectSingle");
     mCollectSingleKernel.setArgument("imagein", pImageInput);
     mCollectSingleKernel.setArgument("imageout", pImageOutput);
-    mCollectSingleKernel.setArgument("fpz", pFluoPhantomZ);
-    mCollectSingleKernel.setArgument("lmz", pLightMapZ);
+    mCollectSingleKernel.setArgument("z", pFocusZ);
 
     mCollectSingleKernel.run(pWaitToFinish);
 
     // pImageOutput.notifyListenersOfChange(mContext.getDefaultQueue());
   }
 
+
   private void defocusBlur(ClearCLImage pImageInput,
                            ClearCLImage pImageOutput,
                            float pSigma,
                            boolean pWaitToFinish)
   {
+    //System.out.println("defocusBlur");
     mDefocusBlurKernel.setArgument("imagein", pImageInput);
     mDefocusBlurKernel.setArgument("imageout", pImageOutput);
     mDefocusBlurKernel.setArgument("sigma", pSigma);

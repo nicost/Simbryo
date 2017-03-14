@@ -1,11 +1,13 @@
 package simbryo.util.timing;
 
+import java.io.Serializable;
+
 /**
  * This utility class can sync a loop to a given period.
  *
  * @author royer
  */
-public class Timming
+public class Timming implements Serializable
 {
   private volatile Long mLastTime;
 

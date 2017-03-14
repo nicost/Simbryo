@@ -38,6 +38,8 @@ public class LightSheetMicroscopeSimulatorPanel extends TabPane
   public LightSheetMicroscopeSimulatorPanel(LightSheetMicroscopeSimulator pSimulator)
   {
     super();
+    
+    setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
 
     int lNumberOfLightSheets = pSimulator.getNumberOfLightSheets();
     int lNumberOfDetectionPaths =
@@ -136,10 +138,10 @@ public class LightSheetMicroscopeSimulatorPanel extends TabPane
     Slider lSlider = new Slider(lMinValue, lMaxValue, lDefaultValue);
     lSlider.setShowTickLabels(true);
     lSlider.setShowTickMarks(true);
-    lSlider.setBlockIncrement((lMaxValue - lMinValue) / 100);
+    lSlider.setBlockIncrement((lMaxValue - lMinValue) / 1000);
     lSlider.setMajorTickUnit((lMaxValue - lMinValue) / 10);
     lSlider.setMinorTickCount(10);
-    lSlider.setSnapToTicks(true);
+    //lSlider.setSnapToTicks(true);
     lSlider.setMaxWidth(Double.MAX_VALUE);
     lSlider.setOrientation(Orientation.HORIZONTAL);
     GridPane.setHgrow(lSlider, Priority.ALWAYS);

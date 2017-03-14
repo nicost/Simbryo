@@ -1,5 +1,7 @@
 package simbryo.dynamics.tissue;
 
+import java.io.Serializable;
+
 import simbryo.particles.ParticleSystemInterface;
 
 /**
@@ -9,7 +11,8 @@ import simbryo.particles.ParticleSystemInterface;
  * @author royer
  */
 public interface TissueDynamicsInterface extends
-                                         ParticleSystemInterface
+                                         ParticleSystemInterface,
+                                         Serializable
 {
 
   /**

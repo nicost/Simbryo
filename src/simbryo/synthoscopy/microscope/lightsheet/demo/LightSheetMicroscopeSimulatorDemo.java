@@ -2,8 +2,6 @@ package simbryo.synthoscopy.microscope.lightsheet.demo;
 
 import java.io.IOException;
 
-import javax.vecmath.Vector3f;
-
 import org.junit.Test;
 
 import clearcl.ClearCL;
@@ -13,9 +11,8 @@ import clearcl.backend.ClearCLBackendInterface;
 import clearcl.backend.ClearCLBackends;
 import clearcl.viewer.ClearCLImageViewer;
 import simbryo.dynamics.tissue.embryo.zoo.Drosophila;
-import simbryo.synthoscopy.microscope.lightsheet.LightSheetMicroscopeSimulator;
+import simbryo.synthoscopy.microscope.lightsheet.LightSheetMicroscopeSimulatorOrtho;
 import simbryo.synthoscopy.microscope.parameters.PhantomParameter;
-import simbryo.synthoscopy.optics.illumination.impl.lightsheet.LightSheetIllumination;
 import simbryo.synthoscopy.phantom.fluo.impl.drosophila.DrosophilaHistoneFluorescence;
 import simbryo.synthoscopy.phantom.scatter.impl.drosophila.DrosophilaScatteringPhantom;
 
@@ -36,18 +33,76 @@ public class LightSheetMicroscopeSimulatorDemo
    *           NA
    */
   @Test
-  public void demo() throws IOException, InterruptedException
+  public void demo1D1I() throws IOException, InterruptedException
   {
+    test(1, 1);
+  }
 
+  /**
+   * Demo
+   * 
+   * @throws IOException
+   *           NA
+   * @throws InterruptedException
+   *           NA
+   */
+  @Test
+  public void demo1D2I() throws IOException, InterruptedException
+  {
+    test(1, 2);
+  }
+
+  /**
+   * Demo
+   * 
+   * @throws IOException
+   *           NA
+   * @throws InterruptedException
+   *           NA
+   */
+  @Test
+  public void demo2D1I() throws IOException, InterruptedException
+  {
+    test(2, 1);
+  }
+
+  /**
+   * Demo
+   * 
+   * @throws IOException
+   *           NA
+   * @throws InterruptedException
+   *           NA
+   */
+  @Test
+  public void demo2D2I() throws IOException, InterruptedException
+  {
+    test(2, 2);
+  }
+
+  /**
+   * Demo
+   * 
+   * @throws IOException
+   *           NA
+   * @throws InterruptedException
+   *           NA
+   */
+  @Test
+  public void demo2D4I() throws IOException, InterruptedException
+  {
+    test(2, 4);
+  }
+
+  private void test(int pNumberOfDetectionArms,
+                    int pNumberOfIlluminationArms)
+  {
     try
     {
 
       int lPhantomWidth = 320;
       int lPhantomHeight = lPhantomWidth;
       int lPhantomDepth = lPhantomWidth;
-
-      int lMaxCameraImageWidth = 2 * lPhantomWidth;
-      int lMaxCameraImageHeight = 2 * lPhantomHeight;
 
       // ElapsedTime.sStandardOutput = true;
 
@@ -61,7 +116,7 @@ public class LightSheetMicroscopeSimulatorDemo
       {
 
         Drosophila lDrosophila =
-                               Drosophila.getDeveloppedEmbryo(14,
+                               Drosophila.getDeveloppedEmbryo(11,
                                                               lPhantomWidth,
                                                               lPhantomHeight,
                                                               lPhantomDepth,
@@ -92,38 +147,30 @@ public class LightSheetMicroscopeSimulatorDemo
         /*ClearCLImageViewer lScatterPhantomViewer =
                                                  lDrosophilaScatteringPhantom.openViewer();/**/
 
-        LightSheetMicroscopeSimulator lSimulator =
-                                                 new LightSheetMicroscopeSimulator(lContext,
-                                                                                   lPhantomWidth,
-                                                                                   lPhantomHeight,
-                                                                                   lPhantomDepth);
+        LightSheetMicroscopeSimulatorOrtho lSimulator =
+                                                      new LightSheetMicroscopeSimulatorOrtho(lContext,
+                                                                                             pNumberOfDetectionArms,
+                                                                                             pNumberOfIlluminationArms,
+                                                                                             lPhantomWidth,
+                                                                                             lPhantomHeight,
+                                                                                             lPhantomDepth);
 
         lSimulator.setPhantom(PhantomParameter.Fluorescence,
                               lDrosophilaFluorescencePhantom.getImage());
         lSimulator.setPhantom(PhantomParameter.Scattering,
                               lDrosophilaScatteringPhantom.getImage());
 
-        Vector3f lIlluminationAxisVector = new Vector3f(1, 0, 0);
-        Vector3f lIlluminationNormalVector = new Vector3f(0, 0, 1);
-
-        LightSheetIllumination lLightSheet =
-                                           lSimulator.addLightSheet(lIlluminationAxisVector,
-                                                                    lIlluminationNormalVector);
-
-        lLightSheet.openViewer();
-
-        Vector3f lDetectionUpDownVector = new Vector3f(0, 1, 0);
-
-        lSimulator.addDetectionPath(lDetectionUpDownVector,
-                                    lMaxCameraImageWidth,
-                                    lMaxCameraImageHeight);
-
         lSimulator.openViewerForControls();
 
         ClearCLImageViewer lCameraImageViewer =
                                               lSimulator.openViewerForCameraImage(0);
+        for (int i = 1; i < pNumberOfDetectionArms; i++)
+          lCameraImageViewer = lSimulator.openViewerForCameraImage(i);
 
-        //float y = 0;
+        for (int i = 0; i < pNumberOfIlluminationArms; i++)
+          lSimulator.openViewerForLightMap(i);
+
+        // float y = 0;
 
         while (lCameraImageViewer.isShowing())
         {
@@ -138,8 +185,11 @@ public class LightSheetMicroscopeSimulatorDemo
           if (y > 1)
             y = 0;
             /**/
+          // lDrosophila.simulationSteps(10, 1);
+          // lDrosophilaFluorescencePhantom.clear(false);
+          lDrosophilaFluorescencePhantom.render(false);
 
-          lSimulator.render();
+          lSimulator.render(true);
         }
 
         lSimulator.close();

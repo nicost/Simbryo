@@ -11,13 +11,15 @@ public enum StageParameter implements ParameterInterface<Number>
  StageX(0.0f, -2, 2),
  StageY(0.0f, -2, 2),
  StageZ(0.0f, -2, 2),
- StageR(0.0f, -180, 180);
+ StageRX(0.0f, -180, 180),
+ StageRY(0.0f, -180, 180),
+ StageRZ(0.0f, -180, 180);
 
   Number mDefaultValue, mMinValue, mMaxValue;
 
   private StageParameter(Number pDefaultValue,
-                               Number pMinValue,
-                               Number pMaxValue)
+                         Number pMinValue,
+                         Number pMaxValue)
   {
     mDefaultValue = pDefaultValue;
     mMinValue = pMinValue;

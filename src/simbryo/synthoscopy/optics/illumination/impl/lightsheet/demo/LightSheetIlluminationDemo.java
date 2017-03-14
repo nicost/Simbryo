@@ -84,8 +84,6 @@ public class LightSheetIlluminationDemo
                                                       0.5f);
         lLightSheetIllumination.setOrientationWithAnglesInDegrees(0, 0, 0);
         lLightSheetIllumination.setLightSheetThetaInDeg(3.0f);
-        lLightSheetIllumination.setZCenterOffset(0.5f);
-        lLightSheetIllumination.setDefaultZDepth(lDrosoFluo.getImage());
         
         //lDrosoFluo.getPhantomImage().fillZero(true);
 

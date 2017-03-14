@@ -43,8 +43,6 @@ __kernel void propagate(   __read_only    image3d_t  scatterphantom,
                            __read_only    image2d_t  sinput,
                            __write_only   image2d_t  soutput,
                            const          int        x,
-                           const          float      zdepth,
-                           const          float      zoffset,
                            const          float      lambda,
                            const          float      intensity,
                            const          float      scatterconstant,                           
@@ -100,9 +98,11 @@ __kernel void propagate(   __read_only    image3d_t  scatterphantom,
   const int oy = get_global_offset(0); 
   const int oz = get_global_offset(1);
    
-  const float2 dvec  = (float2){0.5f-lsay/lsax, 0.5f-lsaz/lsax}*ilmdim.yz;
+  const float2 dvec  = (float2){-lsay/fabs(lsax), -lsaz/fabs(lsax)}*ilmdim.yz;
+  
+  const float2 halfshift = (float2){0.5f,0.5f}*ilmdim.yz;
 
-  const float4 pos = (float4){(float)x/lmwidth,(float)y/lmheight,zoffset+zdepth*(((float)z)/lmdepth), 0.0f};
+  const float4 pos = ((float4){0.5f, 0.5f, 0.5f, 0.0f}+(float4){(float)x,(float)y,(float)z, 0.0f})*ilmdim;
   
   //printf("lsa(%f,%f,%f)\n",lsa.x, lsa.y, lsa.z);
   //printf("lsn(%f,%f,%f)\n",lsn.x, lsn.y, lsn.z);
@@ -112,7 +112,7 @@ __kernel void propagate(   __read_only    image3d_t  scatterphantom,
   const float ballistic0 =  lightsheetfun(lambda, intensity, w0, lsheight, lsp, lsa, lsn, pos);
   
   // [READ IMAGE] proportion of ballistic light that made it through in previous planes:
-  const float oldballisticratio =  read_imagef(binput, normsamplerclamp, dvec+(float2){y,z}/lmdim.yz).x;
+  const float oldballisticratio =  read_imagef(binput, normsamplerclamp, dvec+halfshift+(float2){y,z}*ilmdim.yz).x;
  
   // scattering map value at voxel: 
   const float scattermapvalue = trans_read_imagef(scatterphantom, normsamplerclampedge, matrix16, pos).x;
@@ -143,12 +143,12 @@ __kernel void propagate(   __read_only    image3d_t  scatterphantom,
   for(  int iz=z-KS; iz<=z+KS; iz++)
     for(int iy=y-KS; iy<=y+KS; iy++)
     {
-      previouslyscattered += read_imagef(sinput, normsamplerclampedge, dvec+(float2){iy,iz}*ilmdim.yz).x;
+      previouslyscattered += read_imagef(sinput, normsamplerclampedge, dvec+halfshift+(float2){(float)iy,(float)iz}*ilmdim.yz).x;
     }
   previouslyscattered *= sigma; // weight /**/
   
   // [READ IMAGE] collect scattered light from previous plane without diffusion:
-  previouslyscattered +=  (1-sigma)*read_imagef(sinput, normsamplerclampedge, dvec+(float2){(float)y,(float)z}*ilmdim.yz ).x;
+  previouslyscattered +=  (1-sigma)*read_imagef(sinput, normsamplerclampedge, dvec+halfshift+(float2){(float)y,(float)z}*ilmdim.yz).x;
   
   // normalize to have conservation from one plane to the next:
   previouslyscattered *= 1.0f/((2*KS+1)*(2*KS+1)*sigma+(1-sigma));

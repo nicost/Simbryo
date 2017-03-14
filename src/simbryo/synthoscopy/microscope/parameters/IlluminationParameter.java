@@ -9,7 +9,7 @@ package simbryo.synthoscopy.microscope.parameters;
 public enum IlluminationParameter implements ParameterInterface<Number>
 {
  Wavelength(0.0005f, 0.0001, 0.01f),
- Intensity(1.0f, 0, 100),
+ Intensity(10.0f, 0, 100),
  X(0.5f, 0, 1),
  Y(0.5f, 0, 1),
  Z(0.5f, 0, 1),

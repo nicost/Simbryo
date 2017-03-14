@@ -5,7 +5,7 @@ package simbryo.util.mergeset;
  *
  * @author royer
  */
-public class FastArraySet
+public class FastArraySet 
 {
 
   /**

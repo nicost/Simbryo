@@ -4,16 +4,20 @@ import static java.lang.Math.toRadians;
 
 import java.io.IOException;
 
-import javax.vecmath.Matrix3f;
+import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
+import javax.vecmath.Vector4f;
 
+import clearcl.ClearCLBuffer;
 import clearcl.ClearCLContext;
 import clearcl.ClearCLImage;
 import clearcl.ClearCLKernel;
 import clearcl.ClearCLProgram;
 import clearcl.enums.ImageChannelDataType;
+import clearcl.util.MatrixUtils;
 import simbryo.synthoscopy.optics.illumination.IlluminationOpticsBase;
 import simbryo.synthoscopy.optics.illumination.IlluminationOpticsInterface;
+import simbryo.util.geom.GeometryUtils;
 
 /**
  * Lightsheet illumination.
@@ -30,15 +34,17 @@ public class LightSheetIllumination extends IlluminationOpticsBase
       mBallisticLightImageA, mBallisticLightImageB,
       mScatteredLightImageA, mScatteredLightImageB;
   protected ClearCLKernel mPropagateLightSheetKernel;
+  private ClearCLBuffer mCombinedTransformMatrixBuffer;
 
-  protected Vector3f mLightSheetPosition, mLightSheetAxisVector,
-      mLightSheetNormalVector, mLightSheetEffectiveAxisVector,
+  protected Vector4f mLightSheetPosition, mLightSheetAxisVector,
+      mLightSheetNormalVector, mLightSheetEffectivePosition,
+      mLightSheetEffectiveAxisVector,
       mLightSheetEffectiveNormalVector;
 
   private volatile float mLightSheetAlphaInRad, mLightSheetBetaInRad,
       mLightSheetGammaInRad, mLightSheetThetaInRad, mLightSheetHeigth,
-      mScatterConstant, mScatterLoss, mSigmaMin, mSigmaMax,
-      mZCenterOffset, mZDepth;
+      mScatterConstant, mScatterLoss, mSigmaMin, mSigmaMax;
+  private Matrix4f mDetectionTransformMatrix;
 
   /**
    * Instanciates a light sheet illumination optics class given a ClearCL
@@ -91,20 +97,27 @@ public class LightSheetIllumination extends IlluminationOpticsBase
                                                  1,
                                                  1);
     mNullImage.fillZero(false, false);
-    
+
     mInputImage = null;
 
-    mLightSheetPosition = new Vector3f(0f, 0f, 0.5f);
-    mLightSheetAxisVector = new Vector3f(1.0f, 0, 0);
-    mLightSheetNormalVector = new Vector3f(0, 0, 1.0f);
-    mLightSheetEffectiveAxisVector = new Vector3f(1.0f, 0, 0);
-    mLightSheetEffectiveNormalVector = new Vector3f(0, 0, 1.0f);
+    mLightSheetPosition = new Vector4f(0f, 0f, 0.5f, 1.0f);
+    mLightSheetAxisVector = new Vector4f(1.0f, 0, 0, 1.0f);
+    mLightSheetNormalVector = new Vector4f(0, 0, 1.0f, 1.0f);
+    mLightSheetEffectivePosition =
+                                 new Vector4f(0.5f, 0.5f, 0.5f, 1.0f);
+    mLightSheetEffectiveAxisVector = new Vector4f(1.0f, 0, 0, 1.0f);
+    mLightSheetEffectiveNormalVector = new Vector4f(0, 0, 1.0f, 1.0f);
+
+    mDetectionTransformMatrix = new Matrix4f();
+    mDetectionTransformMatrix.setIdentity();
   }
 
   @Override
   public void setInputImage(ClearCLImage pInputImage)
   {
     mInputImage = pInputImage;
+    if (mInputImage != null)
+      mInputImage.addListener((q, b) -> requestUpdate());
   }
 
   @Override
@@ -323,7 +336,7 @@ public class LightSheetIllumination extends IlluminationOpticsBase
    * 
    * @return axis vector
    */
-  public Vector3f getLightSheetPositionVector()
+  public Vector4f getLightSheetPositionVector()
   {
     return mLightSheetPosition;
   }
@@ -364,16 +377,15 @@ public class LightSheetIllumination extends IlluminationOpticsBase
       mLightSheetAxisVector.y = pY;
       mLightSheetAxisVector.z = pZ;
 
-      mLightSheetAxisVector.normalize();
+      GeometryUtils.homogenousNormalize(mLightSheetAxisVector);
       float lProjection =
-                        mLightSheetAxisVector.dot(mLightSheetNormalVector);
+                        GeometryUtils.homogenousDot(mLightSheetAxisVector,
+                                                    mLightSheetNormalVector);
 
       mLightSheetNormalVector.scaleAdd(-lProjection,
                                        mLightSheetAxisVector,
                                        mLightSheetNormalVector);
-      mLightSheetNormalVector.normalize();
-
-      updateEffectiveAxisAndNormalVectors();
+      GeometryUtils.homogenousNormalize(mLightSheetNormalVector);
       requestUpdate();
     }
   }
@@ -383,7 +395,7 @@ public class LightSheetIllumination extends IlluminationOpticsBase
    * 
    * @return axis vector
    */
-  public Vector3f getLightSheetAxisVector()
+  public Vector4f getLightSheetAxisVector()
   {
     return mLightSheetAxisVector;
   }
@@ -424,17 +436,17 @@ public class LightSheetIllumination extends IlluminationOpticsBase
       mLightSheetNormalVector.y = pY;
       mLightSheetNormalVector.z = pZ;
 
-      mLightSheetNormalVector.normalize();
+      GeometryUtils.homogenousNormalize(mLightSheetNormalVector);
 
       float lProjection =
-                        mLightSheetNormalVector.dot(mLightSheetAxisVector);
+                        GeometryUtils.homogenousDot(mLightSheetNormalVector,
+                                                    mLightSheetAxisVector);
 
       mLightSheetAxisVector.scaleAdd(-lProjection,
                                      mLightSheetNormalVector,
                                      mLightSheetAxisVector);
 
-      mLightSheetAxisVector.normalize();
-      updateEffectiveAxisAndNormalVectors();
+      GeometryUtils.homogenousNormalize(mLightSheetAxisVector);
       requestUpdate();
     }
   }
@@ -444,78 +456,12 @@ public class LightSheetIllumination extends IlluminationOpticsBase
    * 
    * @return normal vector
    */
-  public Vector3f getLightSheetNormalVector()
+  public Vector4f getLightSheetNormalVector()
   {
     return mLightSheetNormalVector;
   }
 
-  /**
-   * Returns the z center position of the lightmap relative to the scatter
-   * phantom in normalized coordinates.
-   * 
-   * @return lightmap z center position relative to scatter phantom
-   */
-  public float getZCenterOffset()
-  {
-    return mZCenterOffset;
-  }
-
-  /**
-   * Sets the z center position of the lightmap relative to the scatter phantom
-   * in normalized coordinates.
-   * 
-   * @param pZCenterOffset
-   *          lightmap z center position relative to scatter phantom
-   */
-  public void setZCenterOffset(float pZCenterOffset)
-  {
-    if (mZCenterOffset != pZCenterOffset)
-    {
-      mZCenterOffset = pZCenterOffset;
-      requestUpdate();
-    }
-  }
-
-  /**
-   * Return the depth of the lightmap stack relative to the scatter phantom in
-   * normalized coordinates.
-   * 
-   * @return lightmap depth relative to scatter phantom
-   */
-  public float getZDepth()
-  {
-    return mZDepth;
-  }
-
-  /**
-   * Sets the depth of the lightmap stack relative to the scatter phantom in
-   * normalized coordinates.
-   * 
-   * @param pZDepth
-   *          lightmap depth relative to scatter phantom
-   */
-  public void setZDepth(float pZDepth)
-  {
-    if (mZDepth != pZDepth)
-    {
-      mZDepth = pZDepth;
-      requestUpdate();
-    }
-  }
-
-  /**
-   * Sets the default depth of the lightmap stack relative to the scatter
-   * phantom in normalized coordinates. This default value is such that each
-   * plane of the lightmap corresponds to a single plane of the scatter phantom.
-   * 
-   * @param pScatteringPhantomImage
-   *          scattering phantom
-   */
-  public void setDefaultZDepth(ClearCLImage pScatteringPhantomImage)
-  {
-    setZDepth((float) getDepth()
-              / pScatteringPhantomImage.getDepth());
-  }
+ 
 
   /**
    * Sets the axis and normal lightsheet vectors from the three angles (alpha,
@@ -563,38 +509,87 @@ public class LightSheetIllumination extends IlluminationOpticsBase
       mLightSheetBetaInRad = pBeta;
       mLightSheetGammaInRad = pGamma;
 
-      updateEffectiveAxisAndNormalVectors();
       requestUpdate();
     }
 
   }
 
-  private void updateEffectiveAxisAndNormalVectors()
+  @Override
+  public void setPhantomTransformMatrix(Matrix4f pTransformMatrix)
   {
-    Matrix3f lMatrix = new Matrix3f();
-    Matrix3f lRotX = new Matrix3f();
-    Matrix3f lRotY = new Matrix3f();
-    Matrix3f lRotZ = new Matrix3f();
+    super.setPhantomTransformMatrix(pTransformMatrix);
+  }
 
-    getLightSheetAxisVector().normalize();
-    getLightSheetNormalVector().normalize();
-    Vector3f lOrthoVector = new Vector3f();
-    lOrthoVector.cross(getLightSheetAxisVector(),
-                       getLightSheetNormalVector());
+  /**
+   * Sets teh detection transform matrix.
+   * 
+   * @param pDetectionTransformMatrix
+   *          detection transform matrix
+   */
+  public void setDetectionTransformMatrix(Matrix4f pDetectionTransformMatrix)
+  {
+    if (mDetectionTransformMatrix == null
+        || !mDetectionTransformMatrix.equals(pDetectionTransformMatrix))
+    {
+      mDetectionTransformMatrix = pDetectionTransformMatrix;
+      requestUpdate();
+    }
+  }
 
-    lMatrix.setColumn(0, getLightSheetAxisVector());
-    lMatrix.setColumn(1, lOrthoVector);
-    lMatrix.setColumn(2, getLightSheetNormalVector());
-    lRotX.rotX(mLightSheetAlphaInRad);
-    lRotY.rotY(mLightSheetBetaInRad);
-    lRotZ.rotZ(mLightSheetGammaInRad);
+  /**
+   * Returns the detection transform matrix
+   * 
+   * @return detection transform matrix
+   */
+  public Matrix4f getDetectionTransformMatrix()
+  {
+    return new Matrix4f(mDetectionTransformMatrix);
+  }
 
-    lMatrix.mul(lRotZ); 
-    lMatrix.mul(lRotX);
-    lMatrix.mul(lRotY);
+  /**
+   * Returns the inverse detection transform matrix
+   * 
+   * @return inverse detection transform matrix
+   */
+  public Matrix4f getInverseDetectionTransformMatrix()
+  {
+    Matrix4f lInverseDetectionTransformMatrix =
+                                              getDetectionTransformMatrix();
+    lInverseDetectionTransformMatrix.invert();
+    return lInverseDetectionTransformMatrix;
+  }
 
-    lMatrix.getColumn(0, mLightSheetEffectiveAxisVector);
-    lMatrix.getColumn(2, mLightSheetEffectiveNormalVector);
+  /**
+   * Returns the product of the phantom and detection transform matrices
+   * 
+   * @return product of the phantom and detection transform matrices
+   */
+  public Matrix4f getPhantomAndDetectionTransformMatrix()
+  {
+    Matrix4f lPhantomAndDetectionTransformMatrix =
+                                                 GeometryUtils.multiply(getPhantomTransformMatrix(),
+                                                                        getDetectionTransformMatrix());
+    return lPhantomAndDetectionTransformMatrix;
+  }
+
+  protected ClearCLBuffer getCombinedTransformMatrixBuffer()
+  {
+    mCombinedTransformMatrixBuffer =
+                                   MatrixUtils.matrixToBuffer(mContext,
+                                                              mCombinedTransformMatrixBuffer,
+                                                              getPhantomAndDetectionTransformMatrix());
+    return mCombinedTransformMatrixBuffer;
+  }
+
+  /**
+   * Returns the light sheet's effective position after all transformations
+   * applied.
+   * 
+   * @return effective lightsheet position
+   */
+  public Vector4f getLightSheetEffectivePosition()
+  {
+    return mLightSheetEffectivePosition;
   }
 
   /**
@@ -603,7 +598,7 @@ public class LightSheetIllumination extends IlluminationOpticsBase
    * 
    * @return effective axis vector
    */
-  public Vector3f getLightSheetEffectiveAxisVector()
+  public Vector4f getLightSheetEffectiveAxisVector()
   {
     return mLightSheetEffectiveAxisVector;
   }
@@ -614,7 +609,7 @@ public class LightSheetIllumination extends IlluminationOpticsBase
    * 
    * @return normal axis vector
    */
-  public Vector3f getLightSheetEffectiveNormalVector()
+  public Vector4f getLightSheetEffectiveNormalVector()
   {
     return mLightSheetEffectiveNormalVector;
   }
@@ -643,15 +638,13 @@ public class LightSheetIllumination extends IlluminationOpticsBase
                          mScatteredLightImageA,
                          mScatteredLightImageB);
 
-    setInvariantKernelParameters(mScatteringPhantomImage,
-                                 getZCenterOffset(),
-                                 getZDepth());
+    setInvariantKernelParameters(mScatteringPhantomImage);
 
     for (int i = 0; i < getWidth(); i++)
     {
       int x;
 
-      if (mLightSheetAxisVector.x > 0)
+      if (mLightSheetEffectiveAxisVector.x > 0)
         x = i;
       else
         x = (int) (getWidth() - 1 - i);
@@ -673,10 +666,46 @@ public class LightSheetIllumination extends IlluminationOpticsBase
     super.render(pWaitToFinish);
   }
 
-  private void setInvariantKernelParameters(ClearCLImage pScatteringPhantomImage,
-                                            float pZCenterOffset,
-                                            float pZDepth)
+  private void updateEffectiveVectors()
   {
+    Matrix4f lInverseDetectionTransformMatrix =
+                                              getInverseDetectionTransformMatrix();
+
+    GeometryUtils.homogenousNormalize(getLightSheetAxisVector());
+    GeometryUtils.homogenousNormalize(getLightSheetNormalVector());
+
+    Matrix4f lRotX = new Matrix4f();
+    Matrix4f lRotY = new Matrix4f();
+    Matrix4f lRotZ = new Matrix4f();
+
+    lRotX.rotX(mLightSheetAlphaInRad);
+    lRotY.rotY(mLightSheetBetaInRad);
+    lRotZ.rotZ(mLightSheetGammaInRad);
+
+    Matrix4f lVectorTransformationMatrix =
+                                         GeometryUtils.multiply(lInverseDetectionTransformMatrix,
+                                                                lRotZ,
+                                                                lRotX,
+                                                                lRotY);
+
+    mLightSheetEffectiveAxisVector =
+                                   GeometryUtils.directionMultiplication(lVectorTransformationMatrix,
+                                                                         mLightSheetAxisVector);
+
+    mLightSheetEffectiveNormalVector =
+                                     GeometryUtils.directionMultiplication(lVectorTransformationMatrix,
+                                                                           mLightSheetNormalVector);
+
+    mLightSheetEffectivePosition =
+                                 GeometryUtils.pointMultiplication(lInverseDetectionTransformMatrix,
+                                                                   mLightSheetPosition);
+
+  }
+
+  private void setInvariantKernelParameters(ClearCLImage pScatteringPhantomImage)
+  {
+    updateEffectiveVectors();
+
     mPropagateLightSheetKernel.setGlobalOffsets(0, 0);
     mPropagateLightSheetKernel.setGlobalSizes(getHeight(),
                                               getDepth());
@@ -689,11 +718,11 @@ public class LightSheetIllumination extends IlluminationOpticsBase
     mPropagateLightSheetKernel.setArgument("lightmapout", getImage());
 
     mPropagateLightSheetKernel.setArgument("lspx",
-                                           mLightSheetPosition.x);
+                                           mLightSheetEffectivePosition.x);
     mPropagateLightSheetKernel.setArgument("lspy",
-                                           mLightSheetPosition.y);
+                                           mLightSheetEffectivePosition.y);
     mPropagateLightSheetKernel.setArgument("lspz",
-                                           mLightSheetPosition.z);
+                                           mLightSheetEffectivePosition.z);
 
     mPropagateLightSheetKernel.setArgument("lsax",
                                            mLightSheetEffectiveAxisVector.x);
@@ -709,11 +738,6 @@ public class LightSheetIllumination extends IlluminationOpticsBase
     mPropagateLightSheetKernel.setArgument("lsnz",
                                            mLightSheetEffectiveNormalVector.z);
 
-    mPropagateLightSheetKernel.setArgument("zdepth", pZDepth);
-
-    mPropagateLightSheetKernel.setArgument("zoffset",
-                                           pZCenterOffset
-                                                      - pZDepth / 2);
 
     mPropagateLightSheetKernel.setArgument("lambda",
                                            getLightWavelength());
@@ -735,10 +759,9 @@ public class LightSheetIllumination extends IlluminationOpticsBase
 
     mPropagateLightSheetKernel.setArgument("lsheight",
                                            getLightSheetHeigth());
-    
-    updateTransformBuffer();
+
     mPropagateLightSheetKernel.setOptionalArgument("matrix",
-                                                   getTransformMatrixBuffer());
+                                                   getCombinedTransformMatrixBuffer());
   }
 
   private void propagate(int pXPosition,

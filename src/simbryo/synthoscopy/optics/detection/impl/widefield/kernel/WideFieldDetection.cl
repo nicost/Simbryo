@@ -8,10 +8,8 @@ __kernel void collectpair( __read_only    image3d_t  fluophantom,
                            __read_only    image2d_t  imagein,
                            __write_only   image2d_t  imageout,
                            const          float      intensity,
-                           const          float      fpz1,
-                           const          float      fpz2,
-                           const          float      lmz1,
-                           const          float      lmz2
+                           const          float      z1,
+                           const          float      z2
                        )
 {
   const sampler_t normsampler = CLK_NORMALIZED_COORDS_TRUE  | CLK_ADDRESS_CLAMP_TO_EDGE | CLK_FILTER_LINEAR;
@@ -22,20 +20,25 @@ __kernel void collectpair( __read_only    image3d_t  fluophantom,
   const int x = get_global_id(0); 
   const int y = get_global_id(1);
   
-  const int width   = get_global_size(0); 
-  const int height  = get_global_size(1);
+  const int    width   = get_global_size(0); 
+  const int    height  = get_global_size(1);
+  
+  const int   fmdepth   = get_image_depth(fluophantom);
+  const float ifmdepth   = 1.0f/fmdepth;
+  
+  const int   lmdepth   = get_image_depth(lightmap);
+  const float ilmdepth   = 1.0f/lmdepth;
   
   const float nx = ((float)x+0.5f)/width;
   const float ny = ((float)y+0.5f)/height;
 
-  
   const float oldvalue     = read_imagef(imagein, intsampler, (int2){x,y}).x;
   
-  const float fluovalue1   = trans_read_imagef(fluophantom, normsampler, matrix16, (float4){nx,ny,fpz1,0.0f}).x;
-  const float fluovalue2   = trans_read_imagef(fluophantom, normsampler, matrix16, (float4){nx,ny,fpz2,0.0f}).x;
+  const float fluovalue1   = trans_read_imagef(fluophantom, normsampler, matrix16, (float4){nx,ny,z1+0.5f*ifmdepth,0.0f}).x;
+  const float fluovalue2   = trans_read_imagef(fluophantom, normsampler, matrix16, (float4){nx,ny,z2+0.5f*ifmdepth,0.0f}).x;
   
-  const float lightvalue1  = read_imagef(lightmap,    normsampler, (float4){nx,ny,lmz1,0.0f}).x;
-  const float lightvalue2  = read_imagef(lightmap,    normsampler, (float4){nx,ny,lmz2,0.0f}).x;
+  const float lightvalue1  = read_imagef(lightmap,    normsampler, (float4){nx,ny,z1+0.5f*ilmdepth,0.0f}).x;
+  const float lightvalue2  = read_imagef(lightmap,    normsampler, (float4){nx,ny,z2+0.5f*ilmdepth,0.0f}).x;
   
   const float newvalue     = oldvalue+intensity*(fluovalue1*lightvalue1+fluovalue2*lightvalue2);
   
@@ -47,9 +50,8 @@ __kernel void collectsingle(   __read_only    image3d_t  fluophantom,
                                __constant     float*     matrix,
                                __read_only    image2d_t  imagein,
                                __write_only   image2d_t  imageout,
-                                 const          float      intensity,
-                                 const        float      fpz,
-                                 const        float      lmz
+                                 const        float      intensity,
+                                 const        float      z
                              )
 {
   const sampler_t normsampler = CLK_NORMALIZED_COORDS_TRUE  | CLK_ADDRESS_CLAMP_TO_EDGE | CLK_FILTER_LINEAR;
@@ -60,15 +62,21 @@ __kernel void collectsingle(   __read_only    image3d_t  fluophantom,
   const int x = get_global_id(0); 
   const int y = get_global_id(1);
   
-  const int width = get_global_size(0); 
-  const int height  = get_global_size(1);
+  const int width  = get_global_size(0); 
+  const int height = get_global_size(1);
+  
+  const int   fmdepth   = get_image_depth(fluophantom);
+  const float ifmdepth  = 1.0f/fmdepth;
+  
+  const int   lmdepth   = get_image_depth(lightmap);
+  const float ilmdepth  = 1.0f/lmdepth;
   
   const float nx = ((float)x+0.5f)/width;
   const float ny = ((float)y+0.5f)/height;
 
   const float oldvalue    = read_imagef(imagein, intsampler, (int2){x,y}).x;
-  const float fluovalue   = trans_read_imagef(fluophantom, normsampler,  matrix16, (float4){nx,ny,fpz,0.0f}).x;
-  const float lightvalue  = read_imagef(lightmap,    normsampler, (float4){nx,ny,lmz,0.0f}).x;
+  const float fluovalue   = trans_read_imagef(fluophantom, normsampler,  matrix16, (float4){nx,ny,z+0.5f*ifmdepth,0.0f}).x;
+  const float lightvalue  = read_imagef(lightmap,    normsampler, (float4){nx,ny,z+0.5f*ilmdepth,0.0f}).x;
   
   const float newvalue    = oldvalue+intensity*fluovalue*lightvalue;
   
@@ -137,6 +145,7 @@ __kernel void scatterblur( __read_only    image3d_t  scatterphantom,
   
   const int width   = get_global_size(0); 
   const int height  = get_global_size(1);
+  
   
   const float nx = ((float)x+0.5f)/width;
   const float ny = ((float)y+0.5f)/height;

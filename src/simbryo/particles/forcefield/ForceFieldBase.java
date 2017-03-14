@@ -5,7 +5,8 @@ package simbryo.particles.forcefield;
  *
  * @author royer
  */
-public abstract class ForceFieldBase implements ForceFieldInterface
+public abstract class ForceFieldBase implements
+                                     ForceFieldInterface
 {
   private static final long serialVersionUID = 1L;
 

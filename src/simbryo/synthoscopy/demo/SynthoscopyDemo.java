@@ -184,15 +184,11 @@ public class SynthoscopyDemo
                                                                     beta,
                                                                     gamma);
           lLightSheetIllumination.setLightSheetThetaInDeg(theta);
-          lLightSheetIllumination.setZCenterOffset(z);
-          lLightSheetIllumination.setDefaultZDepth(lDrosophilaScatteringPhantom.getImage());
 
           lWideFieldDetectionOptics.setIntensity(1);
           lWideFieldDetectionOptics.setLightWavelength(lLightSheetIllumination.getLightWavelength());
           lWideFieldDetectionOptics.setZFocusPosition(z);
-          lWideFieldDetectionOptics.setDefaultZDepth(lDrosophilaFluorescencePhantom.getImage(),
-                                                     lLightSheetIllumination.getImage());
-
+        
           lLightSheetIllumination.setScatteringPhantom(lDrosophilaScatteringPhantom.getImage());
 
           lWideFieldDetectionOptics.setFluorescencePhantomImage(lDrosophilaFluorescencePhantom.getImage());

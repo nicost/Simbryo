@@ -25,7 +25,7 @@ public abstract class OpticsBase extends ClearCLSynthoscopyBase
   private static final float cDefaultWavelengthInNormUnits = 0.0005f;
   private float mWavelengthInNormUnits;
 
-  private Matrix4f mTransformMatrix = new Matrix4f();
+  private Matrix4f mPhantomTransformMatrix = new Matrix4f();
   private ClearCLBuffer mTransformMatrixBuffer;
 
   /**
@@ -42,20 +42,15 @@ public abstract class OpticsBase extends ClearCLSynthoscopyBase
   {
     super(pContext, pImageDimensions);
     mWavelengthInNormUnits = cDefaultWavelengthInNormUnits;
-    mTransformMatrix.setIdentity();
-    mTransformMatrix.setTranslation(new Vector3f(0.1f, 0.1f, 0.1f));
+    mPhantomTransformMatrix.setIdentity();
   }
 
-  protected void updateTransformBuffer()
+  protected ClearCLBuffer getPhantomTransformMatrixBuffer()
   {
     mTransformMatrixBuffer =
                            MatrixUtils.matrixToBuffer(mContext,
                                                       mTransformMatrixBuffer,
-                                                      getTransformMatrix());
-  }
-
-  protected ClearCLBuffer getTransformMatrixBuffer()
-  {
+                                                      getPhantomTransformMatrix());
     return mTransformMatrixBuffer;
   }
 
@@ -76,28 +71,36 @@ public abstract class OpticsBase extends ClearCLSynthoscopyBase
   }
 
   @Override
-  public Matrix4f getTransformMatrix()
+  public Matrix4f getPhantomTransformMatrix()
   {
-    return mTransformMatrix;
+    return new Matrix4f(mPhantomTransformMatrix);
   }
 
   @Override
-  public void setTransformMatrix(Matrix4f pTransformMatrix)
+  public Matrix4f getInversePhantomTransformMatrix()
   {
-    if (!mTransformMatrix.equals(pTransformMatrix))
+    Matrix4f lInverseTransformMatrix = getPhantomTransformMatrix();
+    lInverseTransformMatrix.invert();
+    return lInverseTransformMatrix;
+  }
+
+  @Override
+  public void setPhantomTransformMatrix(Matrix4f pTransformMatrix)
+  {
+    if (mPhantomTransformMatrix==null || !mPhantomTransformMatrix.equals(pTransformMatrix))
     {
-      mTransformMatrix = pTransformMatrix;
+      mPhantomTransformMatrix = pTransformMatrix;
       requestUpdate();
     }
   }
-  
+
   @Override
   public void setTranslation(Vector3f pTranslationVector)
   {
     Matrix4f lNewMatrix = new Matrix4f();
-    lNewMatrix.set(getTransformMatrix());
+    lNewMatrix.set(getPhantomTransformMatrix());
     lNewMatrix.setTranslation(pTranslationVector);
-    setTransformMatrix(lNewMatrix);
+    setPhantomTransformMatrix(lNewMatrix);
   }
 
 }
