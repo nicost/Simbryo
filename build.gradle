@@ -23,6 +23,8 @@ apply plugin: "com.jfrog.bintray"
 apply plugin: 'javafx-gradle-plugin'
 
 
+
+
 sourceSets {
     main
     {
@@ -269,7 +271,10 @@ jfx {
     certCountry = null // required
 }
 
+//***********************************************************************************
+// GIT HOOKS:
 
+apply from: 'gradle/install-git-hooks.gradle'
 
 
 
