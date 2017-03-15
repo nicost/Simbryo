@@ -46,7 +46,7 @@ public class TissueDynamics extends ParticleSystem
   protected volatile long mTimeStepIndex = 0;
   protected final Sequence mSequence = new Sequence();
 
-  private ParticleViewer3D mParticleViewer3D;
+  private transient ParticleViewer3D mParticleViewer3D;
 
   /**
    * Constructs a tissue of given dimensions (2D or 3D), dimension, grid size,

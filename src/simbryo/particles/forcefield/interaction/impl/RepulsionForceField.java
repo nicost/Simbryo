@@ -22,7 +22,7 @@ public class RepulsionForceField extends InteractionForceFieldBase
 
   private int mNumberOfInteractionPartners;
 
-  private SplittableRandom mRandom = new SplittableRandom();
+  private transient SplittableRandom mRandom;
 
   /**
    * Constructs a collision force field given a force intensity and a percentage
@@ -46,6 +46,9 @@ public class RepulsionForceField extends InteractionForceFieldBase
                               int pEndId,
                               ParticleSystem pParticleSystem)
   {
+    if (mRandom == null)
+      mRandom = new SplittableRandom();
+
     final int lDimension = pParticleSystem.getDimension();
 
     final float[] lPositionsRead = pParticleSystem.getPositions()

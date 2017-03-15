@@ -5,7 +5,7 @@ package simbryo.textures;
  *
  * @author royer
  */
-public interface TextureGeneratorInterface
+public interface TextureGeneratorInterface extends Cloneable
 {
 
   /**

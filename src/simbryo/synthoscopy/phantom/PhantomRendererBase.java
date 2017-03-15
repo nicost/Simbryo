@@ -146,7 +146,8 @@ public abstract class PhantomRendererBase extends
                             int pZPlaneIndexEnd,
                             boolean pWaitToFinish)
   {
-    if (!isUpdateNeeded() && isValid(pZPlaneIndexBegin, pZPlaneIndexEnd))
+    if (!isUpdateNeeded()
+        && isValid(pZPlaneIndexBegin, pZPlaneIndexEnd))
       return 0;
 
     int lCounter = 0;
@@ -186,10 +187,11 @@ public abstract class PhantomRendererBase extends
 
     // First we snap the rendering z bounds to the grid cell boundaries:
     pZPlaneIndexBegin =
-                      (int) (Math.floor(pZPlaneIndexBegin
+                      (int) (Math.floor((float) pZPlaneIndexBegin
                                         / mLocalSizeZ)
                              * mLocalSizeZ);
-    pZPlaneIndexEnd = (int) (Math.ceil(pZPlaneIndexEnd / mLocalSizeZ)
+    pZPlaneIndexEnd = (int) (Math.ceil((float) pZPlaneIndexEnd
+                                       / mLocalSizeZ)
                              * mLocalSizeZ);
 
     // Now we can render a possibly slightly larger chunck of the stack:
