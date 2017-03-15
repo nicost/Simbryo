@@ -174,5 +174,5 @@ public abstract class TextureGeneratorBase implements
 
     return pTextureArray;
   }
-  
+
 }
