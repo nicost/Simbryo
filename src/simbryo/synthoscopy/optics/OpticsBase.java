@@ -40,7 +40,7 @@ public abstract class OpticsBase extends ClearCLSynthoscopyBase
   public OpticsBase(final ClearCLContext pContext,
                     long... pImageDimensions)
   {
-    super(pContext, pImageDimensions);
+    super(pContext, false, pImageDimensions);
     mWavelengthInNormUnits = cDefaultWavelengthInNormUnits;
     mPhantomTransformMatrix.setIdentity();
   }

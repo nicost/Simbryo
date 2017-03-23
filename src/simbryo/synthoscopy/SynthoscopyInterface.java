@@ -69,4 +69,11 @@ public interface SynthoscopyInterface<I>
    */
   long getDepth();
 
+  /**
+   * Returns a copy of the array holding the image dimensions
+   * 
+   * @return dimensions array
+   */
+  long[] getImageDimensions();
+
 }

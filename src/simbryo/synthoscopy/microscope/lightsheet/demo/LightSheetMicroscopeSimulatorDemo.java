@@ -116,12 +116,7 @@ public class LightSheetMicroscopeSimulatorDemo
           ClearCLContext lContext = lFastestGPUDevice.createContext())
       {
 
-        Drosophila lDrosophila =
-                               Drosophila.getDeveloppedEmbryo(11,
-                                                              lPhantomWidth,
-                                                              lPhantomHeight,
-                                                              lPhantomDepth,
-                                                              lFastestGPUDevice);
+        Drosophila lDrosophila = Drosophila.getDeveloppedEmbryo(11);
 
         DrosophilaHistoneFluorescence lDrosophilaFluorescencePhantom =
                                                                      new DrosophilaHistoneFluorescence(lContext,
@@ -131,7 +126,8 @@ public class LightSheetMicroscopeSimulatorDemo
                                                                                                        lPhantomDepth);
         lDrosophilaFluorescencePhantom.render(true);
 
-        @SuppressWarnings("unused")
+        // @SuppressWarnings("unused")
+
         /*ClearCLImageViewer lFluoPhantomViewer = lDrosophilaFluorescencePhantom.openViewer();/**/
 
         DrosophilaScatteringPhantom lDrosophilaScatteringPhantom =
@@ -144,7 +140,7 @@ public class LightSheetMicroscopeSimulatorDemo
 
         lDrosophilaScatteringPhantom.render(true);
 
-        @SuppressWarnings("unused")
+        // @SuppressWarnings("unused")
         /*ClearCLImageViewer lScatterPhantomViewer =
                                                  lDrosophilaScatteringPhantom.openViewer();/**/
 
@@ -156,10 +152,10 @@ public class LightSheetMicroscopeSimulatorDemo
                                                                                              lPhantomHeight,
                                                                                              lPhantomDepth);
 
-        lSimulator.setPhantom(PhantomParameter.Fluorescence,
-                              lDrosophilaFluorescencePhantom.getImage());
-        lSimulator.setPhantom(PhantomParameter.Scattering,
-                              lDrosophilaScatteringPhantom.getImage());
+        lSimulator.setPhantomParameter(PhantomParameter.Fluorescence,
+                                       lDrosophilaFluorescencePhantom.getImage());
+        lSimulator.setPhantomParameter(PhantomParameter.Scattering,
+                                       lDrosophilaScatteringPhantom.getImage());
 
         lSimulator.openViewerForControls();
 

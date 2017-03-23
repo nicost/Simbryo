@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 
-import clearcl.ClearCLDevice;
 import simbryo.dynamics.tissue.cellprop.CellProperty;
 import simbryo.dynamics.tissue.cellprop.HasPolarity;
 import simbryo.dynamics.tissue.cellprop.VectorCellProperty;
@@ -265,28 +264,16 @@ public class Drosophila extends EmbryoDynamics
   }
 
   /**
-   * Returns a cached embryo dynamics state. Phantom widths, heuights and depth
-   * are provided to optimize the grid size.
+   * Returns a cached embryo dynamics state. Phantom width, height and depth are
+   * provided to optimize the grid size.
    * 
    * @param pDivisionTime
    *          time in cell-division time
-   * @param pPhantomWidth
-   *          phantom width
-   * @param pPhantomHeight
-   *          phantom height
-   * @param pPhantomDepth
-   *          phantom depth
-   * @param pGPUDevice
-   *          GPU device
    * @return Drosohila dynamics at given state.
    * @throws IOException
    *           exception if problem savin/loading saved dynamics state
    */
-  public static Drosophila getDeveloppedEmbryo(float pDivisionTime,
-                                               int pPhantomWidth,
-                                               int pPhantomHeight,
-                                               int pPhantomDepth,
-                                               ClearCLDevice pGPUDevice) throws IOException
+  public static Drosophila getDeveloppedEmbryo(float pDivisionTime) throws IOException
   {
     File lTempDirectory =
                         new File(System.getProperty("java.io.tmpdir"));

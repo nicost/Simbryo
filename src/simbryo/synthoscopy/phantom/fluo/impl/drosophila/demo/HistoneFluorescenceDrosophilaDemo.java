@@ -1,6 +1,6 @@
 package simbryo.synthoscopy.phantom.fluo.impl.drosophila.demo;
 
-import java.io.IOException;
+import java.io.File;
 import java.util.Arrays;
 import javafx.scene.control.Slider;
 
@@ -11,11 +11,13 @@ import clearcl.backend.ClearCLBackendInterface;
 import clearcl.backend.ClearCLBackends;
 import clearcl.util.ElapsedTime;
 import clearcl.viewer.ClearCLImageViewer;
+import coremem.enums.NativeTypeEnum;
 
 import org.junit.Test;
 
 import simbryo.dynamics.tissue.embryo.zoo.Drosophila;
 import simbryo.synthoscopy.phantom.fluo.impl.drosophila.DrosophilaHistoneFluorescence;
+import simbryo.synthoscopy.phantom.io.PhantomRawWriter;
 import simbryo.util.timing.Timming;
 
 /**
@@ -26,24 +28,28 @@ import simbryo.util.timing.Timming;
 public class HistoneFluorescenceDrosophilaDemo
 {
 
+  private static final boolean cWriteStack = false;
   private static final boolean cRenderFullStack = true;
-  private static final int cWidth = 512;
-  private static final int cHeight = 512;
-  private static final int cDepth = 512;
+  private static final int cWidth = 320;
+  private static final int cHeight = cWidth;
+  private static final int cDepth = cWidth;
   private static final int cStartSimulationStep = 0;
   private static final int cDisplayPeriod = 10;
 
   /**
    * Demo
    * 
-   * @throws IOException
-   *           NA
-   * @throws InterruptedException
+   * @throws Exception
    *           NA
    */
   @Test
-  public void demo() throws IOException, InterruptedException
+  public void demo() throws Exception
   {
+
+    PhantomRawWriter lPhantomRawWriter =
+                                       new PhantomRawWriter(NativeTypeEnum.Float,
+                                                            1f,
+                                                            0f);
 
     ElapsedTime.sStandardOutput = true;
 
@@ -53,15 +59,11 @@ public class HistoneFluorescenceDrosophilaDemo
     try (ClearCL lClearCL = new ClearCL(lBestBackend);
         ClearCLDevice lFastestGPUDevice =
                                         lClearCL.getFastestGPUDeviceForImages();
+
         ClearCLContext lContext = lFastestGPUDevice.createContext())
     {
 
-      Drosophila lDrosophila =
-                             Drosophila.getDeveloppedEmbryo(14,
-                                                            cWidth,
-                                                            cHeight,
-                                                            cDepth,
-                                                            lFastestGPUDevice);
+      Drosophila lDrosophila = Drosophila.getDeveloppedEmbryo(14);
 
       System.out.println("grid size:"
                          + Arrays.toString(lDrosophila.getGridDimensions()));
@@ -87,7 +89,7 @@ public class HistoneFluorescenceDrosophilaDemo
       while (lOpenViewer.isShowing() && !lAbort)
       {
         // System.out.println("i=" + i);
-        lTimming.syncAtPeriod(5000);
+        lTimming.syncAtPeriod(5);
 
         ElapsedTime.measure(i % cDisplayPeriod == 0,
                             "dynamics",
@@ -98,7 +100,7 @@ public class HistoneFluorescenceDrosophilaDemo
           lDrosoFluo.clear(true);
 
           if (cRenderFullStack)
-            lDrosoFluo.render(0, (int) lDrosoFluo.getDepth(), true);
+            lDrosoFluo.render(true);
           else
             lDrosoFluo.render((int) lZSlider.valueProperty().get()
                               - 1,
@@ -107,12 +109,19 @@ public class HistoneFluorescenceDrosophilaDemo
                               true);
 
           lAbort = checkMaxGridCellOccupancy(lDrosophila, lAbort);
+
+          if (cWriteStack)
+            lPhantomRawWriter.write(lDrosoFluo,
+                                    new File("/Users/royer/Temp/temp.raw"));
+          // lAbort=true;
         }
 
         i++;
       }
 
       lDrosoFluo.close();
+
+      lPhantomRawWriter.close();
 
     }
 

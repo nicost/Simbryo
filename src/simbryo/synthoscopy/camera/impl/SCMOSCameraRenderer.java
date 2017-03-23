@@ -2,11 +2,16 @@ package simbryo.synthoscopy.camera.impl;
 
 import java.io.IOException;
 
+import clearcl.ClearCLBuffer;
 import clearcl.ClearCLContext;
 import clearcl.ClearCLImage;
 import clearcl.ClearCLKernel;
 import clearcl.ClearCLProgram;
+import clearcl.enums.HostAccessType;
 import clearcl.enums.ImageChannelDataType;
+import clearcl.enums.KernelAccessType;
+import clearcl.enums.MemAllocMode;
+import coremem.enums.NativeTypeEnum;
 import simbryo.synthoscopy.camera.CameraRendererInterface;
 import simbryo.synthoscopy.camera.ClearCLCameraRendererBase;
 
@@ -19,10 +24,9 @@ public class SCMOSCameraRenderer extends ClearCLCameraRendererBase
                                  implements
                                  CameraRendererInterface<ClearCLImage>
 {
-
-  protected ClearCLImage mImageTemp;
-
   protected ClearCLKernel mUpscaleKernel, mNoiseKernel;
+  protected ClearCLBuffer mImageShortBuffer;
+  protected ClearCLImage mImageTemp;
 
   private int mTimeIndex = 0;
 
@@ -283,7 +287,6 @@ public class SCMOSCameraRenderer extends ClearCLCameraRendererBase
       mYMin = pYMin;
       mYMax = pYMax;
 
-      ensureImagesAllocated();
       requestUpdate();
     }
   }
@@ -306,6 +309,45 @@ public class SCMOSCameraRenderer extends ClearCLCameraRendererBase
            (int) (getMaxWidth() - lMarginX),
            lMarginY,
            (int) (getMaxHeight() - lMarginY));
+  }
+
+  /**
+   * Sets a centered Region-Of-Interest with XY offset (center of ROI coincides
+   * with center of detector)
+   * 
+   * @param pXOffset
+   *          x offset
+   * @param pYOffset
+   *          y offset
+   * @param pWidth
+   *          width of ROI
+   * @param pHeight
+   *          height of ROI
+   */
+
+  public void setCenteredROI(int pXOffset,
+                             int pYOffset,
+                             int pWidth,
+                             int pHeight)
+  {
+    int lMarginX = (int) ((getMaxWidth() - pWidth) / 2);
+    int lMarginY = (int) ((getMaxHeight() - pHeight) / 2);
+
+    int xmin = clamp(lMarginX + pXOffset, 0, getMaxWidth());
+    int xmax = clamp((int) (getMaxWidth() - lMarginX) + pXOffset,
+                     0,
+                     getMaxWidth());
+    int ymin = clamp(lMarginY + pYOffset, 0, getMaxHeight());
+    int ymax = clamp((int) (getMaxHeight() - lMarginY) + pYOffset,
+                     0,
+                     getMaxHeight());
+
+    setROI(xmin, xmax, ymin, ymax);
+  }
+
+  private int clamp(int pValue, int pMin, long pMax)
+  {
+    return (int) Math.max(Math.min(pValue, pMax), pMin);
   }
 
   @Override
@@ -342,10 +384,15 @@ public class SCMOSCameraRenderer extends ClearCLCameraRendererBase
 
   private void ensureImagesAllocated()
   {
-    if (mImage != null)
-      mImage.close();
-    if (mImageTemp != null)
-      mImageTemp.close();
+    if (mImage != null && mImageTemp != null
+        && mImageShortBuffer != null
+        && mImage.getWidth() == getWidth()
+        && mImage.getHeight() == getHeight())
+      return;
+
+    ClearCLImage lImage = mImage;
+    ClearCLImage lImageTemp = mImageTemp;
+    ClearCLBuffer lImageShortBuffer = mImageShortBuffer;
 
     mImage =
            mContext.createSingleChannelImage(ImageChannelDataType.Float,
@@ -353,6 +400,26 @@ public class SCMOSCameraRenderer extends ClearCLCameraRendererBase
                                              getHeight());
 
     mImageTemp = mContext.createImage(mImage);
+
+    mImageShortBuffer =
+                      mContext.createBuffer(MemAllocMode.Best,
+                                            HostAccessType.ReadOnly,
+                                            KernelAccessType.WriteOnly,
+                                            1,
+                                            NativeTypeEnum.UnsignedShort,
+                                            getWidth(),
+                                            getHeight());
+
+    if (mViewImage != null)
+      mViewImage.setImage(mImage);
+
+    if (lImage != null)
+      lImage.close();
+    if (lImageTemp != null)
+      lImageTemp.close();
+    if (lImageShortBuffer != null)
+      lImageShortBuffer.close();
+
   }
 
   protected void setupProgramAndKernels() throws IOException
@@ -375,13 +442,20 @@ public class SCMOSCameraRenderer extends ClearCLCameraRendererBase
     if (!isUpdateNeeded())
       return;
 
+    ensureImagesAllocated();
     clearImages(false);
     setInvariantKernelParameters(mDetectionImage);
     upscale(mDetectionImage, mImageTemp, false);
-    noise(mImageTemp, mImage, pWaitToFinish);
+    noise(mImageTemp, mImage, mImageShortBuffer, pWaitToFinish);
     incrementTimeIndex();
 
     super.render(pWaitToFinish);
+  }
+
+  @Override
+  public ClearCLBuffer getCameraImageBuffer()
+  {
+    return mImageShortBuffer;
   }
 
   private void clearImages(boolean pWaitToFinish)
@@ -422,10 +496,12 @@ public class SCMOSCameraRenderer extends ClearCLCameraRendererBase
 
   private void noise(ClearCLImage pImageInput,
                      ClearCLImage pImageOutput,
+                     ClearCLBuffer pBufferOut,
                      boolean pWaitToFinish)
   {
     mNoiseKernel.setArgument("imagein", pImageInput);
     mNoiseKernel.setArgument("imageout", pImageOutput);
+    mNoiseKernel.setArgument("bufferout", pBufferOut);
     mNoiseKernel.setArgument("timeindex", mTimeIndex);
     mNoiseKernel.setArgument("shotnoise", getShotNoise());
     mNoiseKernel.setArgument("offset", getOffset());

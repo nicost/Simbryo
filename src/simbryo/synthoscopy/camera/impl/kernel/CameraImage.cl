@@ -32,6 +32,7 @@ __kernel void upscale(     __read_only    image2d_t  imagein,
 
 __kernel void camnoise(   __read_only    image2d_t  imagein,
                           __write_only   image2d_t  imageout,
+                          __global       ushort*    bufferout,
                           const          int        timeindex,
                           const          float      shotnoise,
                           const          float      offset,
@@ -47,6 +48,9 @@ __kernel void camnoise(   __read_only    image2d_t  imagein,
  
   const int x = get_global_id(0); 
   const int y = get_global_id(1);
+  
+  const int width   = get_global_size(0); 
+  const int height  = get_global_size(1);
   
   // generating some entropy (its noise_xy and not noi_sexy ;-):
   const unsigned int noisexy1  = rnguint2(x,y);
@@ -75,5 +79,6 @@ __kernel void camnoise(   __read_only    image2d_t  imagein,
   float detectorvalue = offset + offsetbiasvalue + offsetnoisevalue + gain*(1+gainbiasvalue+gainnoisevalue)*(shotnoisevalue+fluovalue);    
   
   write_imagef (imageout, (int2){x,y}, detectorvalue);
+  bufferout[x+width*y] = convert_ushort(detectorvalue);
 }
 

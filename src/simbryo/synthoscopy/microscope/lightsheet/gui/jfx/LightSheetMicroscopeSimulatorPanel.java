@@ -1,4 +1,4 @@
-package simbryo.synthoscopy.microscope.lightsheet.demo.jfx;
+package simbryo.synthoscopy.microscope.lightsheet.gui.jfx;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -50,6 +50,7 @@ public class LightSheetMicroscopeSimulatorPanel extends TabPane
       tab.setText("Stage");
       tab.setContent(setupParameterControls(pSimulator,
                                             StageParameter.values(),
+                                            true,
                                             0));
       getTabs().add(tab);
     }
@@ -60,6 +61,7 @@ public class LightSheetMicroscopeSimulatorPanel extends TabPane
       tab.setText("Illumination" + i);
       tab.setContent(setupParameterControls(pSimulator,
                                             IlluminationParameter.values(),
+                                            true,
                                             i));
       getTabs().add(tab);
     }
@@ -70,6 +72,7 @@ public class LightSheetMicroscopeSimulatorPanel extends TabPane
       tab.setText("Detection" + i);
       tab.setContent(setupParameterControls(pSimulator,
                                             DetectionParameter.values(),
+                                            true,
                                             i));
       getTabs().add(tab);
     }
@@ -80,6 +83,7 @@ public class LightSheetMicroscopeSimulatorPanel extends TabPane
       tab.setText("Camera" + i);
       tab.setContent(setupParameterControls(pSimulator,
                                             CameraParameter.values(),
+                                            true,
                                             i));
       getTabs().add(tab);
     }
@@ -88,15 +92,18 @@ public class LightSheetMicroscopeSimulatorPanel extends TabPane
 
   private Node setupParameterControls(LightSheetMicroscopeSimulator pSimulator,
                                       ParameterInterface<Number>[] pParameterArray,
+                                      boolean sendEventsWhileDragging,
                                       int pIndex)
   {
     return setupParameterControls(pSimulator,
                                   Arrays.asList(pParameterArray),
+                                  sendEventsWhileDragging,
                                   pIndex);
   }
 
   private Node setupParameterControls(LightSheetMicroscopeSimulator pSimulator,
                                       Collection<ParameterInterface<Number>> pParameterList,
+                                      boolean sendEventsWhileDragging,
                                       int pIndex)
   {
     GridPane lGridPane = new GridPane();
@@ -117,7 +124,12 @@ public class LightSheetMicroscopeSimulatorPanel extends TabPane
     int i = 0;
     for (ParameterInterface<Number> lParameter : pParameterList)
     {
-      addSlider(pSimulator, lParameter, pIndex, lGridPane, i++);
+      addSlider(pSimulator,
+                lParameter,
+                pIndex,
+                lGridPane,
+                sendEventsWhileDragging,
+                i++);
     }
     return lGridPane;
   }
@@ -126,6 +138,7 @@ public class LightSheetMicroscopeSimulatorPanel extends TabPane
                          ParameterInterface<Number> pParameter,
                          int pIndex,
                          GridPane pGridPane,
+                         boolean sendEventsWhileDragging,
                          int pRowIndex)
   {
     double lDefaultValue = pParameter.getDefaultValue().doubleValue();
@@ -136,6 +149,7 @@ public class LightSheetMicroscopeSimulatorPanel extends TabPane
     pGridPane.add(lLabel, 0, pRowIndex);
 
     Slider lSlider = new Slider(lMinValue, lMaxValue, lDefaultValue);
+
     lSlider.setShowTickLabels(true);
     lSlider.setShowTickMarks(true);
     lSlider.setBlockIncrement((lMaxValue - lMinValue) / 1000);
@@ -144,14 +158,23 @@ public class LightSheetMicroscopeSimulatorPanel extends TabPane
     // lSlider.setSnapToTicks(true);
     lSlider.setMaxWidth(Double.MAX_VALUE);
     lSlider.setOrientation(Orientation.HORIZONTAL);
+
     GridPane.setHgrow(lSlider, Priority.ALWAYS);
 
-    lSlider.valueProperty().addListener((s, o, n) -> {
-      if (n != o)
-        pSimulator.setNumberParameter(pParameter,
-                                      pIndex,
-                                      n.floatValue());
-    });
+    if (sendEventsWhileDragging)
+      lSlider.valueProperty().addListener((s, o, n) -> {
+        if (n != o)
+          pSimulator.setNumberParameter(pParameter,
+                                        pIndex,
+                                        n.doubleValue());
+      });
+    else
+      lSlider.valueChangingProperty().addListener((s, o, n) -> {
+        if (!n)
+          pSimulator.setNumberParameter(pParameter,
+                                        pIndex,
+                                        lSlider.getValue());
+      });
 
     GridPane.setVgrow(lSlider, Priority.ALWAYS);
     pGridPane.add(lSlider, 1, pRowIndex);

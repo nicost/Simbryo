@@ -40,7 +40,6 @@ public class PhantomRawWriter extends RawWriter implements
                        File pFile) throws IOException
   {
     ClearCLImage lPhantomImage = pPhantomRenderer.getImage();
-
     return write(lPhantomImage, pFile);
   }
 

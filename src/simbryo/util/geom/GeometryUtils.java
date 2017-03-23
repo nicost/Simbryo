@@ -12,6 +12,18 @@ import javax.vecmath.Vector4f;
 public class GeometryUtils
 {
 
+  /**
+   * Adds translation to the given matrix
+   * 
+   * @param pMatrix
+   *          matrix
+   * @param pDeltaX
+   *          translation along x
+   * @param pDeltaY
+   *          translation along y
+   * @param pDeltaZ
+   *          translation along z
+   */
   public static void addTranslation(Matrix4f pMatrix,
                                     float pDeltaX,
                                     float pDeltaY,
@@ -22,6 +34,13 @@ public class GeometryUtils
     pMatrix.m23 += pDeltaZ;
   }
 
+  /**
+   * Returns a new matrix that is the product of the given matrices.
+   * 
+   * @param pMatrices
+   *          matrices to multiply
+   * @return newly allocated product matrix
+   */
   public static Matrix4f multiply(Matrix4f... pMatrices)
   {
     Matrix4f lMatrix = new Matrix4f();
@@ -36,11 +55,22 @@ public class GeometryUtils
     return lMatrix;
   }
 
+  /**
+   * Multiplies a 4x4 matrix to a point represented in homogenous coordinates.
+   * This function is meant to transform the 3D coordinates of the given point
+   * with the affine transformation represented bythe matrix.
+   * 
+   * @param pMatrix
+   *          4x4 matrix
+   * @param pPoint
+   *          point in 3D space representd in homogenous coordinates (x,y,z,1)
+   * @return transformed point (newly allocated)
+   */
   public static Vector4f pointMultiplication(Matrix4f pMatrix,
-                                             Vector4f pVector)
+                                             Vector4f pPoint)
   {
     Matrix4f lMatrixForVector = new Matrix4f();
-    lMatrixForVector.setColumn(0, pVector);
+    lMatrixForVector.setColumn(0, pPoint);
 
     Matrix4f lProduct = new Matrix4f();
 
@@ -51,6 +81,18 @@ public class GeometryUtils
     return lVectorResult;
   }
 
+  /**
+   * Multiplies the given matrix to a vector representing a _direction_ in 3D
+   * space. Only the rotation/scaling/sheering components of the matrix
+   * (excluding the translation) are used. This function is meant to transform a
+   * direction in 3D space.
+   * 
+   * @param pMatrix
+   *          matrix
+   * @param pVector
+   *          vector representing a direction in 3D space (x,y,z,1)
+   * @return transformed direction vector
+   */
   public static Vector4f directionMultiplication(Matrix4f pMatrix,
                                                  Vector4f pVector)
   {
@@ -61,6 +103,15 @@ public class GeometryUtils
     return pointMultiplication(lMatrixWithoutTranslation, pVector);
   }
 
+  /**
+   * Dot product between two 3D vectors represented with homogenous coordinates.
+   * 
+   * @param pVectorA
+   *          vector A
+   * @param pVectorB
+   *          vector B
+   * @return dot poduct (excludes w from calculation)
+   */
   public static float homogenousDot(Vector4f pVectorA,
                                     Vector4f pVectorB)
   {
@@ -68,6 +119,12 @@ public class GeometryUtils
            + pVectorA.z * pVectorB.z;
   }
 
+  /**
+   * Normalizes a 3D vector represented in homogenous coordinates
+   * 
+   * @param pVector
+   *          vector to ormalize, w is untouched.
+   */
   public static void homogenousNormalize(Vector4f pVector)
   {
     float lNorm = (float) Math.sqrt(homogenousDot(pVector, pVector));
@@ -76,7 +133,18 @@ public class GeometryUtils
     pVector.z /= lNorm;
   }
 
-  public static Vector4f cross(Vector4f pVectorA, Vector4f pVectorB)
+  /**
+   * Computes the cross product between two 3D vectors represented in homogenous
+   * coordinates.
+   * 
+   * @param pVectorA
+   *          vector A
+   * @param pVectorB
+   *          vector B
+   * @return cross product
+   */
+  public static Vector4f homogenousCross(Vector4f pVectorA,
+                                         Vector4f pVectorB)
   {
     Vector3f lVectorA = new Vector3f(pVectorA.x,
                                      pVectorA.y,
@@ -92,6 +160,15 @@ public class GeometryUtils
                         1.0f);
   }
 
+  /**
+   * Returns a 3D rotation matrix around the X axis of a given rotation angle.
+   * 
+   * @param pAngle
+   *          angle in radians
+   * @param pRotationCenter
+   *          rotation center
+   * @return rotation matrix
+   */
   public static Matrix4f rotX(float pAngle, Vector3f pRotationCenter)
   {
     Matrix4f lRotationMatrix = new Matrix4f();
@@ -100,6 +177,15 @@ public class GeometryUtils
     return rotAroundCenter(lRotationMatrix, pRotationCenter);
   }
 
+  /**
+   * Returns a 3D rotation matrix around the Y axis of a given rotation angle.
+   * 
+   * @param pAngle
+   *          angle in radians
+   * @param pRotationCenter
+   *          rotation center
+   * @return rotation matrix
+   */
   public static Matrix4f rotY(float pAngle, Vector3f pRotationCenter)
   {
     Matrix4f lRotationMatrix = new Matrix4f();
@@ -108,6 +194,15 @@ public class GeometryUtils
     return rotAroundCenter(lRotationMatrix, pRotationCenter);
   }
 
+  /**
+   * Returns a 3D rotation matrix around the Z axis of a given rotation angle.
+   * 
+   * @param pAngle
+   *          angle in radians
+   * @param pRotationCenter
+   *          rotation center
+   * @return rotation matrix
+   */
   public static Matrix4f rotZ(float pAngle, Vector3f pRotationCenter)
   {
     Matrix4f lRotationMatrix = new Matrix4f();
@@ -116,6 +211,15 @@ public class GeometryUtils
     return rotAroundCenter(lRotationMatrix, pRotationCenter);
   }
 
+  /**
+   * Returns a rotation matrix around a new rotation center
+   * 
+   * @param pRotationMatrix
+   *          original rotation matrix
+   * @param pRotationCenter
+   *          new rotation center
+   * @return new rotation matrix
+   */
   public static Matrix4f rotAroundCenter(Matrix4f pRotationMatrix,
                                          Vector3f pRotationCenter)
   {

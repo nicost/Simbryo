@@ -11,9 +11,11 @@ import simbryo.synthoscopy.ClearCLSynthoscopyBase;
  *
  * @author royer
  */
-public class ClearCLCameraRendererBase extends ClearCLSynthoscopyBase
-                                       implements
-                                       CameraRendererInterface<ClearCLImage>
+public abstract class ClearCLCameraRendererBase extends
+                                                ClearCLSynthoscopyBase
+                                                implements
+                                                CameraRendererInterface<ClearCLImage>
+
 {
   protected ClearCLImage mDetectionImage;
 
@@ -31,7 +33,7 @@ public class ClearCLCameraRendererBase extends ClearCLSynthoscopyBase
   public ClearCLCameraRendererBase(final ClearCLContext pContext,
                                    long... pMaxCameraImageDimensions)
   {
-    super(pContext, pMaxCameraImageDimensions);
+    super(pContext, false, pMaxCameraImageDimensions);
 
     mContext = pContext;
 

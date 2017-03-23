@@ -1,13 +1,175 @@
 package simbryo.synthoscopy.microscope;
 
+import clearcl.ClearCLBuffer;
+import clearcl.ClearCLImage;
+import clearcl.viewer.ClearCLImageViewer;
+import coremem.ContiguousMemoryInterface;
+import simbryo.synthoscopy.camera.impl.SCMOSCameraRenderer;
+import simbryo.synthoscopy.microscope.lightsheet.gui.jfx.LightSheetMicroscopeSimulatorViewer;
+import simbryo.synthoscopy.microscope.parameters.ParameterInterface;
+
 /**
  * Microscope Optics simulator
  *
- * @param <I>
- *          image type
  * @author royer
  */
-public interface MicroscopeSimulatorInterface<I>
+public interface MicroscopeSimulatorInterface extends AutoCloseable
 {
+
+  /**
+   * Called afetr all optical components have been added.
+   */
+  void buildMicroscope();
+
+  /**
+   * Sets a given type of phantom image
+   * 
+   * @param pParameter
+   *          phatom type
+   * @param pPhantom
+   *          phantom image
+   */
+  void setPhantomParameter(ParameterInterface<Void> pParameter,
+                           ClearCLImage pPhantom);
+
+  /**
+   * Returns a phantom parameter of given type.
+   * 
+   * @param pParameter
+   *          phantom type
+   * @return phantom parameter
+   */
+  ClearCLImage getPhantomParameter(ParameterInterface<Void> pParameter);
+
+  /**
+   * Sets a microscope parameter of given type and index.
+   * 
+   * @param pParameter
+   *          parameter type
+   * @param pIndex
+   *          index of parameter (usually device/component index)
+   * @param pValue
+   *          value
+   */
+  void setNumberParameter(ParameterInterface<Number> pParameter,
+                          int pIndex,
+                          Number pValue);
+
+  /**
+   * Returns the value of a given parameter type and index.
+   * 
+   * @param pParameter
+   *          parameter type
+   * @param pIndex
+   *          parameter index
+   * @return parameter value
+   */
+  Number getNumberParameter(ParameterInterface<Number> pParameter,
+                            int pIndex);
+
+  /**
+   * Returns the value of a given parameter type and index. The parameter's
+   * default value is overridden by a provided value.
+   * 
+   * @param pParameter
+   *          parameter type
+   * @param pIndex
+   *          parameter index
+   * @param pDefaultOverideValue
+   *          value overriding the parameter defaults
+   * @return parameter value
+   */
+  Number getNumberParameter(ParameterInterface<Number> pParameter,
+                            int pIndex,
+                            Number pDefaultOverideValue);
+
+  /**
+   * Renders all nescessary intermediate as well as final images for all
+   * detetion paths and cameras.
+   * 
+   * @param pWaitToFinish
+   *          true -> wait to finish GPU computations
+   */
+  void render(boolean pWaitToFinish);
+
+  /**
+   * Renders all nescessary intermediate as well as final images for a given
+   * detection path and camera.
+   * 
+   * @param pDetectionIndex
+   * @param pWaitToFinish
+   */
+  void render(int pDetectionIndex, boolean pWaitToFinish);
+
+  /**
+   * Returns camera renderer of given index.
+   * 
+   * @param pCameraIndex
+   *          camera renderer index
+   * @return camera renderer
+   */
+  SCMOSCameraRenderer getCameraRenderer(int pCameraIndex);
+
+  /**
+   * Returns camera image of given index.
+   * 
+   * @param pCameraIndex
+   *          camera index
+   * @return camera image
+   */
+  ClearCLImage getCameraImage(int pCameraIndex);
+
+  /**
+   * Copies the contents of the camera image of given camera index to a
+   * contiguous memory buffer.
+   * 
+   * @param pIndex
+   *          camera index
+   * @param pContiguousMemory
+   *          contiguous memory
+   * @param pOffsetInContiguousMemory
+   *          offset in bytes into the contiguous memory buffer
+   * @param pWaitToFinish
+   *          true -> waitsfor copy to finish
+   */
+  void copyTo(int pIndex,
+              ContiguousMemoryInterface pContiguousMemory,
+              long pOffsetInContiguousMemory,
+              boolean pWaitToFinish);
+
+  /**
+   * Returns the ClearCL buffer in which the camera image of given index is
+   * stored as 16bit unsigned integers.
+   * 
+   * @param pCameraIndex
+   *          camera index
+   * @return ClearCL buffer in which image is stored after each render
+   */
+  ClearCLBuffer getCameraImageBuffer(int pCameraIndex);
+
+  /**
+   * Opens a viewer for the camera image for a given camera index.
+   * 
+   * @param pCameraIndex
+   *          camera index
+   * @return viewer
+   */
+  ClearCLImageViewer openViewerForCameraImage(int pCameraIndex);
+
+  /**
+   * Opens viewer for lightmap of given index.
+   * 
+   * @param pIndex
+   *          lightmap index
+   * @return viewer
+   */
+  ClearCLImageViewer openViewerForLightMap(int pIndex);
+
+  /**
+   * Opens a viewer for the microscope control parameters.
+   * 
+   * @return viewer
+   */
+  LightSheetMicroscopeSimulatorViewer openViewerForControls();
 
 }

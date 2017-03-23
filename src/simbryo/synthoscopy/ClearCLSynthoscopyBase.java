@@ -6,6 +6,7 @@ import clearcl.enums.ImageChannelDataType;
 import clearcl.util.Region3;
 import clearcl.viewer.ClearCLImageViewer;
 import coremem.ContiguousMemoryInterface;
+import simbryo.synthoscopy.phantom.PhantomRendererUtils;
 
 /**
  * Ilumination optics base class for illumination optics computation based on
@@ -20,6 +21,7 @@ public abstract class ClearCLSynthoscopyBase extends
 
   protected ClearCLContext mContext;
   protected ClearCLImage mImage;
+  protected ClearCLImageViewer mViewImage;
 
   /**
    * Instanciates a ClearCL powered illumination optics base class given the
@@ -28,19 +30,24 @@ public abstract class ClearCLSynthoscopyBase extends
    * 
    * @param pContext
    *          ClearCL context
+   * @param pAdaptImageDimensionToDevice
+   *          true -> adapt image dimension to te device (work groups)
    * @param pImageDimensions
    *          image dimensions
    */
   public ClearCLSynthoscopyBase(final ClearCLContext pContext,
+                                boolean pAdaptImageDimensionToDevice,
                                 long... pImageDimensions)
   {
-    super(pImageDimensions);
+    super(pAdaptImageDimensionToDevice ? PhantomRendererUtils.adaptImageDimensionsToDevice(pContext.getDevice(),
+                                                                                           pImageDimensions)
+                                       : pImageDimensions);
 
     mContext = pContext;
 
     mImage =
            mContext.createSingleChannelImage(ImageChannelDataType.Float,
-                                             pImageDimensions);
+                                             getImageDimensions());
 
     mImage.fillZero(true, false);
   }
@@ -90,11 +97,11 @@ public abstract class ClearCLSynthoscopyBase extends
    */
   public ClearCLImageViewer openViewer()
   {
-    final ClearCLImageViewer lViewImage =
-                                        ClearCLImageViewer.view(mImage,
-                                                                this.getClass()
-                                                                    .getSimpleName());
-    return lViewImage;
+    mViewImage = ClearCLImageViewer.view(mImage,
+                                         this.getClass()
+                                             .getSimpleName());
+
+    return mViewImage;
   }
 
 }

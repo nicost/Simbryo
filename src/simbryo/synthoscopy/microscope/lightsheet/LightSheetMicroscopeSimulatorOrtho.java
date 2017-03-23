@@ -27,13 +27,16 @@ public class LightSheetMicroscopeSimulatorOrtho extends
    *          number of detection arms
    * @param pNumberOfIlluminationArms
    *          number of illuination arms
+   * @param pMaxCameraResolution
+   *          max width and height of camera images
    * @param pMainPhantomDimensions
    *          phantom main dimensions
    */
   public LightSheetMicroscopeSimulatorOrtho(ClearCLContext pContext,
                                             int pNumberOfDetectionArms,
                                             int pNumberOfIlluminationArms,
-                                            int... pMainPhantomDimensions)
+                                            int pMaxCameraResolution,
+                                            long... pMainPhantomDimensions)
   {
     super(pContext, pMainPhantomDimensions);
 
@@ -58,8 +61,8 @@ public class LightSheetMicroscopeSimulatorOrtho extends
                     lIlluminationNormalVector);
     }
 
-    int lMaxCameraImageWidth = 2 * getWidth();
-    int lMaxCameraImageHeight = 2 * getHeight();
+    int lMaxCameraImageWidth = pMaxCameraResolution;
+    int lMaxCameraImageHeight = pMaxCameraResolution;
 
     if (pNumberOfDetectionArms >= 1)
     {

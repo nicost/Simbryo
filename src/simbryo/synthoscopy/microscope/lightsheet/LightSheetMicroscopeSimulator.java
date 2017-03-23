@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
 
+import clearcl.ClearCLBuffer;
 import clearcl.ClearCLContext;
 import clearcl.ClearCLImage;
 import clearcl.util.ElapsedTime;
@@ -17,13 +18,13 @@ import clearcl.viewer.ClearCLImageViewer;
 import coremem.ContiguousMemoryInterface;
 import simbryo.synthoscopy.camera.impl.SCMOSCameraRenderer;
 import simbryo.synthoscopy.microscope.MicroscopeSimulatorBase;
-import simbryo.synthoscopy.microscope.lightsheet.demo.jfx.LightSheetMicroscopeSimulatorViewer;
+import simbryo.synthoscopy.microscope.lightsheet.gui.jfx.LightSheetMicroscopeSimulatorViewer;
 import simbryo.synthoscopy.microscope.parameters.CameraParameter;
 import simbryo.synthoscopy.microscope.parameters.DetectionParameter;
 import simbryo.synthoscopy.microscope.parameters.IlluminationParameter;
-import simbryo.synthoscopy.microscope.parameters.ParameterInterface;
 import simbryo.synthoscopy.microscope.parameters.PhantomParameter;
 import simbryo.synthoscopy.microscope.parameters.StageParameter;
+import simbryo.synthoscopy.microscope.parameters.UnitConversion;
 import simbryo.synthoscopy.optics.detection.impl.widefield.WideFieldDetectionOptics;
 import simbryo.synthoscopy.optics.illumination.impl.lightsheet.LightSheetIllumination;
 import simbryo.util.geom.GeometryUtils;
@@ -34,15 +35,14 @@ import simbryo.util.geom.GeometryUtils;
  * @author royer
  */
 public class LightSheetMicroscopeSimulator extends
-                                           MicroscopeSimulatorBase<ClearCLImage>
-                                           implements AutoCloseable
+                                           MicroscopeSimulatorBase
+                                           implements
+                                           LightSheetMicroscopeSimulatorInterface
 {
 
   private static final float cDepthOfIlluminationInNormUnits = 1f;
 
   private static final int cLightMapScaleFactor = 4;
-
-  private ClearCLContext mContext;
 
   private ArrayList<LightSheetIllumination> mLightSheetIlluminationList =
                                                                         new ArrayList<>();
@@ -50,14 +50,6 @@ public class LightSheetMicroscopeSimulator extends
                                                                             new ArrayList<>();
   private ArrayList<SCMOSCameraRenderer> mCameraRendererList =
                                                              new ArrayList<>();
-
-  private int[] mMainPhantomDimensions;
-
-  private ConcurrentHashMap<ParameterInterface<Void>, ClearCLImage> mPhantomMap =
-                                                                                new ConcurrentHashMap<>();
-
-  private ConcurrentHashMap<ParameterInterface<Number>, ConcurrentHashMap<Integer, Number>> mParametersMap =
-                                                                                                           new ConcurrentHashMap<>();
 
   private ConcurrentHashMap<Integer, Matrix4f> mDetectionTransformationMatrixMap =
                                                                                  new ConcurrentHashMap<>();
@@ -71,62 +63,23 @@ public class LightSheetMicroscopeSimulator extends
    *          main phantom dimensions.
    */
   public LightSheetMicroscopeSimulator(ClearCLContext pContext,
-                                       int... pMainPhantomDimensions)
+                                       long... pMainPhantomDimensions)
   {
-    mContext = pContext;
-    mMainPhantomDimensions = pMainPhantomDimensions;
+    super(pContext, pMainPhantomDimensions);
   }
 
-  /**
-   * Returns the main phantom width
-   * 
-   * @return main phantom width
-   */
-  public int getWidth()
-  {
-    return mMainPhantomDimensions[0];
-  }
-
-  /**
-   * Returns the main phantom height
-   * 
-   * @return main phantom height
-   */
-  public int getHeight()
-  {
-    return mMainPhantomDimensions[1];
-  }
-
-  /**
-   * Returns the main phantom depth
-   * 
-   * @return main phantom depth
-   */
-  public int getDepth()
-  {
-    return mMainPhantomDimensions[2];
-  }
-
-  /**
-   * Adds a lightsheet with given axis and normal vectors.
-   * 
-   * @param pAxisVector
-   *          axis vector
-   * @param pNormalVector
-   *          normal vector
-   * @return lightsheet illumination
-   */
+  @Override
   public LightSheetIllumination addLightSheet(Vector3f pAxisVector,
                                               Vector3f pNormalVector)
   {
     try
     {
-      int lWidth = getWidth() / cLightMapScaleFactor;
-      int lHeight = getHeight() / cLightMapScaleFactor;
-      int lDepth =
-                 min(getDepth(),
-                     closestOddInteger(getDepth()
-                                       * cDepthOfIlluminationInNormUnits));
+      long lWidth = getWidth() / cLightMapScaleFactor;
+      long lHeight = getHeight() / cLightMapScaleFactor;
+      long lDepth =
+                  min(getDepth(),
+                      closestOddInteger(getDepth()
+                                        * cDepthOfIlluminationInNormUnits));
 
       LightSheetIllumination lLightSheetIllumination =
                                                      new LightSheetIllumination(mContext,
@@ -146,19 +99,7 @@ public class LightSheetMicroscopeSimulator extends
     }
   }
 
-  /**
-   * Adds detection path. This includes widefield detection optics and a sCMOS
-   * camera.
-   * 
-   * @param pDetectionTransformMatrix
-   *          detection transform matrix
-   * @param pDownUpVector
-   *          updown vector
-   * @param pMaxCameraWidth
-   *          max camera width
-   * @param pMaxCameraHeight
-   *          max camera height
-   */
+  @Override
   public void addDetectionPath(Matrix4f pDetectionTransformMatrix,
                                Vector3f pDownUpVector,
                                int pMaxCameraWidth,
@@ -194,6 +135,7 @@ public class LightSheetMicroscopeSimulator extends
   /**
    * Must be called after all lightsheets and detection arms have been added.
    */
+  @Override
   public void buildMicroscope()
   {
     for (LightSheetIllumination lLightSheetIllumination : mLightSheetIlluminationList)
@@ -203,45 +145,25 @@ public class LightSheetMicroscopeSimulator extends
       }
   }
 
-  /**
-   * Returns the number of lightsheets
-   * 
-   * @return number of lightsheets
-   */
+  @Override
   public int getNumberOfLightSheets()
   {
     return mLightSheetIlluminationList.size();
   }
 
-  /**
-   * Returns the number of detection paths
-   * 
-   * @return number of detection paths
-   */
+  @Override
   public int getNumberOfDetectionPaths()
   {
     return mWideFieldDetectionOpticsList.size();
   }
 
-  /**
-   * Returns lightsheet for index
-   * 
-   * @param pIndex
-   *          index
-   * @return lightsheet
-   */
+  @Override
   public LightSheetIllumination getLightSheet(int pIndex)
   {
     return mLightSheetIlluminationList.get(pIndex);
   }
 
-  /**
-   * Returns detection optics for index
-   * 
-   * @param pIndex
-   *          index
-   * @return detection optics
-   */
+  @Override
   public WideFieldDetectionOptics getDetectionOptics(int pIndex)
   {
     return mWideFieldDetectionOpticsList.get(pIndex);
@@ -254,117 +176,21 @@ public class LightSheetMicroscopeSimulator extends
    *          index
    * @return camera
    */
-  public SCMOSCameraRenderer getCamera(int pIndex)
+  @Override
+  public SCMOSCameraRenderer getCameraRenderer(int pIndex)
   {
     return mCameraRendererList.get(pIndex);
-  }
-
-  /**
-   * Sets a given Phanton.
-   * 
-   * @param pParameter
-   *          parameter
-   * @param pPhantom
-   *          phantom
-   */
-  public void setPhantom(ParameterInterface<Void> pParameter,
-                         ClearCLImage pPhantom)
-  {
-    mPhantomMap.put(pParameter, pPhantom);
-  }
-
-  /**
-   * Sets a parameter value for a given index
-   * 
-   * @param pParameter
-   *          parameter name
-   * @param pIndex
-   *          index
-   * @param pValue
-   *          value
-   */
-  public void setNumberParameter(ParameterInterface<Number> pParameter,
-                                 int pIndex,
-                                 Number pValue)
-  {
-    ConcurrentHashMap<Integer, Number> lConcurrentHashMap =
-                                                          mParametersMap.get(pParameter);
-    if (lConcurrentHashMap == null)
-    {
-      lConcurrentHashMap = new ConcurrentHashMap<Integer, Number>();
-      mParametersMap.put(pParameter, lConcurrentHashMap);
-    }
-
-    lConcurrentHashMap.put(pIndex, pValue);
-  }
-
-  /**
-   * Returns value for a given parameter and index
-   * 
-   * @param pParameter
-   *          parameter name
-   * @param pIndex
-   *          index
-   * @return value
-   */
-  public Number getNumberParameter(ParameterInterface<Number> pParameter,
-                                   int pIndex)
-  {
-    ConcurrentHashMap<Integer, Number> lConcurrentHashMap =
-                                                          mParametersMap.get(pParameter);
-    if (lConcurrentHashMap == null)
-      return pParameter.getDefaultValue();
-
-    Number lNumber = lConcurrentHashMap.get(pIndex);
-    if (lNumber == null)
-      return pParameter.getDefaultValue();
-    return lNumber;
-  }
-
-  /**
-   * Returns value for a given parameter and index. If the parameter is not
-   * defined, a overriding default value is given which is used instead of the
-   * parameter's default value.
-   * 
-   * @param pParameter
-   *          parameter name
-   * @param pIndex
-   *          index
-   * @param pDefaultOverideValue
-   *          default overide value
-   * @return value
-   */
-  public Number getNumberParameter(ParameterInterface<Number> pParameter,
-                                   int pIndex,
-                                   Number pDefaultOverideValue)
-  {
-    ConcurrentHashMap<Integer, Number> lConcurrentHashMap =
-                                                          mParametersMap.get(pParameter);
-    if (lConcurrentHashMap == null)
-      return pDefaultOverideValue;
-
-    Number lNumber = lConcurrentHashMap.get(pIndex);
-
-    if (lNumber == null)
-      return pDefaultOverideValue;
-    return lNumber;
-  }
-
-  /**
-   * Returns a phantom image for a given parameter
-   * 
-   * @param pParameter
-   *          phantom parameter name
-   * @return phantom image
-   */
-  public ClearCLImage getPhantomParameter(ParameterInterface<Void> pParameter)
-  {
-    return mPhantomMap.get(pParameter);
   }
 
   private void applyParametersForLightSheet(int pLightSheetIndex,
                                             int pDetectionPathIndex)
   {
+    float lLengthConversionfactor =
+                                  getNumberParameter(UnitConversion.Length,
+                                                     0).floatValue();
+    float lLaserPowerConversionfactor =
+                                      getNumberParameter(UnitConversion.LaserIntensity,
+                                                         0).floatValue();
 
     LightSheetIllumination lLightSheetIllumination =
                                                    mLightSheetIlluminationList.get(pLightSheetIndex);
@@ -376,21 +202,29 @@ public class LightSheetMicroscopeSimulator extends
 
     float lIntensity =
                      getNumberParameter(IlluminationParameter.Intensity,
-                                        pLightSheetIndex).floatValue();
+                                        pLightSheetIndex).floatValue()
+                       / lLaserPowerConversionfactor;
 
     float lWaveLength =
                       getNumberParameter(IlluminationParameter.Wavelength,
                                          pLightSheetIndex).floatValue();
 
-    float xl = getNumberParameter(IlluminationParameter.X,
-                                  pLightSheetIndex).floatValue();
-    float yl = getNumberParameter(IlluminationParameter.Y,
-                                  pLightSheetIndex).floatValue();
-    float zl = getNumberParameter(IlluminationParameter.Z,
-                                  pLightSheetIndex).floatValue();
+    float xl = (getNumberParameter(IlluminationParameter.X,
+                                   pLightSheetIndex).floatValue()
+                / lLengthConversionfactor)
+               + 0.5f;
+    float yl = (getNumberParameter(IlluminationParameter.Y,
+                                   pLightSheetIndex).floatValue()
+                / lLengthConversionfactor)
+               + 0.5f;
+    float zl = (getNumberParameter(IlluminationParameter.Z,
+                                   pLightSheetIndex).floatValue()
+                / lLengthConversionfactor)
+               + 0.5f;
 
     float height = getNumberParameter(IlluminationParameter.Height,
-                                      pLightSheetIndex).floatValue();
+                                      pLightSheetIndex).floatValue()
+                   / lLengthConversionfactor;
 
     float alpha = getNumberParameter(IlluminationParameter.Alpha,
                                      pLightSheetIndex).floatValue();
@@ -415,6 +249,10 @@ public class LightSheetMicroscopeSimulator extends
   private void applyParametersForDetectionPath(int pDetectionPathIndex,
                                                ClearCLImage pLightMapImage)
   {
+    float lLengthConversionfactor =
+                                  getNumberParameter(UnitConversion.Length,
+                                                     0).floatValue();
+
     WideFieldDetectionOptics lWideFieldDetectionOptics =
                                                        mWideFieldDetectionOpticsList.get(pDetectionPathIndex);
     SCMOSCameraRenderer lSCMOSCameraRenderer =
@@ -433,13 +271,21 @@ public class LightSheetMicroscopeSimulator extends
                       getNumberParameter(DetectionParameter.Wavelength,
                                          pDetectionPathIndex).floatValue();
 
-    float lFocusZ =
-                  getNumberParameter(DetectionParameter.FocusZ,
-                                     pDetectionPathIndex).floatValue();
+    float lFocusZ = (getNumberParameter(DetectionParameter.FocusZ,
+                                        pDetectionPathIndex).floatValue()
+                     / lLengthConversionfactor)
+                    + 0.5f;
 
     long lDetectionImageWidth = lFluorescencePhantomImage.getWidth();
     long lDetectionImageHeight =
                                lFluorescencePhantomImage.getHeight();
+
+    int lROIOffsetX =
+                    getNumberParameter(CameraParameter.ROIOffsetX,
+                                       pDetectionPathIndex).intValue();
+    int lROIOffsetY =
+                    getNumberParameter(CameraParameter.ROIOffsetY,
+                                       pDetectionPathIndex).intValue();
 
     int lROIWidth =
                   getNumberParameter(CameraParameter.ROIWidth,
@@ -464,7 +310,10 @@ public class LightSheetMicroscopeSimulator extends
 
     lSCMOSCameraRenderer.setDetectionImage(lWideFieldDetectionOptics.getImage());
 
-    lSCMOSCameraRenderer.setCenteredROI(lROIWidth, lROIHeight);
+    lSCMOSCameraRenderer.setCenteredROI(lROIOffsetX,
+                                        lROIOffsetY,
+                                        lROIWidth,
+                                        lROIHeight);
 
   }
 
@@ -485,15 +334,19 @@ public class LightSheetMicroscopeSimulator extends
 
   private Matrix4f getStageTransformMatrix()
   {
-    float lStageX = getNumberParameter(StageParameter.StageX,
-                                       0,
-                                       0).floatValue();
-    float lStageY = getNumberParameter(StageParameter.StageY,
-                                       0,
-                                       0).floatValue();
-    float lStageZ = getNumberParameter(StageParameter.StageZ,
-                                       0,
-                                       0).floatValue();
+    float lLengthConversionfactor =
+                                  getNumberParameter(UnitConversion.Length,
+                                                     0).floatValue();
+
+    float lStageX = getNumberParameter(StageParameter.StageX, 0, 0)
+                                                                   .floatValue()
+                    / lLengthConversionfactor;
+    float lStageY = getNumberParameter(StageParameter.StageY, 0, 0)
+                                                                   .floatValue()
+                    / lLengthConversionfactor;
+    float lStageZ = getNumberParameter(StageParameter.StageZ, 0, 0)
+                                                                   .floatValue()
+                    / lLengthConversionfactor;
 
     float lStageRX = getNumberParameter(StageParameter.StageRX,
                                         0,
@@ -527,98 +380,78 @@ public class LightSheetMicroscopeSimulator extends
     return lMatrix;
   }
 
-  /**
-   * Renders all that needs to be rendered to obtain the camera images
-   * 
-   * @param pWaitToFinish
-   *          true -> wait for computation to finish
-   */
+  @Override
   public void render(boolean pWaitToFinish)
   {
-    int lNumberOfLightSheets = mLightSheetIlluminationList.size();
     int lNumberOfDetectionPath = mWideFieldDetectionOpticsList.size();
 
     for (int d = 0; d < lNumberOfDetectionPath; d++)
     {
-      WideFieldDetectionOptics lWideFieldDetectionOptics =
-                                                         mWideFieldDetectionOpticsList.get(d);
-      SCMOSCameraRenderer lSCMOSCameraRenderer =
-                                               mCameraRendererList.get(d);
-
-      ClearCLImage lCurrentLightMap = null;
-      for (int l = 0; l < lNumberOfLightSheets; l++)
-      {
-        LightSheetIllumination lLightSheetIllumination =
-                                                       mLightSheetIlluminationList.get(l);
-        applyParametersForLightSheet(l, d);
-        lLightSheetIllumination.setInputImage(lCurrentLightMap);
-        ElapsedTime.measure("renderlightsheet",
-                            () -> lLightSheetIllumination.render(false));
-
-        lCurrentLightMap = lLightSheetIllumination.getImage();
-
-      }
-
-      applyParametersForDetectionPath(d, lCurrentLightMap);
-
-      ElapsedTime.measure("renderdetection",
-                          () -> lWideFieldDetectionOptics.render(false));
-
-      ElapsedTime.measure("rendercameraimage",
-                          () -> lSCMOSCameraRenderer.render(pWaitToFinish));/**/
-
-      lWideFieldDetectionOptics.clearUpdate();
-      lSCMOSCameraRenderer.clearUpdate();
+      render(d, pWaitToFinish && (d == lNumberOfDetectionPath - 1));
     }
-
   }
 
-  /**
-   * Returns camera image
-   * 
-   * @param pIndex
-   *          camera index
-   * @return camera image
-   */
+  @Override
+  public void render(int pDetectionIndex, boolean pWaitToFinish)
+  {
+    WideFieldDetectionOptics lWideFieldDetectionOptics =
+                                                       mWideFieldDetectionOpticsList.get(pDetectionIndex);
+    SCMOSCameraRenderer lSCMOSCameraRenderer =
+                                             mCameraRendererList.get(pDetectionIndex);
+
+    ClearCLImage lCurrentLightMap = null;
+    int lNumberOfLightSheets = mLightSheetIlluminationList.size();
+    for (int lLightSheetIndex =
+                              0; lLightSheetIndex < lNumberOfLightSheets; lLightSheetIndex++)
+    {
+      LightSheetIllumination lLightSheetIllumination =
+                                                     mLightSheetIlluminationList.get(lLightSheetIndex);
+      applyParametersForLightSheet(lLightSheetIndex, pDetectionIndex);
+      lLightSheetIllumination.setInputImage(lCurrentLightMap);
+      ElapsedTime.measure("renderlightsheet",
+                          () -> lLightSheetIllumination.render(false));
+
+      lCurrentLightMap = lLightSheetIllumination.getImage();
+
+    }
+
+    applyParametersForDetectionPath(pDetectionIndex,
+                                    lCurrentLightMap);
+
+    ElapsedTime.measure("renderdetection",
+                        () -> lWideFieldDetectionOptics.render(false));
+
+    ElapsedTime.measure("rendercameraimage",
+                        () -> lSCMOSCameraRenderer.render(pWaitToFinish));/**/
+
+    lWideFieldDetectionOptics.clearUpdate();
+    lSCMOSCameraRenderer.clearUpdate();
+  }
+
+  @Override
   public ClearCLImage getCameraImage(int pIndex)
   {
     return mCameraRendererList.get(pIndex).getImage();
   }
 
-  /**
-   * Opens viewer for the camera image of given index.
-   * 
-   * @param pIndex
-   *          camera/detection path index
-   * @return viewer
-   */
+  @Override
   public ClearCLImageViewer openViewerForCameraImage(int pIndex)
   {
+    SCMOSCameraRenderer lSCMOSCameraRenderer =
+                                             mCameraRendererList.get(pIndex);
+
     final ClearCLImageViewer lViewImage =
-                                        ClearCLImageViewer.view(getCameraImage(pIndex),
-                                                                "CameraImage" + pIndex);
+                                        lSCMOSCameraRenderer.openViewer();
     return lViewImage;
   }
 
-  /**
-   * Opens viewer for the lightmap of given index.
-   * 
-   * @param pIndex
-   *          camera/detection path index
-   * @return viewer
-   */
+  @Override
   public ClearCLImageViewer openViewerForLightMap(int pIndex)
   {
     return getLightSheet(pIndex).openViewer();
   }
 
-  /**
-   * Opens viewer for controls to the microscope parameters. Must be called
-   * after the simulator is fully initialized (after all calls that add
-   * lightsheets and detection paths...)
-   * 
-   * @return viewer
-   */
+  @Override
   public LightSheetMicroscopeSimulatorViewer openViewerForControls()
   {
     LightSheetMicroscopeSimulatorViewer lViewer =
@@ -628,21 +461,24 @@ public class LightSheetMicroscopeSimulator extends
     return lViewer;
   }
 
-  /**
-   * Copies the contents of the camera image to a contiguous memory object
-   * 
-   * @param pIndex
-   *          camera/detection path index
-   * @param pContiguousMemory
-   *          memory object
-   * @param pBlocking
-   *          true -> blocking, false otherwise
-   */
-  public void copyTo(int pIndex,
+  @Override
+  public void copyTo(int pCameraIndex,
                      ContiguousMemoryInterface pContiguousMemory,
+                     long pOffsetInContiguousMemory,
                      boolean pBlocking)
   {
-    getCameraImage(pIndex).writeTo(pContiguousMemory, pBlocking);
+    ClearCLImage lCameraImage = getCameraImage(pCameraIndex);
+    ContiguousMemoryInterface lImagePlane =
+                                          pContiguousMemory.subRegion(pOffsetInContiguousMemory,
+                                                                      lCameraImage.getSizeInBytes());
+    lCameraImage.writeTo(lImagePlane, pBlocking);
+  }
+
+  @Override
+  public ClearCLBuffer getCameraImageBuffer(int pCameraIndex)
+  {
+    return mCameraRendererList.get(pCameraIndex)
+                              .getCameraImageBuffer();
   }
 
   private int closestOddInteger(float pValue)

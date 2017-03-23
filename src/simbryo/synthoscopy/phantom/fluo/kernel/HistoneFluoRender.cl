@@ -124,7 +124,7 @@ __kernel void hisrender(   __write_only    image3d_t  image,
     }
   }
     
-  write_imagef (image, (int4){x,y,z,0.0f}, intensity*value);
+  write_imagef (image, (int4){x,y,z,0}, intensity*value);
 
 }
 

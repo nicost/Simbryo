@@ -1,5 +1,6 @@
 package simbryo.synthoscopy;
 
+import java.util.Arrays;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
@@ -156,6 +157,12 @@ public abstract class SynthoscopyBase<I> implements
   public long getDepth()
   {
     return mImageDimensions[2];
+  }
+
+  @Override
+  public long[] getImageDimensions()
+  {
+    return Arrays.copyOf(mImageDimensions, mImageDimensions.length);
   }
 
   @Override

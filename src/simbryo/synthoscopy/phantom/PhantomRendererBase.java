@@ -50,7 +50,7 @@ public abstract class PhantomRendererBase extends
                              final TissueDynamicsInterface pTissueDynamics,
                              final long... pStackDimensions)
   {
-    super(pContext, pStackDimensions);
+    super(pContext, true, pStackDimensions);
     mTissue = pTissueDynamics;
     mPlaneAlreadyDrawnTable =
                             new boolean[Math.toIntExact(getDepth())];
@@ -67,10 +67,6 @@ public abstract class PhantomRendererBase extends
     mLocalSizeX = getWidth() / lGridDimensions[0];
     mLocalSizeY = getHeight() / lGridDimensions[1];
     mLocalSizeZ = getDepth() / lGridDimensions[2];
-
-    setWidth(mLocalSizeX * lGridDimensions[0]);
-    setHeight(mLocalSizeY * lGridDimensions[1]);
-    setDepth(mLocalSizeZ * lGridDimensions[2]);
 
     setBeginZ(0);
     setEndZ((int) (getDepth() - 1));

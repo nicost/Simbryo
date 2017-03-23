@@ -42,7 +42,7 @@ __kernel void scatterrender(   __write_only    image3d_t  image,
 
   value = clamp(intensity*value, 0.0f, 1.0f);
   
-  write_imagef (image, (int4){x,y,z,0.0f}, value);
+  write_imagef (image, (int4){x,y,z,0}, value);
 }
 
 

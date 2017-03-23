@@ -1,8 +1,5 @@
 package simbryo.synthoscopy.demo;
 
-import static java.lang.Math.max;
-import static java.lang.Math.min;
-
 import java.io.File;
 import java.io.IOException;
 
@@ -66,12 +63,7 @@ public class SynthoscopyDemo
           ClearCLContext lContext = lFastestGPUDevice.createContext())
       {
 
-        Drosophila lDrosophila =
-                               Drosophila.getDeveloppedEmbryo(14,
-                                                              lPhantomWidth,
-                                                              lPhantomHeight,
-                                                              lPhantomDepth,
-                                                              lFastestGPUDevice);
+        Drosophila lDrosophila = Drosophila.getDeveloppedEmbryo(14);
 
         DrosophilaHistoneFluorescence lDrosophilaFluorescencePhantom =
                                                                      new DrosophilaHistoneFluorescence(lContext,
@@ -80,6 +72,7 @@ public class SynthoscopyDemo
                                                                                                        lPhantomHeight,
                                                                                                        lPhantomDepth);
 
+        @SuppressWarnings("unused")
         ClearCLImageViewer lFluoPhantomViewer =
                                               lDrosophilaFluorescencePhantom.openViewer();/**/
 
@@ -91,8 +84,8 @@ public class SynthoscopyDemo
                                                                                                  lPhantomHeight / 4,
                                                                                                  lPhantomDepth / 4);
 
-        @SuppressWarnings("unused")
-        /*ClearCLImageViewer lScatterPhantomViewer =
+        /*@SuppressWarnings("unused")
+        ClearCLImageViewer lScatterPhantomViewer =
                                                  lDrosophilaScatteringPhantom.openViewer();/**/
 
         LightSheetIllumination lLightSheetIllumination =
@@ -120,6 +113,7 @@ public class SynthoscopyDemo
         lSCMOSCameraRenderer.setCenteredROI(lMaxCameraImageWidth / 1,
                                             lMaxCameraImageHeight / 1);
 
+        @SuppressWarnings("unused")
         ClearCLImageViewer lCameraImageViewer =
                                               lSCMOSCameraRenderer.openViewer();/**/
 
@@ -200,7 +194,7 @@ public class SynthoscopyDemo
 
           lSCMOSCameraRenderer.setDetectionImage(lWideFieldDetectionOptics.getImage());
 
-          int lZStart = max(0, (int) ((z - 0.1) * lPhantomDepth));
+          /*int lZStart = max(0, (int) ((z - 0.1) * lPhantomDepth));
           int lZEnd = min(lPhantomDepth - 1,
                           (int) ((z + 0.1) * lPhantomDepth));/**/
 

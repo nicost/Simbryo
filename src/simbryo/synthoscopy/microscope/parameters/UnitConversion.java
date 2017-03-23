@@ -1,25 +1,20 @@
 package simbryo.synthoscopy.microscope.parameters;
 
 /**
- * Camera Parameters
+ * Unit conversion factors parameters
  *
  * @author royer
  */
 @SuppressWarnings("javadoc")
-public enum CameraParameter implements ParameterInterface<Number>
+public enum UnitConversion implements ParameterInterface<Number>
 {
- ROIXMin(0, 0, 2048),
- ROIXMax(0, 0, 2048),
- ROIWidth(1024, 0, 2048),
- ROIHeight(1024, 0, 2048),
- ROIOffsetX(0, -1024, 1024),
- ROIOffsetY(0, -1024, 1024);
+ Length(1f, 0, 1000f), LaserIntensity(1f, 0, 100f);
 
   Number mDefaultValue, mMinValue, mMaxValue;
 
-  private CameraParameter(Number pDefaultValue,
-                          Number pMinValue,
-                          Number pMaxValue)
+  private UnitConversion(Number pDefaultValue,
+                         Number pMinValue,
+                         Number pMaxValue)
   {
     mDefaultValue = pDefaultValue;
     mMinValue = pMinValue;

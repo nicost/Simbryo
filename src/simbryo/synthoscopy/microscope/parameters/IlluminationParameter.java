@@ -11,9 +11,9 @@ public enum IlluminationParameter implements
 {
  Wavelength(0.0005f, 0.0001, 0.01f),
  Intensity(10.0f, 0, 100),
- X(0.5f, 0, 1),
- Y(0.5f, 0, 1),
- Z(0.5f, 0, 1),
+ X(0.0f, -1, 1),
+ Y(0.0f, -1, 1),
+ Z(0.0f, -1, 1),
  Height(0.5f, 0, 1),
  Alpha(0.0f, -45, 45),
  Beta(0.0f, -45, 45),
