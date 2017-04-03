@@ -101,6 +101,8 @@ public class LightSheetMicroscopeSimulatorDemo
     try
     {
 
+      int lMaxCameraResolution = 2048;
+
       int lPhantomWidth = 320;
       int lPhantomHeight = lPhantomWidth;
       int lPhantomDepth = lPhantomWidth;
@@ -148,6 +150,7 @@ public class LightSheetMicroscopeSimulatorDemo
                                                       new LightSheetMicroscopeSimulatorOrtho(lContext,
                                                                                              pNumberOfDetectionArms,
                                                                                              pNumberOfIlluminationArms,
+                                                                                             lMaxCameraResolution,
                                                                                              lPhantomWidth,
                                                                                              lPhantomHeight,
                                                                                              lPhantomDepth);
@@ -164,8 +167,8 @@ public class LightSheetMicroscopeSimulatorDemo
         for (int i = 1; i < pNumberOfDetectionArms; i++)
           lCameraImageViewer = lSimulator.openViewerForCameraImage(i);
 
-        for (int i = 0; i < pNumberOfIlluminationArms; i++)
-          lSimulator.openViewerForLightMap(i);
+        // for (int i = 0; i < pNumberOfIlluminationArms; i++)
+        // lSimulator.openViewerForLightMap(i);
 
         // float y = 0;
 
