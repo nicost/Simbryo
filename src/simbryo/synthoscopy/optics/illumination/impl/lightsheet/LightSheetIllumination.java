@@ -44,6 +44,7 @@ public class LightSheetIllumination extends IlluminationOpticsBase
   private volatile float mLightSheetAlphaInRad, mLightSheetBetaInRad,
       mLightSheetGammaInRad, mLightSheetThetaInRad, mLightSheetHeigth,
       mScatterConstant, mScatterLoss, mSigmaMin, mSigmaMax;
+
   private Matrix4f mDetectionTransformMatrix;
 
   /**
@@ -66,7 +67,7 @@ public class LightSheetIllumination extends IlluminationOpticsBase
     setLightSheetThetaInDeg(2);
     setLightSheetHeigth(0.5f);
     setScatterConstant(100.0f);
-    setScatterLoss(0.01f);
+    setScatterLoss(0.03f);
     setSigmaMin(0.5f);
     setSigmaMax(1.0f);
 

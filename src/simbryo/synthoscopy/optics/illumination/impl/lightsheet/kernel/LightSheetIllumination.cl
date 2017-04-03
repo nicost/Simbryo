@@ -117,11 +117,11 @@ __kernel void propagate(   __read_only    image3d_t  scatterphantom,
   // scattering map value at voxel: 
   const float scattermapvalue = trans_read_imagef(scatterphantom, normsamplerclampedge, matrix16, pos).x;
   
-  // local loss from ballistic light to scattered light: (0 -> no loss, 1 -> max loss)
-  const float loss = 1.0f-native_exp2(-(scatterconstant/lmwidth)*scattermapvalue);
+  // local transfer from ballistic light to scattered light: (0 -> no transfer, 1 -> max transfer)
+  const float transfer = 1.0f-native_exp2(-(scatterconstant/lmwidth)*scattermapvalue);
   
   // updated ballistic ratio:
-  const float ballisticratio = oldballisticratio*(1.0f-loss);
+  const float ballisticratio = oldballisticratio*(1.0f-transfer);
   
   // [WRITE IMAGE] update ballistic light ratio map:
   write_imagef (boutput, (int2){y,z}, ballisticratio);
@@ -130,10 +130,10 @@ __kernel void propagate(   __read_only    image3d_t  scatterphantom,
   const float ballistic = ballistic0 * ballisticratio;
   
   // amount of ballistic light transfered to scattering at current voxel:
-  const float transferredlight = loss*oldballisticratio*ballistic0;
+  const float transferredlight = transfer*oldballisticratio*ballistic0;
   
   // scattering sigma has a min and a part modulated by density of scattering media:
-  const float sigma = sigmamin + loss*(sigmamax-sigmamin);
+  const float sigma = sigmamin + transfer*(sigmamax-sigmamin);
   
   // [READ IMAGE] collect light from previous plane that diffused to current voxel:
   // Note: turns out its slower to do separable-diffusion, because of the image cache - 

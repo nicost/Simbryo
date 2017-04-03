@@ -271,7 +271,7 @@ public class LightSheetMicroscopeSimulator extends
                       getNumberParameter(DetectionParameter.Wavelength,
                                          pDetectionPathIndex).floatValue();
 
-    float lFocusZ = (getNumberParameter(DetectionParameter.FocusZ,
+    float lFocusZ = (getNumberParameter(DetectionParameter.Z,
                                         pDetectionPathIndex).floatValue()
                      / lLengthConversionfactor)
                     + 0.5f;

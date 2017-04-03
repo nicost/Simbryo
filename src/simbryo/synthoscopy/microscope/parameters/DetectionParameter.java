@@ -10,7 +10,7 @@ public enum DetectionParameter implements ParameterInterface<Number>
 {
  Wavelength(0.0005f, 0.0001f, 0.01f),
  Intensity(0.95f, 0.0f, 1.0f),
- FocusZ(0.0f, -1, 1);
+ Z(0.0f, -1, 1);
 
   Number mDefaultValue, mMinValue, mMaxValue;
 
