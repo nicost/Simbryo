@@ -126,6 +126,7 @@ public abstract class MicroscopeSimulatorBase implements
       mParametersMap.put(pParameter, lConcurrentHashMap);
     }
 
+    // System.out.format("%s[%d]=%g\n",pParameter,pIndex,pValue.doubleValue());
     lConcurrentHashMap.put(pIndex, pValue);
   }
 

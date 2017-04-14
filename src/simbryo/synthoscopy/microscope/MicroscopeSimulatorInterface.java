@@ -166,6 +166,11 @@ public interface MicroscopeSimulatorInterface extends AutoCloseable
   ClearCLImageViewer openViewerForLightMap(int pIndex);
 
   /**
+   * Opens viewer for all lightmaps.
+   */
+  void openViewerForAllLightMaps();
+
+  /**
    * Opens a viewer for the microscope control parameters.
    * 
    * @return viewer

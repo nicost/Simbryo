@@ -8,6 +8,7 @@ package simbryo.synthoscopy.microscope.parameters;
 @SuppressWarnings("javadoc")
 public enum CameraParameter implements ParameterInterface<Number>
 {
+ Exposure(0, 0.020, 60 * 60), // unit: seconds, longest exposure is 1 hour...
  ROIXMin(0, 0, 2048),
  ROIXMax(0, 0, 2048),
  ROIWidth(1024, 0, 2048),

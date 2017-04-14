@@ -17,6 +17,7 @@ public class DrosophilaScatteringPhantom extends ScatteringPhantom
 {
 
   private float mLowEdge, mHighEdge;
+  private float mScatteringYolk, mScatteringWhole;
 
   /**
    * Instanciates a Drosophila scattering phantom renderer.
@@ -38,14 +39,17 @@ public class DrosophilaScatteringPhantom extends ScatteringPhantom
                                      long... pStackDimensions) throws IOException
   {
     super(pContext, 16, pDrosophila, pStackDimensions);
-    setNoiseOverSignalRatio(0.1f);
-    setSignalIntensity(0.9f);
+    setNoiseOverSignalRatio(0.02f);
+    setSignalIntensity(1f);
 
     float lNucleiRadius =
                         pDrosophilaHistoneFluorescence.getNucleiRadius();
 
     mLowEdge = 2 * lNucleiRadius;
     mHighEdge = 20 * lNucleiRadius;
+
+    setScatteringWhole(1f);
+    setScatteringYolk(4f);
 
     setupProgramAndKernel();
   }
@@ -71,8 +75,33 @@ public class DrosophilaScatteringPhantom extends ScatteringPhantom
     mRenderKernel.setArgument("highedge", mHighEdge);
     mRenderKernel.setArgument("noiseratio",
                               getNoiseOverSignalRatio());
+    mRenderKernel.setArgument("scattering_whole",
+                              getScatteringWhole());
+    mRenderKernel.setArgument("scattering_yolk", getScatteringYolk());
+    mRenderKernel.setArgument("noiseratio",
+                              getNoiseOverSignalRatio());
 
     mRenderKernel.setArgument("image", mImage);
+  }
+
+  public float getScatteringYolk()
+  {
+    return mScatteringYolk;
+  }
+
+  public float getScatteringWhole()
+  {
+    return mScatteringWhole;
+  }
+
+  public void setScatteringYolk(float pScatteringYolk)
+  {
+    mScatteringYolk = pScatteringYolk;
+  }
+
+  public void setScatteringWhole(float pScatteringWhole)
+  {
+    mScatteringWhole = pScatteringWhole;
   }
 
 }

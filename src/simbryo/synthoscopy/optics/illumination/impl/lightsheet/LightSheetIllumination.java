@@ -1,5 +1,6 @@
 package simbryo.synthoscopy.optics.illumination.impl.lightsheet;
 
+import static java.lang.Math.max;
 import static java.lang.Math.toRadians;
 
 import java.io.IOException;
@@ -67,7 +68,7 @@ public class LightSheetIllumination extends IlluminationOpticsBase
     setLightSheetThetaInDeg(2);
     setLightSheetHeigth(0.5f);
     setScatterConstant(100.0f);
-    setScatterLoss(0.03f);
+    setScatterLoss(0.02f);
     setSigmaMin(0.5f);
     setSigmaMax(1.0f);
 
@@ -628,12 +629,18 @@ public class LightSheetIllumination extends IlluminationOpticsBase
   public void render(boolean pWaitToFinish)
   {
     if (!isUpdateNeeded())
+    {
+      if (getInputImage() != null)
+        getInputImage().copyTo(getImage(), pWaitToFinish);
+
       return;
+    }
 
     initializeLightSheet(mBallisticLightImageA,
                          mBallisticLightImageB,
                          mScatteredLightImageA,
-                         mScatteredLightImageB);
+                         mScatteredLightImageB,
+                         false);
 
     setInvariantKernelParameters(mScatteringPhantomImage);
 
@@ -738,8 +745,12 @@ public class LightSheetIllumination extends IlluminationOpticsBase
     mPropagateLightSheetKernel.setArgument("lambda",
                                            getLightWavelength());
 
+    float lEffectiveIntensity = getIntensity()
+                                * (1.0f / max(1.0f / getHeight(),
+                                              getLightSheetHeigth()));
+
     mPropagateLightSheetKernel.setArgument("intensity",
-                                           getIntensity());
+                                           lEffectiveIntensity);
 
     mPropagateLightSheetKernel.setArgument("scatterconstant",
                                            getScatterConstant());
@@ -789,13 +800,14 @@ public class LightSheetIllumination extends IlluminationOpticsBase
   private void initializeLightSheet(ClearCLImage pBallisticLightImageA,
                                     ClearCLImage pBallisticLightImageB,
                                     ClearCLImage pScatteredLightImageA,
-                                    ClearCLImage pScatteredLightImageB)
+                                    ClearCLImage pScatteredLightImageB,
+                                    boolean pBlockingCall)
   {
 
     pBallisticLightImageA.fill(1.0f, false, false);
     pBallisticLightImageB.fill(1.0f, false, false);
     pScatteredLightImageA.fill(0.0f, false, false);
-    pScatteredLightImageB.fill(0.0f, true, false);
+    pScatteredLightImageB.fill(0.0f, pBlockingCall, false);
   }
 
   private void swapLightImages()

@@ -143,7 +143,7 @@ public class LightSheetMicroscopeSimulatorDemo
         lDrosophilaScatteringPhantom.render(true);
 
         // @SuppressWarnings("unused")
-        /*ClearCLImageViewer lScatterPhantomViewer =
+        ClearCLImageViewer lScatterPhantomViewer =
                                                  lDrosophilaScatteringPhantom.openViewer();/**/
 
         LightSheetMicroscopeSimulatorOrtho lSimulator =
