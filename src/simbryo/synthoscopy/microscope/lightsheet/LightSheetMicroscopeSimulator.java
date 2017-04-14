@@ -26,6 +26,7 @@ import simbryo.synthoscopy.microscope.parameters.PhantomParameter;
 import simbryo.synthoscopy.microscope.parameters.StageParameter;
 import simbryo.synthoscopy.microscope.parameters.UnitConversion;
 import simbryo.synthoscopy.optics.detection.impl.widefield.WideFieldDetectionOptics;
+import simbryo.synthoscopy.optics.illumination.combiner.IlluminationCombiner;
 import simbryo.synthoscopy.optics.illumination.impl.lightsheet.LightSheetIllumination;
 import simbryo.util.geom.GeometryUtils;
 
@@ -46,6 +47,8 @@ public class LightSheetMicroscopeSimulator extends
 
   private ArrayList<LightSheetIllumination> mLightSheetIlluminationList =
                                                                         new ArrayList<>();
+  private IlluminationCombiner<LightSheetIllumination> mIlluminationCombiner;
+
   private ArrayList<WideFieldDetectionOptics> mWideFieldDetectionOpticsList =
                                                                             new ArrayList<>();
   private ArrayList<SCMOSCameraRenderer> mCameraRendererList =
@@ -66,6 +69,7 @@ public class LightSheetMicroscopeSimulator extends
                                        long... pMainPhantomDimensions)
   {
     super(pContext, pMainPhantomDimensions);
+
   }
 
   @Override
@@ -134,22 +138,26 @@ public class LightSheetMicroscopeSimulator extends
 
   /**
    * Must be called after all lightsheets and detection arms have been added.
+   * 
+   * @throws IOException
+   *           thrown if problems while reading kernel sources
    */
   @Override
-  public void buildMicroscope()
+  public void buildMicroscope() throws IOException
   {
-    LightSheetIllumination lCurrentLightSheetIllumination = null;
+    mIlluminationCombiner =
+                          new IlluminationCombiner<>(mContext,
+                                                     mLightSheetIlluminationList);
+
     for (LightSheetIllumination lLightSheetIllumination : mLightSheetIlluminationList)
     {
-      if (lCurrentLightSheetIllumination != null)
-        lCurrentLightSheetIllumination.addUpdateListener(lLightSheetIllumination);
+      lLightSheetIllumination.addUpdateListener(mIlluminationCombiner);
 
-      for (WideFieldDetectionOptics lWideFieldDetectionOptics : mWideFieldDetectionOpticsList)
-      {
-        lLightSheetIllumination.addUpdateListener(lWideFieldDetectionOptics);
-      }
+    }
 
-      lCurrentLightSheetIllumination = lLightSheetIllumination;
+    for (WideFieldDetectionOptics lWideFieldDetectionOptics : mWideFieldDetectionOpticsList)
+    {
+      mIlluminationCombiner.addUpdateListener(lWideFieldDetectionOptics);
     }
   }
 
@@ -438,7 +446,6 @@ public class LightSheetMicroscopeSimulator extends
     SCMOSCameraRenderer lSCMOSCameraRenderer =
                                              mCameraRendererList.get(pDetectionIndex);
 
-    ClearCLImage lCurrentLightMap = null;
     int lNumberOfLightSheets = mLightSheetIlluminationList.size();
     for (int lLightSheetIndex =
                               0; lLightSheetIndex < lNumberOfLightSheets; lLightSheetIndex++)
@@ -446,17 +453,19 @@ public class LightSheetMicroscopeSimulator extends
       LightSheetIllumination lLightSheetIllumination =
                                                      mLightSheetIlluminationList.get(lLightSheetIndex);
       applyParametersForLightSheet(lLightSheetIndex, pDetectionIndex);
-      lLightSheetIllumination.setInputImage(lCurrentLightMap);
-      // lLightSheetIllumination.requestUpdate();
+
+      lLightSheetIllumination.requestUpdate();
       ElapsedTime.measure("renderlightsheet",
                           () -> lLightSheetIllumination.render(true));
 
-      lCurrentLightMap = lLightSheetIllumination.getImage();
-
     }
 
+    ElapsedTime.measure("rendercombinedlightsheet",
+                        () -> mIlluminationCombiner.render(true));
+    ClearCLImage lCombinedLightMap = mIlluminationCombiner.getImage();
+
     applyParametersForDetectionPath(pDetectionIndex,
-                                    lCurrentLightMap);
+                                    lCombinedLightMap);
 
     ElapsedTime.measure("renderdetection",
                         () -> lWideFieldDetectionOptics.render(false));

@@ -31,8 +31,7 @@ public class LightSheetIllumination extends IlluminationOpticsBase
                                     AutoCloseable
 {
 
-  protected ClearCLImage mNullImage, mInputImage,
-      mBallisticLightImageA, mBallisticLightImageB,
+  protected ClearCLImage mBallisticLightImageA, mBallisticLightImageB,
       mScatteredLightImageA, mScatteredLightImageB;
   protected ClearCLKernel mPropagateLightSheetKernel;
   private ClearCLBuffer mCombinedTransformMatrixBuffer;
@@ -94,14 +93,6 @@ public class LightSheetIllumination extends IlluminationOpticsBase
                                                             getHeight(),
                                                             getDepth());
 
-    mNullImage =
-               mContext.createSingleChannelImage(ImageChannelDataType.Float,
-                                                 1,
-                                                 1);
-    mNullImage.fillZero(false, false);
-
-    mInputImage = null;
-
     mLightSheetPosition = new Vector4f(0f, 0f, 0.5f, 1.0f);
     mLightSheetAxisVector = new Vector4f(1.0f, 0, 0, 1.0f);
     mLightSheetNormalVector = new Vector4f(0, 0, 1.0f, 1.0f);
@@ -112,18 +103,6 @@ public class LightSheetIllumination extends IlluminationOpticsBase
 
     mDetectionTransformMatrix = new Matrix4f();
     mDetectionTransformMatrix.setIdentity();
-  }
-
-  @Override
-  public void setInputImage(ClearCLImage pInputImage)
-  {
-    mInputImage = pInputImage;
-  }
-
-  @Override
-  public ClearCLImage getInputImage()
-  {
-    return mInputImage;
   }
 
   /**
@@ -512,6 +491,51 @@ public class LightSheetIllumination extends IlluminationOpticsBase
 
   }
 
+  /**
+   * Sets the alpha angle in radians
+   * 
+   * @param pAlphaInRadians
+   *          alpha in radians
+   */
+  public void setAlphaInRadians(float pAlphaInRadians)
+  {
+    if (mLightSheetAlphaInRad != pAlphaInRadians)
+    {
+      mLightSheetAlphaInRad = pAlphaInRadians;
+      requestUpdate();
+    }
+  }
+
+  /**
+   * Sets the beta angle in radians
+   * 
+   * @param pBetaInRadians
+   *          beta in radians
+   */
+  public void setBetaInRadians(float pBetaInRadians)
+  {
+    if (mLightSheetBetaInRad != pBetaInRadians)
+    {
+      mLightSheetBetaInRad = pBetaInRadians;
+      requestUpdate();
+    }
+  }
+
+  /**
+   * Sets the alpha angle in radians
+   * 
+   * @param pGammaInRadians
+   *          gamma in radians
+   */
+  public void setGammaInRadians(float pGammaInRadians)
+  {
+    if (mLightSheetGammaInRad != pGammaInRadians)
+    {
+      mLightSheetGammaInRad = pGammaInRadians;
+      requestUpdate();
+    }
+  }
+
   @Override
   public void setPhantomTransformMatrix(Matrix4f pTransformMatrix)
   {
@@ -629,12 +653,7 @@ public class LightSheetIllumination extends IlluminationOpticsBase
   public void render(boolean pWaitToFinish)
   {
     if (!isUpdateNeeded())
-    {
-      if (getInputImage() != null)
-        getInputImage().copyTo(getImage(), pWaitToFinish);
-
       return;
-    }
 
     initializeLightSheet(mBallisticLightImageA,
                          mBallisticLightImageB,
@@ -716,9 +735,6 @@ public class LightSheetIllumination extends IlluminationOpticsBase
 
     mPropagateLightSheetKernel.setArgument("scatterphantom",
                                            pScatteringPhantomImage);
-    mPropagateLightSheetKernel.setArgument("lightmapin",
-                                           getInputImage() == null ? mNullImage
-                                                                   : getInputImage());
     mPropagateLightSheetKernel.setArgument("lightmapout", getImage());
 
     mPropagateLightSheetKernel.setArgument("lspx",

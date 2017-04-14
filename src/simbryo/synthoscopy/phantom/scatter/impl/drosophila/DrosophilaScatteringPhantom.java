@@ -84,21 +84,45 @@ public class DrosophilaScatteringPhantom extends ScatteringPhantom
     mRenderKernel.setArgument("image", mImage);
   }
 
+  /**
+   * Returns the scattering intensity for the yolk (region at the center of
+   * embryo)
+   * 
+   * @return scattering intensity for Yolk
+   */
   public float getScatteringYolk()
   {
     return mScatteringYolk;
   }
 
+  /**
+   * Returns the scattering intensity for the whole embryo (region at the center
+   * of embryo)
+   * 
+   * @return scattering intensity for the whole embryo
+   */
   public float getScatteringWhole()
   {
     return mScatteringWhole;
   }
 
+  /**
+   * Sets the scattering intensity for the Yolk.
+   * 
+   * @param pScatteringYolk
+   *          scattering intensity for the Yolk.
+   */
   public void setScatteringYolk(float pScatteringYolk)
   {
     mScatteringYolk = pScatteringYolk;
   }
 
+  /**
+   * Sets the scattering intensity for the whole embryo
+   * 
+   * @param pScatteringWhole
+   *          scattering intensity for the whole embryo
+   */
   public void setScatteringWhole(float pScatteringWhole)
   {
     mScatteringWhole = pScatteringWhole;

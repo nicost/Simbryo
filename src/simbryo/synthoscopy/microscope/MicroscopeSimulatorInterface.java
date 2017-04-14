@@ -1,5 +1,7 @@
 package simbryo.synthoscopy.microscope;
 
+import java.io.IOException;
+
 import clearcl.ClearCLBuffer;
 import clearcl.ClearCLImage;
 import clearcl.viewer.ClearCLImageViewer;
@@ -18,8 +20,11 @@ public interface MicroscopeSimulatorInterface extends AutoCloseable
 
   /**
    * Called afetr all optical components have been added.
+   * 
+   * @throws IOException
+   *           thrown if problems while reading kernel sources
    */
-  void buildMicroscope();
+  void buildMicroscope() throws IOException;
 
   /**
    * Sets a given type of phantom image
