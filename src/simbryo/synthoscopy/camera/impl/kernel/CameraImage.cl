@@ -3,8 +3,8 @@
 #include [OCLlib] "noise/noise.cl"
           
                                 
-__kernel void upscale(     __read_only    image2d_t  imagein,
-                           __write_only   image2d_t  imageout,
+__kernel void upscale(     __read_only    image2d_t    imagein,
+                           __write_only   image2d_t    imageout,
                            const          float        nxmin,
                            const          float        nxscale,
                            const          float        nymin,

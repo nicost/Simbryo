@@ -24,7 +24,6 @@ public class SCMOSCameraRenderer extends ClearCLCameraRendererBase
                                  implements
                                  CameraRendererInterface<ClearCLImage>
 {
-  private static final float cNormalExposure = 0.020f;
 
   protected ClearCLKernel mUpscaleKernel, mNoiseKernel;
   protected ClearCLBuffer mImageShortBuffer;
@@ -36,6 +35,8 @@ public class SCMOSCameraRenderer extends ClearCLCameraRendererBase
 
   private volatile float mExposureInSeconds, mShotNoise, mOffset,
       mGain, mOffsetNoise, mGainNoise, mOffsetBias, mGainBias;
+
+  private volatile float mShiftX, mShiftY, mMagnification;
 
   /**
    * Instanciates a light sheet illumination optics class given a ClearCL
@@ -52,6 +53,11 @@ public class SCMOSCameraRenderer extends ClearCLCameraRendererBase
                              long... pMaxCameraImageDimensions) throws IOException
   {
     super(pContext, pMaxCameraImageDimensions);
+
+    setExposure(cNormalExposure);
+    setMagnification(1);
+    setShiftX(0);
+    setShiftY(0);
 
     setShotNoise(0.02f);
     setOffset(97.0f);
@@ -78,7 +84,7 @@ public class SCMOSCameraRenderer extends ClearCLCameraRendererBase
    */
   public float getExposure()
   {
-    return mShotNoise;
+    return mExposureInSeconds;
   }
 
   /**
@@ -92,6 +98,81 @@ public class SCMOSCameraRenderer extends ClearCLCameraRendererBase
     if (mExposureInSeconds != pExposureInSeconds)
     {
       mExposureInSeconds = pExposureInSeconds;
+      requestUpdate();
+    }
+  }
+
+  /**
+   * Returns the magnification
+   * 
+   * @return magnification
+   */
+  public float getMagnification()
+  {
+    return mMagnification;
+  }
+
+  /**
+   * Sets the magnification.
+   * 
+   * @param pMagnification
+   *          magnification
+   */
+  public void setMagnification(float pMagnification)
+  {
+    if (mMagnification != pMagnification)
+    {
+      mMagnification = pMagnification;
+      requestUpdate();
+    }
+  }
+
+  /**
+   * Returns the camera image shift along x
+   * 
+   * @return exposure in seconds
+   */
+  public float getShiftX()
+  {
+    return mShiftX;
+  }
+
+  /**
+   * Sets the camera image shift along x
+   * 
+   * @param pShiftX
+   *          shift x
+   */
+  public void setShiftX(float pShiftX)
+  {
+    if (mShiftX != pShiftX)
+    {
+      mShiftX = pShiftX;
+      requestUpdate();
+    }
+  }
+
+  /**
+   * Returns the camera image shift along y
+   * 
+   * @return exposure in seconds
+   */
+  public float getShiftY()
+  {
+    return mShiftY;
+  }
+
+  /**
+   * Sets the camera image shift along y
+   * 
+   * @param pShiftY
+   *          shift y
+   */
+  public void setShiftY(float pShiftY)
+  {
+    if (mShiftY != pShiftY)
+    {
+      mShiftY = pShiftY;
       requestUpdate();
     }
   }
@@ -512,6 +593,20 @@ public class SCMOSCameraRenderer extends ClearCLCameraRendererBase
     float lNormalizedXScale = (float) getWidth() / getMaxWidth();
     float lNormalizedYMin = (float) mYMin / getMaxHeight();
     float lNormalizedYScale = (float) getHeight() / getMaxHeight();
+
+    lNormalizedXMin += mShiftX;
+    lNormalizedYMin += mShiftY;
+
+    if (mMagnification != 1.0f)
+    {
+      lNormalizedXMin +=
+                      0.5f * lNormalizedXScale * (1 - mMagnification);
+      lNormalizedYMin +=
+                      0.5f * lNormalizedYScale * (1 - mMagnification);
+
+      lNormalizedXScale *= mMagnification;
+      lNormalizedYScale *= mMagnification;
+    } /**/
 
     mUpscaleKernel.setArgument("nxmin", lNormalizedXMin);
     mUpscaleKernel.setArgument("nxscale", lNormalizedXScale);

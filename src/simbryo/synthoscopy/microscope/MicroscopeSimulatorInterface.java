@@ -6,8 +6,9 @@ import clearcl.ClearCLBuffer;
 import clearcl.ClearCLImage;
 import clearcl.viewer.ClearCLImageViewer;
 import coremem.ContiguousMemoryInterface;
+import simbryo.SimulationInterface;
 import simbryo.synthoscopy.camera.impl.SCMOSCameraRenderer;
-import simbryo.synthoscopy.microscope.lightsheet.gui.jfx.LightSheetMicroscopeSimulatorViewer;
+import simbryo.synthoscopy.microscope.lightsheet.gui.LightSheetMicroscopeSimulatorViewer;
 import simbryo.synthoscopy.microscope.parameters.ParameterInterface;
 
 /**
@@ -15,7 +16,9 @@ import simbryo.synthoscopy.microscope.parameters.ParameterInterface;
  *
  * @author royer
  */
-public interface MicroscopeSimulatorInterface extends AutoCloseable
+public interface MicroscopeSimulatorInterface extends
+                                              SimulationInterface,
+                                              AutoCloseable
 {
 
   /**
@@ -73,6 +76,19 @@ public interface MicroscopeSimulatorInterface extends AutoCloseable
                             int pIndex);
 
   /**
+   * Returns the value of a given parameter type and index. The value is then
+   * transformed according to the abberations added to this microscope.
+   * 
+   * @param pParameter
+   *          parameter type
+   * @param pIndex
+   *          parameter index
+   * @return parameter value
+   */
+  Number getNumberParameterWithAberrations(ParameterInterface<Number> pParameter,
+                                           int pIndex);
+
+  /**
    * Returns the value of a given parameter type and index. The parameter's
    * default value is overridden by a provided value.
    * 
@@ -87,6 +103,23 @@ public interface MicroscopeSimulatorInterface extends AutoCloseable
   Number getNumberParameter(ParameterInterface<Number> pParameter,
                             int pIndex,
                             Number pDefaultOverideValue);
+
+  /**
+   * Returns the value of a given parameter type and index. The parameter's
+   * default value is overridden by a provided value. The value is then
+   * transformed according to the abberations added to this microscope
+   * 
+   * @param pParameter
+   *          parameter type
+   * @param pIndex
+   *          parameter index
+   * @param pDefaultOverideValue
+   *          value overriding the parameter defaults
+   * @return parameter value
+   */
+  Number getNumberParameterWithAberrations(ParameterInterface<Number> pParameter,
+                                           int pIndex,
+                                           Number pDefaultOverideValue);
 
   /**
    * Renders all nescessary intermediate as well as final images for all

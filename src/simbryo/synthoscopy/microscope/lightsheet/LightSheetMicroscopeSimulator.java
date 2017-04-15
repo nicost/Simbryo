@@ -18,7 +18,7 @@ import clearcl.viewer.ClearCLImageViewer;
 import coremem.ContiguousMemoryInterface;
 import simbryo.synthoscopy.camera.impl.SCMOSCameraRenderer;
 import simbryo.synthoscopy.microscope.MicroscopeSimulatorBase;
-import simbryo.synthoscopy.microscope.lightsheet.gui.jfx.LightSheetMicroscopeSimulatorViewer;
+import simbryo.synthoscopy.microscope.lightsheet.gui.LightSheetMicroscopeSimulatorViewer;
 import simbryo.synthoscopy.microscope.parameters.CameraParameter;
 import simbryo.synthoscopy.microscope.parameters.DetectionParameter;
 import simbryo.synthoscopy.microscope.parameters.IlluminationParameter;
@@ -202,11 +202,11 @@ public class LightSheetMicroscopeSimulator extends
                                             int pDetectionPathIndex)
   {
     float lLengthConversionfactor =
-                                  getNumberParameter(UnitConversion.Length,
-                                                     0).floatValue();
+                                  getNumberParameterWithAberrations(UnitConversion.Length,
+                                                                    0).floatValue();
     float lLaserPowerConversionfactor =
-                                      getNumberParameter(UnitConversion.LaserIntensity,
-                                                         0).floatValue();
+                                      getNumberParameterWithAberrations(UnitConversion.LaserIntensity,
+                                                                        0).floatValue();
 
     LightSheetIllumination lLightSheetIllumination =
                                                    mLightSheetIlluminationList.get(pLightSheetIndex);
@@ -217,39 +217,44 @@ public class LightSheetMicroscopeSimulator extends
     lLightSheetIllumination.setScatteringPhantom(getPhantomParameter(PhantomParameter.Scattering));
 
     float lIntensity =
-                     getNumberParameter(IlluminationParameter.Intensity,
-                                        pLightSheetIndex).floatValue()
+                     getNumberParameterWithAberrations(IlluminationParameter.Intensity,
+                                                       pLightSheetIndex).floatValue()
                        / lLaserPowerConversionfactor;
 
     float lWaveLength =
-                      getNumberParameter(IlluminationParameter.Wavelength,
-                                         pLightSheetIndex).floatValue();
+                      getNumberParameterWithAberrations(IlluminationParameter.Wavelength,
+                                                        pLightSheetIndex).floatValue();
 
-    float xl = (getNumberParameter(IlluminationParameter.X,
-                                   pLightSheetIndex).floatValue()
-                / lLengthConversionfactor)
-               + 0.5f;
-    float yl = (getNumberParameter(IlluminationParameter.Y,
-                                   pLightSheetIndex).floatValue()
-                / lLengthConversionfactor)
-               + 0.5f;
-    float zl = (getNumberParameter(IlluminationParameter.Z,
-                                   pLightSheetIndex).floatValue()
-                / lLengthConversionfactor)
-               + 0.5f;
+    float xl =
+             (getNumberParameterWithAberrations(IlluminationParameter.X,
+                                                pLightSheetIndex).floatValue()
+              / lLengthConversionfactor) + 0.5f;
+    float yl =
+             (getNumberParameterWithAberrations(IlluminationParameter.Y,
+                                                pLightSheetIndex).floatValue()
+              / lLengthConversionfactor) + 0.5f;
+    float zl =
+             (getNumberParameterWithAberrations(IlluminationParameter.Z,
+                                                pLightSheetIndex).floatValue()
+              / lLengthConversionfactor) + 0.5f;
 
-    float height = getNumberParameter(IlluminationParameter.Height,
-                                      pLightSheetIndex).floatValue()
+    float height =
+                 getNumberParameterWithAberrations(IlluminationParameter.Height,
+                                                   pLightSheetIndex).floatValue()
                    / lLengthConversionfactor;
 
-    float alpha = getNumberParameter(IlluminationParameter.Alpha,
-                                     pLightSheetIndex).floatValue();
-    float beta = getNumberParameter(IlluminationParameter.Beta,
-                                    pLightSheetIndex).floatValue();
-    float gamma = getNumberParameter(IlluminationParameter.Gamma,
-                                     pLightSheetIndex).floatValue();
-    float theta = getNumberParameter(IlluminationParameter.Theta,
-                                     pLightSheetIndex).floatValue();
+    float alpha =
+                getNumberParameterWithAberrations(IlluminationParameter.Alpha,
+                                                  pLightSheetIndex).floatValue();
+    float beta =
+               getNumberParameterWithAberrations(IlluminationParameter.Beta,
+                                                 pLightSheetIndex).floatValue();
+    float gamma =
+                getNumberParameterWithAberrations(IlluminationParameter.Gamma,
+                                                  pLightSheetIndex).floatValue();
+    float theta =
+                getNumberParameterWithAberrations(IlluminationParameter.Theta,
+                                                  pLightSheetIndex).floatValue();
 
     lLightSheetIllumination.setIntensity(lIntensity);
     lLightSheetIllumination.setLightWavelength(lWaveLength);
@@ -266,8 +271,8 @@ public class LightSheetMicroscopeSimulator extends
                                                ClearCLImage pLightMapImage)
   {
     float lLengthConversionfactor =
-                                  getNumberParameter(UnitConversion.Length,
-                                                     0).floatValue();
+                                  getNumberParameterWithAberrations(UnitConversion.Length,
+                                                                    0).floatValue();
 
     WideFieldDetectionOptics lWideFieldDetectionOptics =
                                                        mWideFieldDetectionOpticsList.get(pDetectionPathIndex);
@@ -280,37 +285,37 @@ public class LightSheetMicroscopeSimulator extends
                                          getPhantomParameter(PhantomParameter.Scattering);
 
     float lIntensity =
-                     getNumberParameter(DetectionParameter.Intensity,
-                                        pDetectionPathIndex).floatValue();
+                     getNumberParameterWithAberrations(DetectionParameter.Intensity,
+                                                       pDetectionPathIndex).floatValue();
 
     float lWaveLength =
-                      getNumberParameter(DetectionParameter.Wavelength,
-                                         pDetectionPathIndex).floatValue();
+                      getNumberParameterWithAberrations(DetectionParameter.Wavelength,
+                                                        pDetectionPathIndex).floatValue();
 
-    float lFocusZ = (getNumberParameter(DetectionParameter.Z,
-                                        pDetectionPathIndex).floatValue()
-                     / lLengthConversionfactor)
-                    + 0.5f;
+    float lFocusZ =
+                  (getNumberParameterWithAberrations(DetectionParameter.Z,
+                                                     pDetectionPathIndex).floatValue()
+                   / lLengthConversionfactor) + 0.5f;
 
     long lDetectionImageWidth = lFluorescencePhantomImage.getWidth();
     long lDetectionImageHeight =
                                lFluorescencePhantomImage.getHeight();
 
     int lROIOffsetX =
-                    getNumberParameter(CameraParameter.ROIOffsetX,
-                                       pDetectionPathIndex).intValue();
+                    getNumberParameterWithAberrations(CameraParameter.ROIOffsetX,
+                                                      pDetectionPathIndex).intValue();
     int lROIOffsetY =
-                    getNumberParameter(CameraParameter.ROIOffsetY,
-                                       pDetectionPathIndex).intValue();
+                    getNumberParameterWithAberrations(CameraParameter.ROIOffsetY,
+                                                      pDetectionPathIndex).intValue();
 
     int lROIWidth =
-                  getNumberParameter(CameraParameter.ROIWidth,
-                                     pDetectionPathIndex,
-                                     lSCMOSCameraRenderer.getMaxWidth()).intValue();
+                  getNumberParameterWithAberrations(CameraParameter.ROIWidth,
+                                                    pDetectionPathIndex,
+                                                    lSCMOSCameraRenderer.getMaxWidth()).intValue();
     int lROIHeight =
-                   getNumberParameter(CameraParameter.ROIHeight,
-                                      pDetectionPathIndex,
-                                      lSCMOSCameraRenderer.getMaxHeight()).intValue();
+                   getNumberParameterWithAberrations(CameraParameter.ROIHeight,
+                                                     pDetectionPathIndex,
+                                                     lSCMOSCameraRenderer.getMaxHeight()).intValue();
 
     lWideFieldDetectionOptics.setFluorescencePhantomImage(lFluorescencePhantomImage);
     lWideFieldDetectionOptics.setScatteringPhantomImage(lScatteringPhantomImage);
@@ -325,11 +330,28 @@ public class LightSheetMicroscopeSimulator extends
     lWideFieldDetectionOptics.setPhantomTransformMatrix(getStageAndDetectionTransformMatrix(pDetectionPathIndex));
 
     float lExposureInSeconds =
-                             getNumberParameter(CameraParameter.Exposure,
-                                                pDetectionPathIndex).floatValue();
+                             getNumberParameterWithAberrations(CameraParameter.Exposure,
+                                                               pDetectionPathIndex).floatValue();
+
+    float lMagnification =
+                         getNumberParameterWithAberrations(CameraParameter.Magnification,
+                                                           pDetectionPathIndex).floatValue();
+
+    float lShiftX =
+                  getNumberParameterWithAberrations(CameraParameter.ShiftX,
+                                                    pDetectionPathIndex).floatValue();
+
+    float lShiftY =
+                  getNumberParameterWithAberrations(CameraParameter.ShiftY,
+                                                    pDetectionPathIndex).floatValue();
 
     lSCMOSCameraRenderer.setDetectionImage(lWideFieldDetectionOptics.getImage());
     lSCMOSCameraRenderer.setExposure(lExposureInSeconds);
+
+    lSCMOSCameraRenderer.setMagnification(lMagnification);
+    lSCMOSCameraRenderer.setShiftX(lShiftX);
+    lSCMOSCameraRenderer.setShiftY(lShiftY);
+
     lSCMOSCameraRenderer.setCenteredROI(lROIOffsetX,
                                         lROIOffsetY,
                                         lROIWidth,
@@ -358,26 +380,35 @@ public class LightSheetMicroscopeSimulator extends
                                   getNumberParameter(UnitConversion.Length,
                                                      0).floatValue();
 
-    float lStageX = getNumberParameter(StageParameter.StageX, 0, 0)
-                                                                   .floatValue()
+    float lStageX =
+                  getNumberParameterWithAberrations(StageParameter.StageX,
+                                                    0,
+                                                    0).floatValue()
                     / lLengthConversionfactor;
-    float lStageY = getNumberParameter(StageParameter.StageY, 0, 0)
-                                                                   .floatValue()
+    float lStageY =
+                  getNumberParameterWithAberrations(StageParameter.StageY,
+                                                    0,
+                                                    0).floatValue()
                     / lLengthConversionfactor;
-    float lStageZ = getNumberParameter(StageParameter.StageZ, 0, 0)
-                                                                   .floatValue()
+    float lStageZ =
+                  getNumberParameterWithAberrations(StageParameter.StageZ,
+                                                    0,
+                                                    0).floatValue()
                     / lLengthConversionfactor;
 
-    float lStageRX = getNumberParameter(StageParameter.StageRX,
-                                        0,
-                                        0).floatValue();
+    float lStageRX =
+                   getNumberParameterWithAberrations(StageParameter.StageRX,
+                                                     0,
+                                                     0).floatValue();
 
-    float lStageRY = getNumberParameter(StageParameter.StageRY,
-                                        0,
-                                        0).floatValue();
-    float lStageRZ = getNumberParameter(StageParameter.StageRZ,
-                                        0,
-                                        0).floatValue();
+    float lStageRY =
+                   getNumberParameterWithAberrations(StageParameter.StageRY,
+                                                     0,
+                                                     0).floatValue();
+    float lStageRZ =
+                   getNumberParameterWithAberrations(StageParameter.StageRZ,
+                                                     0,
+                                                     0).floatValue();
 
     Vector3f lCenter = new Vector3f(0.5f, 0.5f, 0.5f);
 
