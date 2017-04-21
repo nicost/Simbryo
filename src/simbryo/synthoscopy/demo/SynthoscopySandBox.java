@@ -199,11 +199,11 @@ public class SynthoscopySandBox
 
   }
 
-  public void simulate_single_beams(final int side,
-                                    final float angle,
-                                    final int n_planes,
-                                    final String outdir) throws IOException,
-                                                         InterruptedException
+  private void simulate_single_beams(final int side,
+                                     final float angle,
+                                     final int n_planes,
+                                     final String outdir) throws IOException,
+                                                          InterruptedException
   {
 
     try
@@ -379,6 +379,14 @@ public class SynthoscopySandBox
 
   }
 
+  /**
+   * Demo single arms
+   * 
+   * @throws IOException
+   *           NA
+   * @throws InterruptedException
+   *           NA
+   */
   @Test
   public void demo_single_arms() throws IOException,
                                  InterruptedException

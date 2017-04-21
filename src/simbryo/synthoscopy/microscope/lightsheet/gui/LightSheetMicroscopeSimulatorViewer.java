@@ -15,7 +15,6 @@ import simbryo.synthoscopy.microscope.lightsheet.LightSheetMicroscopeSimulator;
  *
  * @author royer
  */
-@SuppressWarnings("restriction")
 public class LightSheetMicroscopeSimulatorViewer
 {
 

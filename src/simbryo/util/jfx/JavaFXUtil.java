@@ -11,7 +11,6 @@ import com.sun.javafx.application.PlatformImpl;
  *
  * @author royer
  */
-@SuppressWarnings("restriction")
 public class JavaFXUtil
 {
   /**
