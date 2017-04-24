@@ -43,7 +43,7 @@ public class LightSheetMicroscopeSimulatorPanel extends TabPane
 
     int lNumberOfLightSheets = pSimulator.getNumberOfLightSheets();
     int lNumberOfDetectionPaths =
-                                pSimulator.getNumberOfDetectionPaths();
+                                pSimulator.getNumberOfDetectionArms();
 
     {
       Tab tab = new Tab();

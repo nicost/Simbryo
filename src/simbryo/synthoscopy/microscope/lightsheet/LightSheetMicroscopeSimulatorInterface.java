@@ -58,7 +58,7 @@ public interface LightSheetMicroscopeSimulatorInterface extends
    * 
    * @return number of detection paths
    */
-  int getNumberOfDetectionPaths();
+  int getNumberOfDetectionArms();
 
   /**
    * Returns lightsheet for index

@@ -168,7 +168,7 @@ public class LightSheetMicroscopeSimulator extends
   }
 
   @Override
-  public int getNumberOfDetectionPaths()
+  public int getNumberOfDetectionArms()
   {
     return mWideFieldDetectionOpticsList.size();
   }
