@@ -43,7 +43,7 @@ public class LightSheetMicroscopeSimulator extends
 
   private static final float cDepthOfIlluminationInNormUnits = 1f;
 
-  private static final int cLightMapScaleFactor = 4;
+  private static final int cLightMapScaleFactor = 2;
 
   private ArrayList<LightSheetIllumination> mLightSheetIlluminationList =
                                                                         new ArrayList<>();
