@@ -4,6 +4,7 @@ import javax.vecmath.Vector3f;
 
 import clearcl.ClearCLContext;
 import clearcl.ClearCLImage;
+import clearcl.enums.ImageChannelDataType;
 import simbryo.synthoscopy.ClearCLSynthoscopyBase;
 
 /**
@@ -34,11 +35,14 @@ public abstract class ClearCLCameraRendererBase extends
    *          ClearCL context
    * @param pMaxCameraImageDimensions
    *          max camera image dimensions
+   * @param pDataType
+   *          data type for rendered image
    */
   public ClearCLCameraRendererBase(final ClearCLContext pContext,
+                                   ImageChannelDataType pDataType,
                                    long... pMaxCameraImageDimensions)
   {
-    super(pContext, false, pMaxCameraImageDimensions);
+    super(pContext, false, pDataType, pMaxCameraImageDimensions);
 
     mContext = pContext;
 

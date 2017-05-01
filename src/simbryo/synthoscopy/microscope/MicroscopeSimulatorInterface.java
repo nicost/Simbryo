@@ -2,12 +2,13 @@ package simbryo.synthoscopy.microscope;
 
 import java.io.IOException;
 
-import clearcl.ClearCLBuffer;
+import clearcl.ClearCLContext;
 import clearcl.ClearCLImage;
 import clearcl.viewer.ClearCLImageViewer;
 import coremem.ContiguousMemoryInterface;
 import simbryo.SimulationInterface;
 import simbryo.synthoscopy.camera.impl.SCMOSCameraRenderer;
+import simbryo.synthoscopy.microscope.aberration.AberrationInterface;
 import simbryo.synthoscopy.microscope.lightsheet.gui.LightSheetMicroscopeSimulatorViewer;
 import simbryo.synthoscopy.microscope.parameters.ParameterInterface;
 
@@ -20,6 +21,13 @@ public interface MicroscopeSimulatorInterface extends
                                               SimulationInterface,
                                               AutoCloseable
 {
+
+  /**
+   * Returns the ClearCL context used by this microscope simulator.
+   * 
+   * @return context
+   */
+  ClearCLContext getContext();
 
   /**
    * Called afetr all optical components have been added.
@@ -122,6 +130,13 @@ public interface MicroscopeSimulatorInterface extends
                                            Number pDefaultOverideValue);
 
   /**
+   * Adds aberrations to this microscope.
+   * 
+   * @param pAberrations
+   */
+  void addAbberation(AberrationInterface... pAberrations);
+
+  /**
    * Renders all nescessary intermediate as well as final images for all
    * detetion paths and cameras.
    * 
@@ -174,16 +189,6 @@ public interface MicroscopeSimulatorInterface extends
               ContiguousMemoryInterface pContiguousMemory,
               long pOffsetInContiguousMemory,
               boolean pWaitToFinish);
-
-  /**
-   * Returns the ClearCL buffer in which the camera image of given index is
-   * stored as 16bit unsigned integers.
-   * 
-   * @param pCameraIndex
-   *          camera index
-   * @return ClearCL buffer in which image is stored after each render
-   */
-  ClearCLBuffer getCameraImageBuffer(int pCameraIndex);
 
   /**
    * Opens a viewer for the camera image for a given camera index.

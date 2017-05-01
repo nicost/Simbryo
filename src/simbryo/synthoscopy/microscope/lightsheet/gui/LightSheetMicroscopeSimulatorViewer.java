@@ -15,6 +15,7 @@ import simbryo.synthoscopy.microscope.lightsheet.LightSheetMicroscopeSimulator;
  *
  * @author royer
  */
+@SuppressWarnings("restriction")
 public class LightSheetMicroscopeSimulatorViewer
 {
 
@@ -67,6 +68,7 @@ public class LightSheetMicroscopeSimulatorViewer
    * @param pWindowHeight
    *          window height
    */
+
   public LightSheetMicroscopeSimulatorViewer(LightSheetMicroscopeSimulator pSimulator,
                                              String pWindowTitle,
                                              int pWindowWidth,

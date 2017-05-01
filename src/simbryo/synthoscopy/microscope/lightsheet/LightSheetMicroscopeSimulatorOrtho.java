@@ -44,6 +44,38 @@ public class LightSheetMicroscopeSimulatorOrtho extends
                                             int pMaxCameraResolution,
                                             long... pMainPhantomDimensions)
   {
+    this(pContext,
+         GeometryUtils.getIdentity(),
+         pNumberOfDetectionArms,
+         pNumberOfIlluminationArms,
+         pMaxCameraResolution,
+         pMainPhantomDimensions);
+  }
+
+  /**
+   * Instantiates a simulator with given ClearCL context, number of detection
+   * and illumination arms as well as main phantom dimensions
+   * 
+   * @param pContext
+   *          ClearCL context
+   * @param pCameraMisalignmentMatrix
+   *          camera misalignment matrix
+   * @param pNumberOfDetectionArms
+   *          number of detection arms
+   * @param pNumberOfIlluminationArms
+   *          number of illumination arms
+   * @param pMaxCameraResolution
+   *          max width and height of camera images
+   * @param pMainPhantomDimensions
+   *          phantom main dimensions
+   */
+  public LightSheetMicroscopeSimulatorOrtho(ClearCLContext pContext,
+                                            Matrix4f pCameraMisalignmentMatrix,
+                                            int pNumberOfDetectionArms,
+                                            int pNumberOfIlluminationArms,
+                                            int pMaxCameraResolution,
+                                            long... pMainPhantomDimensions)
+  {
     super(pContext, pMainPhantomDimensions);
 
     if (pMainPhantomDimensions.length != 3)
@@ -122,12 +154,9 @@ public class LightSheetMicroscopeSimulatorOrtho extends
                                                                 0.5f,
                                                                 0.5f));
 
-      /*
-      Matrix4f lVector = new Matrix4f();
-      lVector.setColumn(0, new Vector4f(0.5f, 0.5f, 0.5f, 1.0f));
-      
-      lDetectionMatrix.mul(lVector);
-      System.out.println(lDetectionMatrix);/**/
+      lDetectionMatrix =
+                       GeometryUtils.multiply(pCameraMisalignmentMatrix,
+                                              lDetectionMatrix);
 
       Vector3f lDetectionUpDownVector = new Vector3f(0, 1, 0);
 

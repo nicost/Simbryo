@@ -6,6 +6,7 @@ import javax.vecmath.Vector3f;
 import clearcl.ClearCLBuffer;
 import clearcl.ClearCLContext;
 import clearcl.ClearCLImage;
+import clearcl.enums.ImageChannelDataType;
 import clearcl.util.MatrixUtils;
 import simbryo.synthoscopy.ClearCLSynthoscopyBase;
 import simbryo.synthoscopy.SynthoscopyInterface;
@@ -40,7 +41,10 @@ public abstract class OpticsBase extends ClearCLSynthoscopyBase
   public OpticsBase(final ClearCLContext pContext,
                     long... pImageDimensions)
   {
-    super(pContext, false, pImageDimensions);
+    super(pContext,
+          false,
+          ImageChannelDataType.Float,
+          pImageDimensions);
     mWavelengthInNormUnits = cDefaultWavelengthInNormUnits;
     mPhantomTransformMatrix.setIdentity();
   }

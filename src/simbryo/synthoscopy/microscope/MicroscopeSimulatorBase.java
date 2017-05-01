@@ -35,7 +35,7 @@ public abstract class MicroscopeSimulatorBase implements
                                                               new ArrayList<>();
 
   /**
-   * Instanciates a microscope simulator.
+   * Instantiates a microscope simulator.
    * 
    * @param pContext
    *          ClearCL context
@@ -52,12 +52,19 @@ public abstract class MicroscopeSimulatorBase implements
                                                                              pMainPhantomDimensions);
   }
 
+  @Override
+  public ClearCLContext getContext()
+  {
+    return mContext;
+  }
+
   /**
-   * Adds abberations to this microscope
+   * Adds aberrations to this microscope
    * 
    * @param pAberrations
-   *          vararg list of abberations
+   *          vararg list of aberrations
    */
+  @Override
   public void addAbberation(AberrationInterface... pAberrations)
   {
     for (AberrationInterface lAberration : pAberrations)

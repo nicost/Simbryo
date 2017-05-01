@@ -10,9 +10,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
 
-import clearcl.ClearCLBuffer;
 import clearcl.ClearCLContext;
 import clearcl.ClearCLImage;
+import clearcl.enums.ImageChannelDataType;
 import clearcl.util.ElapsedTime;
 import clearcl.viewer.ClearCLImageViewer;
 import coremem.ContiguousMemoryInterface;
@@ -58,7 +58,7 @@ public class LightSheetMicroscopeSimulator extends
                                                                                  new ConcurrentHashMap<>();
 
   /**
-   * Instanciates a light sheet microscope simulator given a ClearCL context
+   * Instantiates a light sheet microscope simulator given a ClearCL context
    * 
    * @param pContext
    *          ClearCL context
@@ -123,6 +123,7 @@ public class LightSheetMicroscopeSimulator extends
 
       SCMOSCameraRenderer lSCMOSCameraRenderer =
                                                new SCMOSCameraRenderer(mContext,
+                                                                       ImageChannelDataType.UnsignedInt16,
                                                                        pMaxCameraWidth,
                                                                        pMaxCameraHeight);
       lSCMOSCameraRenderer.setDetectionDownUpVector(pDownUpVector);
@@ -567,13 +568,6 @@ public class LightSheetMicroscopeSimulator extends
                                           pContiguousMemory.subRegion(pOffsetInContiguousMemory,
                                                                       lCameraImage.getSizeInBytes());
     lCameraImage.writeTo(lImagePlane, pBlocking);
-  }
-
-  @Override
-  public ClearCLBuffer getCameraImageBuffer(int pCameraIndex)
-  {
-    return mCameraRendererList.get(pCameraIndex)
-                              .getCameraImageBuffer();
   }
 
   private int closestOddInteger(float pValue)

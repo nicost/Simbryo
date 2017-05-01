@@ -24,19 +24,23 @@ public abstract class ClearCLSynthoscopyBase extends
   protected ClearCLImageViewer mViewImage;
 
   /**
-   * Instanciates a ClearCL powered illumination optics base class given the
+   * Instantiates a ClearCL powered illumination optics base class given the
    * wavelength of light, the light intensity, ClearCL context, and the light
    * map image dimensions.
    * 
    * @param pContext
    *          ClearCL context
    * @param pAdaptImageDimensionToDevice
-   *          true -> adapt image dimension to te device (work groups)
+   *          true -> adapt image dimension to the device (work groups)
+   * @param pDataType
+   *          image datatype
    * @param pImageDimensions
    *          image dimensions
+   * 
    */
   public ClearCLSynthoscopyBase(final ClearCLContext pContext,
                                 boolean pAdaptImageDimensionToDevice,
+                                ImageChannelDataType pDataType,
                                 long... pImageDimensions)
   {
     super(pAdaptImageDimensionToDevice ? PhantomRendererUtils.adaptImageDimensionsToDevice(pContext.getDevice(),
@@ -45,9 +49,8 @@ public abstract class ClearCLSynthoscopyBase extends
 
     mContext = pContext;
 
-    mImage =
-           mContext.createSingleChannelImage(ImageChannelDataType.Float,
-                                             getImageDimensions());
+    mImage = mContext.createSingleChannelImage(pDataType,
+                                               getImageDimensions());
 
     mImage.fillZero(true, false);
   }

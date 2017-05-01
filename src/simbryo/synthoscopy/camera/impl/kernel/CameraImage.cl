@@ -25,14 +25,14 @@ __kernel void upscale(     __read_only    image2d_t    imagein,
 
   const float value = read_imagef(imagein, normsampler, (float2){nxmin+nx*nxscale,nymin+ny*nyscale}).x;
   
-  write_imagef (imageout, (int2){x,y}, value);
+  write_imagef  (imageout, (int2){x,y}, (float4){value,0.0f,0.0f,0.0f});
+  
 }
 
 
 
 __kernel void camnoise(   __read_only    image2d_t  imagein,
                           __write_only   image2d_t  imageout,
-                          __global       ushort*    bufferout,
                           const          int        timeindex,
                           const          float      exposure,
                           const          float      shotnoise,
@@ -66,7 +66,8 @@ __kernel void camnoise(   __read_only    image2d_t  imagein,
   const float noisexyt2f = rngfloat(noisexyt2);
   const float noisexyt3f = rngfloat(noisexyt3);
   
-  const float fluovalue        = exposure*read_imagef(imagein, intsampler, (int2){x,y}).x;
+  
+  const float fluovalue  = exposure*read_imagef( imagein, intsampler, (int2){x,y}).x;
   
   const float shotnoisevalue   = shotnoise*native_sqrt(fluovalue)*clampedcauchy(noisexyt1f,9);
   
@@ -79,7 +80,13 @@ __kernel void camnoise(   __read_only    image2d_t  imagein,
   
   float detectorvalue = offset + offsetbiasvalue + offsetnoisevalue + gain*(1+gainbiasvalue+gainnoisevalue)*(shotnoisevalue+fluovalue);    
   
-  write_imagef (imageout, (int2){x,y}, detectorvalue);
-  bufferout[x+width*y] = convert_ushort(detectorvalue);
+  #if defined FLOAT
+   write_imagef  (imageout, (int2){x,y},  (float4){detectorvalue,0.0f,0.0f,0.0f});
+  #elif defined UINT
+   write_imageui (imageout, (int2){x,y}, (uint4){convert_ushort(detectorvalue),0.0f,0.0f,0.0f});
+  #elif defined INT
+   write_imagei  (imageout, (int2){x,y},  (uint4){convert_short(detectorvalue),0.0f,0.0f,0.0f});
+  #endif
+  
 }
 

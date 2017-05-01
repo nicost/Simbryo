@@ -5,6 +5,7 @@ import java.util.Arrays;
 import clearcl.ClearCLContext;
 import clearcl.ClearCLImage;
 import clearcl.ClearCLKernel;
+import clearcl.enums.ImageChannelDataType;
 import simbryo.dynamics.tissue.TissueDynamicsInterface;
 import simbryo.particles.neighborhood.NeighborhoodGrid;
 import simbryo.synthoscopy.ClearCLSynthoscopyBase;
@@ -50,7 +51,10 @@ public abstract class PhantomRendererBase extends
                              final TissueDynamicsInterface pTissueDynamics,
                              final long... pStackDimensions)
   {
-    super(pContext, true, pStackDimensions);
+    super(pContext,
+          true,
+          ImageChannelDataType.Float,
+          pStackDimensions);
     mTissue = pTissueDynamics;
     mPlaneAlreadyDrawnTable =
                             new boolean[Math.toIntExact(getDepth())];

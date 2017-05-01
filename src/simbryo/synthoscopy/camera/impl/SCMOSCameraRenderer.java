@@ -2,16 +2,11 @@ package simbryo.synthoscopy.camera.impl;
 
 import java.io.IOException;
 
-import clearcl.ClearCLBuffer;
 import clearcl.ClearCLContext;
 import clearcl.ClearCLImage;
 import clearcl.ClearCLKernel;
 import clearcl.ClearCLProgram;
-import clearcl.enums.HostAccessType;
 import clearcl.enums.ImageChannelDataType;
-import clearcl.enums.KernelAccessType;
-import clearcl.enums.MemAllocMode;
-import coremem.enums.NativeTypeEnum;
 import simbryo.synthoscopy.camera.CameraRendererInterface;
 import simbryo.synthoscopy.camera.ClearCLCameraRendererBase;
 
@@ -26,7 +21,6 @@ public class SCMOSCameraRenderer extends ClearCLCameraRendererBase
 {
 
   protected ClearCLKernel mUpscaleKernel, mNoiseKernel;
-  protected ClearCLBuffer mImageShortBuffer;
   protected ClearCLImage mImageTemp;
 
   private volatile int mTimeIndex = 0;
@@ -39,20 +33,25 @@ public class SCMOSCameraRenderer extends ClearCLCameraRendererBase
   private volatile float mShiftX, mShiftY, mMagnification;
 
   /**
-   * Instanciates a light sheet illumination optics class given a ClearCL
+   * Instantiates a light sheet illumination optics class given a ClearCL
    * context, and light map image dimensions
    * 
    * @param pContext
    *          OpenCL context
+   * 
+   * @param pDataType
+   *          data type for image
    * @param pMaxCameraImageDimensions
    *          max camera image dimensions in voxels
+   * 
    * @throws IOException
    *           thrown if kernels cannot be read
    */
   public SCMOSCameraRenderer(ClearCLContext pContext,
+                             ImageChannelDataType pDataType,
                              long... pMaxCameraImageDimensions) throws IOException
   {
-    super(pContext, pMaxCameraImageDimensions);
+    super(pContext, pDataType, pMaxCameraImageDimensions);
 
     setExposure(cNormalExposure);
     setMagnification(1);
@@ -493,30 +492,20 @@ public class SCMOSCameraRenderer extends ClearCLCameraRendererBase
   private void ensureImagesAllocated()
   {
     if (mImage != null && mImageTemp != null
-        && mImageShortBuffer != null
         && mImage.getWidth() == getWidth()
         && mImage.getHeight() == getHeight())
       return;
 
     ClearCLImage lImage = mImage;
     ClearCLImage lImageTemp = mImageTemp;
-    ClearCLBuffer lImageShortBuffer = mImageShortBuffer;
 
     mImage =
-           mContext.createSingleChannelImage(ImageChannelDataType.Float,
+           mContext.createSingleChannelImage(mImage.getChannelDataType(),
                                              getWidth(),
                                              getHeight());
 
-    mImageTemp = mContext.createImage(mImage);
-
-    mImageShortBuffer =
-                      mContext.createBuffer(MemAllocMode.Best,
-                                            HostAccessType.ReadOnly,
-                                            KernelAccessType.WriteOnly,
-                                            1,
-                                            NativeTypeEnum.UnsignedShort,
-                                            getWidth(),
-                                            getHeight());
+    mImageTemp = mContext.createImage(mImage,
+                                      ImageChannelDataType.Float);
 
     if (mViewImage != null)
       mViewImage.setImage(mImage);
@@ -525,8 +514,6 @@ public class SCMOSCameraRenderer extends ClearCLCameraRendererBase
       lImage.close();
     if (lImageTemp != null)
       lImageTemp.close();
-    if (lImageShortBuffer != null)
-      lImageShortBuffer.close();
 
   }
 
@@ -538,6 +525,7 @@ public class SCMOSCameraRenderer extends ClearCLCameraRendererBase
                        "kernel/CameraImage.cl");
 
     lProgram.addBuildOptionAllMathOpt();
+    lProgram.addDefineForDataType(mImage.getChannelDataType());
     lProgram.buildAndLog();
 
     mUpscaleKernel = lProgram.createKernel("upscale");
@@ -554,21 +542,15 @@ public class SCMOSCameraRenderer extends ClearCLCameraRendererBase
     clearImages(false);
     setInvariantKernelParameters(mDetectionImage);
     upscale(mDetectionImage, mImageTemp, false);
-    noise(mImageTemp, mImage, mImageShortBuffer, pWaitToFinish);
+    noise(mImageTemp, mImage, pWaitToFinish);
     incrementTimeIndex();
 
     super.render(pWaitToFinish);
   }
 
-  @Override
-  public ClearCLBuffer getCameraImageBuffer()
-  {
-    return mImageShortBuffer;
-  }
-
   private void clearImages(boolean pWaitToFinish)
   {
-    mImageTemp.fill(0.0f, pWaitToFinish, false);
+    mImageTemp.fillZero(pWaitToFinish, false);
     super.clear(false);
   }
 
@@ -618,12 +600,10 @@ public class SCMOSCameraRenderer extends ClearCLCameraRendererBase
 
   private void noise(ClearCLImage pImageInput,
                      ClearCLImage pImageOutput,
-                     ClearCLBuffer pBufferOut,
                      boolean pWaitToFinish)
   {
     mNoiseKernel.setArgument("imagein", pImageInput);
     mNoiseKernel.setArgument("imageout", pImageOutput);
-    mNoiseKernel.setArgument("bufferout", pBufferOut);
     mNoiseKernel.setArgument("timeindex", mTimeIndex);
     mNoiseKernel.setArgument("exposure",
                              getExposure() / cNormalExposure);

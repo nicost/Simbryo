@@ -13,6 +13,18 @@ public class GeometryUtils
 {
 
   /**
+   * Returns a newly allocated identity matrix.
+   * 
+   * @return newly allocated identity matrix
+   */
+  public static Matrix4f getIdentity()
+  {
+    Matrix4f lIdentity = new Matrix4f();
+    lIdentity.setIdentity();
+    return null;
+  }
+
+  /**
    * Adds translation to the given matrix
    * 
    * @param pMatrix
