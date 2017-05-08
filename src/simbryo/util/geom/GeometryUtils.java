@@ -21,7 +21,7 @@ public class GeometryUtils
   {
     Matrix4f lIdentity = new Matrix4f();
     lIdentity.setIdentity();
-    return null;
+    return lIdentity;
   }
 
   /**
