@@ -80,6 +80,18 @@ __kernel void hisrender(   __write_only    image3d_t  image,
  
   value += autofluo(dim, voxelpos, sampler, perlin, timeindex);
   value += NOISERATIO*rngfloat3(x+timeindex,y+timeindex,z+timeindex);    
+ 
+  if(false && rngfloat3(x,y,z)<0.0001f)
+  {
+    value += 5;
+  }
+  
+  if(false && x==100 && y ==50)
+  {
+    value += 5;
+  }
+ 
+   
   
   if(localneighboors[0]<0)
   {
