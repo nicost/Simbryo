@@ -20,8 +20,36 @@ public class IlluminationMisalignment extends AberrationBase
   private HashMap<MutablePair<ParameterInterface<Number>, Integer>, Number> mOffsetMap =
                                                                                        new HashMap<>();
 
+  private float mAlpha, mBeta, mGamma, mHeight, mIntensity, mTheta,
+      mX, mY, mZ;
+
   /**
-   * Instanciates an illumination misalignment
+   * Instantiates an illumination misalignment for a given offset in X, Y and Z
+   * 
+   * @param pX
+   *          X misalignment
+   * @param pY
+   *          Y misalignment
+   * @param pZ
+   *          Z misalignment
+   * @return illumination misalignment
+   */
+  public static IlluminationMisalignment buildXYZ(float pX,
+                                                  float pY,
+                                                  float pZ)
+  {
+    IlluminationMisalignment lIlluminationMisalignment =
+                                                       new IlluminationMisalignment();
+
+    lIlluminationMisalignment.setX(pX);
+    lIlluminationMisalignment.setY(pY);
+    lIlluminationMisalignment.setZ(pZ);
+
+    return lIlluminationMisalignment;
+  }
+
+  /**
+   * Instantiates an illumination misalignment
    */
   public IlluminationMisalignment()
   {
@@ -72,39 +100,119 @@ public class IlluminationMisalignment extends AberrationBase
     switch ((IlluminationParameter) pParameter)
     {
     case Alpha:
-      lOffsetConstant = 5;
+      lOffsetConstant = getAlpha();
       break;
     case Beta:
-      lOffsetConstant = 0;
+      lOffsetConstant = getBeta();
       break;
     case Gamma:
-      lOffsetConstant = 0;
+      lOffsetConstant = getGamma();
       break;
     case Height:
-      lOffsetConstant = 1;
+      lOffsetConstant = mHeight;
       break;
     case Intensity:
-      lOffsetConstant = 0.01f;
+      lOffsetConstant = getIntensity();
       break;
     case Theta:
-      lOffsetConstant = 0;
+      lOffsetConstant = getTheta();
       break;
     case Wavelength:
       lOffsetConstant = 0;
       break;
     case X:
-      lOffsetConstant = 30;
+      lOffsetConstant = getX();
       break;
     case Y:
-      lOffsetConstant = 30;
+      lOffsetConstant = getY();
       break;
     case Z:
-      lOffsetConstant = 30;
+      lOffsetConstant = getZ();
       break;
     default:
       break;
     }
     return lOffsetConstant;
+  }
+
+  public float getAlpha()
+  {
+    return mAlpha;
+  }
+
+  public void setAlpha(float pAlpha)
+  {
+    mAlpha = pAlpha;
+  }
+
+  public float getBeta()
+  {
+    return mBeta;
+  }
+
+  public void setBeta(float pBeta)
+  {
+    mBeta = pBeta;
+  }
+
+  public float getGamma()
+  {
+    return mGamma;
+  }
+
+  public void setGamma(float pGamma)
+  {
+    mGamma = pGamma;
+  }
+
+  public float getIntensity()
+  {
+    return mIntensity;
+  }
+
+  public void setIntensity(float pIntensity)
+  {
+    mIntensity = pIntensity;
+  }
+
+  public float getTheta()
+  {
+    return mTheta;
+  }
+
+  public void setTheta(float pTheta)
+  {
+    mTheta = pTheta;
+  }
+
+  public float getX()
+  {
+    return mX;
+  }
+
+  public void setX(float pX)
+  {
+    mX = pX;
+  }
+
+  public float getY()
+  {
+    return mY;
+  }
+
+  public void setY(float pY)
+  {
+    mY = pY;
+  }
+
+  public float getZ()
+  {
+    return mZ;
+  }
+
+  public void setZ(float pZ)
+  {
+    mZ = pZ;
   }
 
 }

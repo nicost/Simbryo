@@ -33,7 +33,7 @@ public class WideFieldDetectionOptics extends DetectionOpticsBase
       mScatterSamplingDeltaZ;
 
   /**
-   * Instanciates a light sheet illumination optics class given a ClearCL
+   * Instantiates a light sheet illumination optics class given a ClearCL
    * context, and detection image dimensions
    * 
    * @param pContext
@@ -49,7 +49,7 @@ public class WideFieldDetectionOptics extends DetectionOpticsBase
     super(pContext, pImageDimensions);
 
     setSigma(1.0f);
-    setSmoothDefocusTransitionPoint(0.03f);
+    setSmoothDefocusTransitionPoint(0.001f);
     setScatterSigmaMin(0.0001f);
     setScatterSigmaMax(0.04f);
     setScatterSamplingDeltaZ(0.01f);
