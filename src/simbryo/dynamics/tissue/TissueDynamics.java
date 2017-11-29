@@ -102,6 +102,18 @@ public class TissueDynamics extends ParticleSystem
     mTargetRadii.getCurrentArray()[pParticleId] = pTargetRadius;
   }
 
+  /**
+   * Returns the target radius for a given particle id.
+   * 
+   * @param pParticleId
+   *          particle id
+   * @return target radius
+   */
+  public float getTargetRadius(int pParticleId)
+  {
+    return mTargetRadii.getCurrentArray()[pParticleId];
+  }
+
   @Override
   public void copyParticle(int pSourceParticleId,
                            int pDestinationParticleId)

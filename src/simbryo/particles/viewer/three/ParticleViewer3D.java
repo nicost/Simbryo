@@ -1,5 +1,6 @@
 package simbryo.particles.viewer.three;
 
+import java.util.function.Function;
 import javafx.application.Platform;
 import javafx.scene.DepthTest;
 import javafx.scene.Group;
@@ -249,5 +250,16 @@ public class ParticleViewer3D extends Stage
   public void setDisplayRadius(boolean pDisplayRadius)
   {
     mParticleViewerGroup.setDisplayRadius(pDisplayRadius);
+  }
+
+  /**
+   * Sets the display color.
+   * 
+   * @param pColorClosure
+   *          color
+   */
+  public void setColorClosure(Function<Integer, Color> pColorClosure)
+  {
+    mParticleViewerGroup.setColorClosure(pColorClosure);
   }
 }

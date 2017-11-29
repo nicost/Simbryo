@@ -83,12 +83,13 @@ __kernel void hisrender(   __write_only    image3d_t  image,
  
   if(false && rngfloat3(x,y,z)<0.0001f)
   {
-    value += 5;
+    value += 5.0f;
   }
   
-  if(false && x==100 && y ==50)
+  // we add a little bead for fun and work.
+  if(false && x==100 && y==50)
   {
-    value += 5;
+    value += 5.0f;
   }
  
    
@@ -135,6 +136,8 @@ __kernel void hisrender(   __write_only    image3d_t  image,
       value += noisylevel;
     }
   }
+    
+ 
     
   write_imagef (image, (int4){x,y,z,0}, intensity*value);
 

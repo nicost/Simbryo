@@ -22,6 +22,9 @@ public class Timming implements Serializable
    */
   public long syncAtPeriod(double pPeriodInMilliseconds)
   {
+    if (pPeriodInMilliseconds == 0)
+      return 0;
+
     long lDeadline = 0;
 
     if (mLastTime != null)

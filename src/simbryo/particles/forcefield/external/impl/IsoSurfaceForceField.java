@@ -38,6 +38,7 @@ public class IsoSurfaceForceField extends ExternalForceFieldBase
   @Override
   public void applyForceField(int pBeginId,
                               int pEndId,
+                              float[] pForceFactor,
                               ParticleSystem pParticleSystem)
   {
     final float lForceIntensity = mForceIntensity;
@@ -56,7 +57,10 @@ public class IsoSurfaceForceField extends ExternalForceFieldBase
     final int lIndexStart = pBeginId * lDimension;
     final int lIndexEnd = pEndId * lDimension;
 
-    for (int i = lIndexStart; i < lIndexEnd; i += lDimension)
+    for (int i =
+               lIndexStart, id =
+                               pBeginId; id < pEndId; i +=
+                                                        lDimension, id++)
     {
       mIsoSurfaceInterface.clear();
 
@@ -66,15 +70,19 @@ public class IsoSurfaceForceField extends ExternalForceFieldBase
         mIsoSurfaceInterface.addCoordinate(px);
       }
 
-      float lDistance = mIsoSurfaceInterface.getDistance();
+      final float lDistance = mIsoSurfaceInterface.getDistance();
 
-      float lForceSign = Math.signum(lDistance);
+      final float lForceSign = Math.signum(lDistance);
+
+      final float lForceIntensityFinal = lForceSign * lForceIntensity
+                                         * (pForceFactor != null ? pForceFactor[id]
+                                                                 : 1);
 
       for (int d = 0; d < lDimension; d++)
       {
         float dx = mIsoSurfaceInterface.getNormalizedGardient(d);
         lVelocitiesWrite[i + d] = lVelocitiesRead[i + d]
-                                  + dx * lForceSign * lForceIntensity;
+                                  + dx * lForceIntensityFinal;
       }
 
     }

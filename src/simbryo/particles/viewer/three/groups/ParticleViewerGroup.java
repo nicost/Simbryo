@@ -1,11 +1,14 @@
 package simbryo.particles.viewer.three.groups;
 
+import java.util.HashMap;
 import java.util.concurrent.CountDownLatch;
+import java.util.function.Function;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Material;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
 import javafx.scene.shape.CullFace;
@@ -41,8 +44,13 @@ public class ParticleViewerGroup extends Group
   private final PhongMaterial mBoxMaterial, mParticleMaterial,
       mParticlePolarityMaterial;
 
+  private HashMap<Color, PhongMaterial> mMaterialForColorMap =
+                                                             new HashMap<>();
+
+  private Function<Integer, Color> mColorClosure;
+
   /**
-   * Instanciates a particle viewer group for a given volume
+   * Instantiates a particle viewer group for a given volume
    * (width,height,depth)
    * 
    * @param pWidth
@@ -144,6 +152,17 @@ public class ParticleViewerGroup extends Group
   }
 
   /**
+   * Sets the display color.
+   * 
+   * @param pColorClosure
+   *          color
+   */
+  public void setColorClosure(Function<Integer, Color> pColorClosure)
+  {
+    mColorClosure = pColorClosure;
+  }
+
+  /**
    * Updates display for a given particle system.
    * 
    * @param pParticleSystem
@@ -224,7 +243,6 @@ public class ParticleViewerGroup extends Group
       while (lParticlesSpheres.size() < pParticleSystem.getNumberOfParticles())
       {
         Sphere lSphere = new Sphere(1, mDisplayRadius ? 16 : 6);
-        lSphere.setMaterial(mParticleMaterial);
         lSphere.setTranslateX(0);
         lSphere.setTranslateY(0);
         lSphere.setTranslateZ(0);
@@ -239,7 +257,6 @@ public class ParticleViewerGroup extends Group
           lPolaritySphere.setTranslateX(0);
           lPolaritySphere.setTranslateY(0);
           lPolaritySphere.setTranslateZ(0);
-
           lParticlesPolaritySpheres.add(lPolaritySphere);
         }
       }
@@ -281,6 +298,9 @@ public class ParticleViewerGroup extends Group
         lSphere.setScaleY(lRadius);
         lSphere.setScaleZ(lRadius);
 
+        if (mColorClosure != null)
+          lSphere.setMaterial(getMaterialForColor(getColor(id)));
+
         if (lHasPolarity)
         {
 
@@ -316,6 +336,25 @@ public class ParticleViewerGroup extends Group
 
     });
 
+  }
+
+  private Material getMaterialForColor(Color pColor)
+  {
+    PhongMaterial lPhongMaterial = mMaterialForColorMap.get(pColor);
+    if (lPhongMaterial == null)
+    {
+      lPhongMaterial = new PhongMaterial();
+      lPhongMaterial.setDiffuseColor(pColor);
+      lPhongMaterial.setSpecularColor(Color.WHITE);
+      mMaterialForColorMap.put(pColor, lPhongMaterial);
+    }
+
+    return lPhongMaterial;
+  }
+
+  private Color getColor(int pParticleId)
+  {
+    return mColorClosure.apply(pParticleId);
   }
 
 }

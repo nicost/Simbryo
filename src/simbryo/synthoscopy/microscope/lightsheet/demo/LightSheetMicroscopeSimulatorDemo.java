@@ -128,7 +128,7 @@ public class LightSheetMicroscopeSimulatorDemo
 
       try (ClearCL lClearCL = new ClearCL(lBestBackend);
           ClearCLDevice lFastestGPUDevice =
-                                          lClearCL.getFastestGPUDeviceForImages();
+                                          lClearCL.getDeviceByName("HD");
           ClearCLContext lContext = lFastestGPUDevice.createContext())
       {
 

@@ -5,32 +5,40 @@ import simbryo.particles.forcefield.external.ExternalForceFieldBase;
 import simbryo.particles.forcefield.external.ExternalForceFieldInterface;
 
 /**
- * This force field applies a centri(petal+/fugal-) force to the particles.
+ * This force field applies a centri(petal+/fugal-) force to the particles in a
+ * cylindrical geometry.
  * 
  * @author royer
  */
-public class CentriForceField extends ExternalForceFieldBase
-                              implements ExternalForceFieldInterface
+public class CylindricalForceField extends ExternalForceFieldBase
+                                   implements
+                                   ExternalForceFieldInterface
 {
   private static final long serialVersionUID = 1L;
 
+  private int mAxis;
   private float[] mCenter;
 
   /**
-   * Constructs a centri(petal+/fugal-) force field given a force intensity and
-   * center. if the the force intensity is positive then it is a centripetal
-   * force, otherwise it is a centrifugal force.
+   * Constructs a centri(petal+/fugal-) cylindrical force field given a force
+   * intensity and center. if the the force intensity is positive then it is a
+   * centripetal force, otherwise it is a centrifugal force.
    * 
+   * @param pAxis
+   *          axis index (x=0, y=1, z=2, ...) along which there is no force
+   *          (cylinder axis)
    * @param pForceIntensity
    *          force intensity
    * @param pCenter
    *          force field center
    */
-  public CentriForceField(float pForceIntensity, float... pCenter)
+  public CylindricalForceField(int pAxis,
+                               float pForceIntensity,
+                               float... pCenter)
   {
     super(pForceIntensity);
+    mAxis = pAxis;
     mCenter = pCenter;
-
   }
 
   @SuppressWarnings("unused")
@@ -66,7 +74,7 @@ public class CentriForceField extends ExternalForceFieldBase
       {
         float px = lPositionsRead[i + d];
         float cx = mCenter[d];
-        float dx = cx - px;
+        float dx = d == mAxis ? 0 : cx - px;
         lVector[d] = dx;
 
         lSquaredLength += dx * dx;

@@ -30,19 +30,22 @@ public interface ForceFieldInterface extends Serializable
 
   /**
    * Applies the nD force field to particles within a given range of ids (begin
-   * inclusive, end exclusive). the positions, velocities and radii of the
-   * particles are provided as double buffered float arrays.
+   * inclusive, end exclusive). A float array can be provided to adjust the
+   * force per particle. If the float array is null then it is ignored.
    * 
    * @param pBeginId
    *          particle id range beginning inclusive
    * @param pEndId
    *          particle id range end exclusive
+   * @param pFactor
+   *          applies a force factor per particle, ignored if null.
    * @param pParticleSystem
-   *          parrticle system
+   *          particle system
    * 
    */
   void applyForceField(int pBeginId,
                        int pEndId,
+                       float[] pFactor,
                        ParticleSystem pParticleSystem);
 
 }

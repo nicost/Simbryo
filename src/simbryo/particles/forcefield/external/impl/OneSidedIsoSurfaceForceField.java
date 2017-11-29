@@ -57,6 +57,7 @@ public class OneSidedIsoSurfaceForceField extends
   @Override
   public void applyForceField(int pBeginId,
                               int pEndId,
+                              float[] pForceFactor,
                               ParticleSystem pParticleSystem)
   {
     final int lDimension = pParticleSystem.getDimension();
@@ -102,19 +103,23 @@ public class OneSidedIsoSurfaceForceField extends
 
       float lSignedDistanceToEllipoid = lDistance - lValue;
 
+      float lForceIntensityPerParticle = lForceIntensity
+                                         * (pForceFactor != null ? pForceFactor[id]
+                                                                 : 1);
+
       if (lConstraintInside && lSignedDistanceToEllipoid >= 0)
         for (int d = 0; d < lDimension; d++)
         {
           float dx = mIsoSurfaceInterface.getNormalizedGardient(d);
           lVelocitiesWrite[i + d] = lVelocitiesRead[i + d]
-                                    + dx * lForceIntensity;
+                                    + dx * lForceIntensityPerParticle;
         }
       else if (!lConstraintInside && lSignedDistanceToEllipoid < 0)
         for (int d = 0; d < lDimension; d++)
         {
           float dx = mIsoSurfaceInterface.getNormalizedGardient(d);
           lVelocitiesWrite[i + d] = lVelocitiesRead[i + d]
-                                    - dx * lForceIntensity;
+                                    - dx * lForceIntensityPerParticle;
         }
       else
         for (int d = 0; d < lDimension; d++)

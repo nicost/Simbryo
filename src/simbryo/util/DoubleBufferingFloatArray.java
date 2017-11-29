@@ -90,8 +90,23 @@ public class DoubleBufferingFloatArray implements Serializable
    */
   public void clear(int pBeginIndex, int pEndIndex)
   {
+    set(pBeginIndex, pEndIndex, 0f);
+  }
+
+  /**
+   * Sets array with gievn value.
+   * 
+   * @param pBeginIndex
+   *          begin index (inclusive)
+   * @param pEndIndex
+   *          end index (exclusive)
+   * @param pValue
+   *          value to set.
+   */
+  public void set(int pBeginIndex, int pEndIndex, float pValue)
+  {
     for (int i = pBeginIndex; i < pEndIndex; i++)
-      mWriteArray[i] = 0;
+      mWriteArray[i] = pValue;
   }
 
   /**

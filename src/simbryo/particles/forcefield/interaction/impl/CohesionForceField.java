@@ -7,27 +7,24 @@ import simbryo.particles.neighborhood.NeighborhoodGrid;
 import simbryo.util.geom.GeometryUtils;
 
 /**
- * This interaction force field applies a force to each particle that prevents
- * particles influence radii from overlapping. This in effect is a way to handle
- * particle-particle collisions.
+ * This interaction force field applies a force to each particle that keeps
+ * particles that are in close proximity (distance between influence spheres)
+ * together This is a good way to create meshes of particles
  * 
  * 
  */
-public class CollisionForceField extends InteractionForceFieldBase
-                                 implements
-                                 InteractionForceFieldInterface
+public class CohesionForceField extends InteractionForceFieldBase
+                                implements
+                                InteractionForceFieldInterface
 {
   private static final long serialVersionUID = 1L;
 
-  private static final float cGapCorrectionFactor = 0.5f;
-
   private float mDrag;
-  private boolean mForbidOverlap = true;
 
   private int[] mNeighboorsArray;
 
   /**
-   * Constructs a collision force field given a force intensity and drag
+   * Constructs a cohesion force field given a force intensity and drag
    * coefficient. The drag coefficient is often necessary to prevent excessive
    * bouncing.
    * 
@@ -35,40 +32,11 @@ public class CollisionForceField extends InteractionForceFieldBase
    *          constant force applied during collision.
    * @param pDrag
    *          drag applied to slow down particles.
-   * 
-   * @param pForbidOverlap
-   *          if true, overlaps between particles spheres of influence will be
-   *          forbidden by forcibly displacing the spheres after an overlap is
-   *          detected.
    */
-  public CollisionForceField(float pForceIntensity,
-                             float pDrag,
-                             boolean pForbidOverlap)
+  public CohesionForceField(float pForceIntensity, float pDrag)
   {
     super(pForceIntensity);
     mDrag = pDrag;
-    setForbidOverlap(pForbidOverlap);
-  }
-
-  /**
-   * Returns true if overlap is forbidden.
-   * 
-   * @return true if overlap is forbidden.
-   */
-  public boolean isForbidOverlap()
-  {
-    return mForbidOverlap;
-  }
-
-  /**
-   * Sets whether particle overlap is forbidden.
-   * 
-   * @param pForbidOverlap
-   *          true to forbid overlap
-   */
-  public void setForbidOverlap(boolean pForbidOverlap)
-  {
-    mForbidOverlap = pForbidOverlap;
   }
 
   @SuppressWarnings("unused")
@@ -142,13 +110,13 @@ public class CollisionForceField extends InteractionForceFieldBase
         final float rv = lRadii[idv];
 
         // testing bounding box collision:
-        if (idu < idv
-            && GeometryUtils.detectBoundingBoxCollision(lDimension,
-                                                        lPositionsRead,
-                                                        ru,
-                                                        rv,
-                                                        idu,
-                                                        idv)) //
+        if (idu < idv) /*
+                       && GeometryUtils.detectBoundingBoxCollision(lDimension,
+                                                    lPositionsRead,
+                                                    ru,
+                                                    rv,
+                                                    idu,
+                                                    idv)/**/
         {
           int j = idv * lDimension;
           /// System.out.println("BB collision");
@@ -158,11 +126,12 @@ public class CollisionForceField extends InteractionForceFieldBase
                                                           idv);
           float lGap = lDistance - ru - rv;
 
-          // testing sphere collision:
-          if (lGap < 0 && lDistance != 0)
+          // testing sphere proximity:
+          if (lGap < 0.5f * (ru + rv) && lGap > 0f && lDistance != 0)
           {
 
-            // Collision -> apply force.
+            // Cohesion -> apply force.
+            // System.out.println("Cohesion -> apply force.");
             float lInvDistance = 1.0f / lDistance;
             float lInvDistanceWithForce = mForceIntensity
                                           * (pForceFactor != null ? pForceFactor[idu]
@@ -177,20 +146,9 @@ public class CollisionForceField extends InteractionForceFieldBase
 
               float lAxisVector = lInvDistanceWithForce * lDelta;
 
-              lVelocitiesWrite[i + d] += lAxisVector;
-              lVelocitiesWrite[j + d] += -lAxisVector;
+              lVelocitiesWrite[i + d] += -lAxisVector;
+              lVelocitiesWrite[j + d] += +lAxisVector;
 
-              if (isForbidOverlap())
-              {
-
-                float lOverlapCorrection = lInvDistance * lDelta
-                                           * (cGapCorrectionFactor
-                                              * -lGap);
-                lPositionsWrite[i + d] = lPositionsRead[i + d]
-                                         + lOverlapCorrection;
-                lPositionsWrite[j + d] = lPositionsRead[j + d]
-                                         + -lOverlapCorrection;
-              }
             }
 
           }
@@ -199,9 +157,6 @@ public class CollisionForceField extends InteractionForceFieldBase
       }
 
     }
-
-    if (isForbidOverlap())
-      pParticleSystem.getPositions().swap();
 
     pParticleSystem.getVelocities().swap();
 

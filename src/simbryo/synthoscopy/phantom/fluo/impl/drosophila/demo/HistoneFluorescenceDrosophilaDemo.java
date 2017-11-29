@@ -58,7 +58,7 @@ public class HistoneFluorescenceDrosophilaDemo
     System.out.println("lBestBackend=" + lBestBackend);
     try (ClearCL lClearCL = new ClearCL(lBestBackend);
         ClearCLDevice lFastestGPUDevice =
-                                        lClearCL.getFastestGPUDeviceForImages();
+                                        lClearCL.getDeviceByName("HD");
 
         ClearCLContext lContext = lFastestGPUDevice.createContext())
     {

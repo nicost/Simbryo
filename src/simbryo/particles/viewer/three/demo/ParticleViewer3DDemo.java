@@ -1,5 +1,7 @@
 package simbryo.particles.viewer.three.demo;
 
+import javafx.scene.paint.Color;
+
 import org.junit.Test;
 
 import simbryo.particles.ParticleSystem;
@@ -81,6 +83,10 @@ public class ParticleViewer3DDemo
                                                              "Particles Are Fun",
                                                              768,
                                                              768);
+
+    lParticleViewer3D.setColorClosure((id) -> {
+      return Color.hsb(id % 360, 0.6, 0.6);
+    });
 
     Timming lTimming = new Timming();
 

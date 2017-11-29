@@ -35,12 +35,12 @@ public class Ellipsoid extends IsoSurfaceBase
   protected float mAccumulatorGradientLength;
 
   /**
-   * Instanciates an ellipsoid with a given radius, center and axis parameters
+   * Instantiates an ellipsoid with a given radius, center and axis parameters
    * 
    * @param pRadius
    *          radius
    * @param pCenterAndAxis
-   *          center and axis.
+   *          center and axis {cx, cy, cz, ..., a, b, c, ,...}
    */
   public Ellipsoid(float pRadius, float... pCenterAndAxis)
   {

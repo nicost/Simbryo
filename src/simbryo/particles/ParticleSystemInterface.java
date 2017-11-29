@@ -263,10 +263,14 @@ public interface ParticleSystemInterface extends Serializable
    *          begin id
    * @param pEndId
    *          end id
+   * @param pForceFactor
+   *          array of force factors to modulate application of the force field
+   *          per particle.
    */
   void applyForceField(ForceFieldInterface pForceField,
                        int pBeginId,
-                       int pEndId);
+                       int pEndId,
+                       float[] pForceFactor);
 
   /**
    * Euler integration

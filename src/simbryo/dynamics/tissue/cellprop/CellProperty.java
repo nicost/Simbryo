@@ -97,6 +97,35 @@ public class CellProperty implements Serializable
   }
 
   /**
+   * Sets cell property to a given value.
+   * 
+   * @param pBeginId
+   *          begin id of range
+   * @param pEndId
+   *          end id of range
+   * @param pValue
+   *          value
+   */
+  public void set(int pBeginId, int pEndId, float pValue)
+  {
+    mPropertyArray.set(pBeginId, pEndId, pValue);
+    mPropertyArray.swap();
+  }
+
+  /**
+   * Sets value at given index in the current array.
+   * 
+   * @param pId
+   *          cell id
+   * @param pValue
+   *          value of property
+   */
+  public void set(int pId, float pValue)
+  {
+    mPropertyArray.getCurrentArray()[pId] = pValue;
+  }
+
+  /**
    * Copies a cell property value from one cell id to another cell id.
    * 
    * @param pSourceParticleId

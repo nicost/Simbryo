@@ -226,23 +226,40 @@ public class ParticleSystem implements ParticleSystemInterface
                            int pDestinationParticleId)
   {
     final int lDimension = mDimension;
-    final float[] lPositions = mPositions.getCurrentArray();
-    final float[] lVelocities = mVelocities.getCurrentArray();
-    final float[] lRadii = mRadii.getCurrentArray();
+    final float[] lPositionsRead = mPositions.getReadArray();
+    final float[] lPositionsWrite = mPositions.getWriteArray();
+    final float[] lVelocitiesRead = mVelocities.getReadArray();
+    final float[] lVelocitiesWrite = mVelocities.getWriteArray();
+    final float[] lRadiiRead = mRadii.getReadArray();
+    final float[] lRadiiWrite = mRadii.getWriteArray();
 
     for (int d = 0; d < lDimension; d++)
     {
 
-      lPositions[pDestinationParticleId * lDimension
-                 + d] =
-                      lPositions[pSourceParticleId * lDimension + d];
-      lVelocities[pDestinationParticleId * lDimension
-                  + d] =
-                       lVelocities[pSourceParticleId * lDimension
-                                   + d];
+      lPositionsRead[pDestinationParticleId * lDimension
+                     + d] =
+                          lPositionsRead[pSourceParticleId
+                                         * lDimension + d];
+
+      lPositionsWrite[pDestinationParticleId * lDimension
+                      + d] =
+                           lPositionsWrite[pSourceParticleId
+                                           * lDimension + d];
+
+      lVelocitiesRead[pDestinationParticleId * lDimension
+                      + d] =
+                           lVelocitiesRead[pSourceParticleId
+                                           * lDimension + d];
+      lVelocitiesWrite[pDestinationParticleId * lDimension
+                       + d] =
+                            lVelocitiesWrite[pSourceParticleId
+                                             * lDimension + d];
     }
 
-    lRadii[pDestinationParticleId] = lRadii[pSourceParticleId];
+    lRadiiRead[pDestinationParticleId] =
+                                       lRadiiRead[pSourceParticleId];
+    lRadiiWrite[pDestinationParticleId] =
+                                        lRadiiWrite[pSourceParticleId];
   }
 
   @Override
@@ -463,15 +480,16 @@ public class ParticleSystem implements ParticleSystemInterface
   @Override
   public void applyForceField(ForceFieldInterface pForceField)
   {
-    applyForceField(pForceField, 0, getNumberOfParticles());
+    applyForceField(pForceField, 0, getNumberOfParticles(), null);
   }
 
   @Override
   public void applyForceField(ForceFieldInterface pForceField,
                               int pBeginId,
-                              int pEndId)
+                              int pEndId,
+                              float[] pForceFactor)
   {
-    pForceField.applyForceField(0, getNumberOfParticles(), this);
+    pForceField.applyForceField(pBeginId, pEndId, pForceFactor, this);
   }
 
   @Override

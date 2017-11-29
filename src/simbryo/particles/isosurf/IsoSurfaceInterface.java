@@ -30,12 +30,13 @@ public interface IsoSurfaceInterface extends Serializable
   void addCoordinate(float pValue);
 
   /**
-   * Returns the distance to the surface. This may not be a geometric distance
-   * but a proportional, 'transformed' or geodesic distance, depending on what
-   * is practical or required. But it should be continuous and be zero at the
-   * surface.
+   * Returns the signed distance to the surface. This may not be a geometric
+   * distance but a proportional, 'transformed' or geodesic distance, depending
+   * on what is practical or required. But it should be continuous and be zero
+   * and change sign at the surface. The sign defines the identity of the two
+   * sides.
    * 
-   * @return distance to surface
+   * @return signed distance to surface
    */
   float getDistance();
 

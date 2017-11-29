@@ -26,7 +26,7 @@ public class RepulsionForceField extends InteractionForceFieldBase
 
   /**
    * Constructs a collision force field given a force intensity and a percentage
-   * of intercation partners.
+   * of interaction partners.
    * 
    * @param pForceIntensity
    *          constant force applied during collision.
@@ -44,6 +44,7 @@ public class RepulsionForceField extends InteractionForceFieldBase
   @Override
   public void applyForceField(int pBeginId,
                               int pEndId,
+                              float[] pForceFactor,
                               ParticleSystem pParticleSystem)
   {
     if (mRandom == null)
@@ -87,7 +88,11 @@ public class RepulsionForceField extends InteractionForceFieldBase
                                                         idu,
                                                         idv);
 
-        float lInvDistanceWithForce = lForceIntensity / lDistance;
+        float lInvDistanceWithForce = lForceIntensity
+                                      * (pForceFactor != null ? pForceFactor[idu]
+                                                                * pForceFactor[idv]
+                                                              : 1)
+                                      / lDistance;
 
         for (int d = 0; d < lDimension; d++)
         {
