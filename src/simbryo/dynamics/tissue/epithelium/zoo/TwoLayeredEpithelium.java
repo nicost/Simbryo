@@ -117,9 +117,11 @@ public class TwoLayeredEpithelium extends LayeredEpitheliumDynamics
     {
       mCellLabelProperty.getArray().getCurrentArray()[middleIndex] =
                                                                    1;
-      // .getCurrentArray()[(int) (random()
-      // * pInitialNumberOfCells)] =
-      // 1;
+       mCellLabelProperty.getArray().getCurrentArray()[(int) (random()
+       * pInitialNumberOfCells)] =  2;
+       
+              mCellLabelProperty.getArray().getCurrentArray()[(int) (random()
+       * pInitialNumberOfCells)] =  3;
     }
 
     super.updateNeighborhoodGrid();

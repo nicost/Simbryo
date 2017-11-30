@@ -40,7 +40,14 @@ public class EpitheliumDemo
                      (int) lTwoLayeredEpithelium.getCellLabelProperty()
                                                 .getArray()
                                                 .getCurrentArray()[id];
-      return lCellLabel == 0 ? Color.BLUE : Color.RED;
+      switch (lCellLabel) {
+         case 0: return Color.BLUE;
+         case 1 : return Color.RED;
+         case 2 : return Color.GREEN;
+         case 3 : return Color.FLORALWHITE;
+      }
+      return Color.BLUE;
+      //return lCellLabel == 0 ? Color.BLUE : Color.RED;
     });/**/
 
     Timming lTimming = new Timming();
