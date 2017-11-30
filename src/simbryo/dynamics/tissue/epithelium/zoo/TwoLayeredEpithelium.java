@@ -61,42 +61,70 @@ public class TwoLayeredEpithelium extends LayeredEpitheliumDynamics
     Plane lBottomLayer = new Plane(0f, 0f, 1f);
     lBottomLayer.setPoint(0.5f, 0.5f, 0.5f - 0.5f * pLayerSpacing);
 
-    addLayer(lTopLayer, -cDefaultLayerForce);
-    addLayer(lBottomLayer, -cDefaultLayerForce);
+    super.addLayer(lTopLayer, -cDefaultLayerForce);
+    super.addLayer(lBottomLayer, -cDefaultLayerForce);
 
-    mCellLabelProperty = addCellProperty();
-    mCellStateProperty = addCellProperty();
+    mCellLabelProperty = super.addCellProperty();
+    mCellStateProperty = super.addCellProperty();
 
     for (int i = 0; i < pInitialNumberOfCells; i++)
     {
       float x = (float) (Math.random());
       float y = (float) (Math.random());
 
-      int lId = addParticle(0.45f + 0.1f * x, 0.45f + 0.1f * y, 0.5f);
-      setRadius(lId, getRandomRadius(i));
-      setTargetRadius(lId, getRadius(lId));
-
-      /*mCellLabelProperty.getArray()
-      .getCurrentArray()[i] =
-                            (int) (Math.random()
-                                   * 1.05);/**/
-
-      assignCellToLayer(i, 1); // (int) (Math.random() * 2)
+      final int lId = super.addParticle(0.45f + 0.1f * x, 0.45f + 0.1f * y, 0.5f);
+      super.setRadius(lId, getRandomRadius(i));
+      super.setTargetRadius(lId, super.getRadius(lId));
+      super.assignCellToLayer(i, 1); // (int) (Math.random() * 2)
 
       mCellStateProperty.set(i, (float) (random()));
-
     }
 
-    for (int j = 0; j < 3; j++)
+    // make the middle cell red
+    float[] dsSquared = new float[pInitialNumberOfCells];
+    float[] avgCenter = new float[2];
+    for (int i = 0; i < pInitialNumberOfCells; i++) {
+       float[] pos = getPosition(i);
+       avgCenter[0] += pos[0];
+       avgCenter[1] += pos[1];
+       //dsSquared[i] = (0.5f - pos[0]) * (0.5f - pos[0]) + (0.5f * pos[1]) * (0.5f * pos[1]);
+    }
+    avgCenter[0] /= pInitialNumberOfCells;
+    avgCenter[1] /= pInitialNumberOfCells;
+    for (int i = 0; i < pInitialNumberOfCells; i++) {
+       float[] pos = getPosition(i);
+       dsSquared[i] = (avgCenter[0] - pos[0]) * (avgCenter[0] - pos[0]) + 
+                        (avgCenter[1] * pos[1]) * (avgCenter[1] * pos[1]);
+    }
+    int middleIndex = 0;
+    float minDistance = dsSquared[0];
+    for (int i = 1; i < pInitialNumberOfCells; i++) {
+       if (dsSquared[i] < minDistance) {
+          minDistance = dsSquared[i];
+          middleIndex = i;
+       }
+    }
+    
+    for (int j = 0; j < 1; j++)
     {
       mCellLabelProperty.getArray()
-                        .getCurrentArray()[(int) (random()
-                                                  * pInitialNumberOfCells)] =
-                                                                            1;
+              .getCurrentArray()[middleIndex] = 1;
+                        // .getCurrentArray()[(int) (random()
+                        //                          * pInitialNumberOfCells)] =
+                        //                                                    1;
     }
 
-    updateNeighborhoodGrid();
+    super.updateNeighborhoodGrid();
 
+  }
+  
+   public final float[]  getPosition(int pParticleId)
+   {
+      final int index = 3 * pParticleId; // note: 2 == pGridDimension.length
+      float[] pos = new float[2];
+      pos[0] = mPositions.getCurrentArray()[index];
+      pos[1] = mPositions.getCurrentArray()[index + 1];
+      return pos;
   }
 
   private float getRandomRadius(int i)

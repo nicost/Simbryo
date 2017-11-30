@@ -21,7 +21,7 @@ public class EpitheliumDemo
    *           NA
    */
   @Test
-  public void demoTwoLayeredEpithelium() throws InterruptedException
+  public static void demoTwoLayeredEpithelium() throws InterruptedException
   {
 
     float radius = 0.005f;
@@ -54,4 +54,12 @@ public class EpitheliumDemo
     lTwoLayeredEpithelium.getViewer().waitWhileShowing();
   }
 
+  public static void main(String[] args) {
+     try {
+        demoTwoLayeredEpithelium();
+     } catch (InterruptedException ex) {
+        System.out.println("Got interrupted");
+     }
+  }
+  
 }
