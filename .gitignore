@@ -9,3 +9,4 @@ build/
 hs_err_pid*
 old/
 
+/.nb-gradle/
