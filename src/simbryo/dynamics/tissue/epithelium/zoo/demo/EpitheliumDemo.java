@@ -54,12 +54,16 @@ public class EpitheliumDemo
     lTwoLayeredEpithelium.getViewer().waitWhileShowing();
   }
 
-  public static void main(String[] args) {
-     try {
-        demoTwoLayeredEpithelium();
-     } catch (InterruptedException ex) {
-        System.out.println("Got interrupted");
-     }
+  public static void main(String[] args)
+  {
+    try
+    {
+      demoTwoLayeredEpithelium();
+    }
+    catch (InterruptedException ex)
+    {
+      System.out.println("Got interrupted");
+    }
   }
-  
+
 }
