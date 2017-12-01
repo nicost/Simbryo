@@ -185,9 +185,9 @@ public class TissueDynamics extends ParticleSystem
       // mSequence.step(pDeltaTime);
     }
 
-    if (mParticleViewer3D != null)
-      mParticleViewer3D.updateDisplay(true);
-
+    if (mParticleViewer3D != null) {
+      //mParticleViewer3D.updateDisplay(true);
+    }
   }
 
   /**

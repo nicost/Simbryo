@@ -3,6 +3,7 @@ package simbryo.dynamics.tissue.epithelium.zoo;
 import static java.lang.Math.pow;
 import static java.lang.Math.random;
 import static java.lang.Math.sin;
+import java.util.Arrays;
 
 import simbryo.dynamics.tissue.cellprop.CellProperty;
 import simbryo.dynamics.tissue.epithelium.LayeredEpitheliumDynamics;
@@ -21,18 +22,18 @@ public class TwoLayeredEpithelium extends LayeredEpitheliumDynamics
   protected static final float Fc = 0.0001f;
   protected static final float D = 0.95f;
 
-  private static final float cDefaultLayerForce = 0.0001f;
+  private final float cDefaultLayerForce = 0.0001f;
 
-  private static final float cMasterIncrement = 0.00001f;
+  private final float cMasterIncrement = 0.00001f;
 
-  private static final float cCellCycleIncrement = cMasterIncrement;
-  private static final float cCellDivisionIncrement = cMasterIncrement
+  private final float cCellCycleIncrement = cMasterIncrement;
+  private final float cCellDivisionIncrement = cMasterIncrement
                                                       * 40;
 
-  private float mExclusionRadius;
+  private final float mExclusionRadius;
 
-  private CellProperty mCellLabelProperty;
-  private CellProperty mCellStateProperty;
+  private final CellProperty mCellLabelProperty;
+  private final CellProperty mCellStateProperty;
 
   /**
    * Creates a two-layered epithelium.
@@ -67,13 +68,20 @@ public class TwoLayeredEpithelium extends LayeredEpitheliumDynamics
     mCellLabelProperty = super.addCellProperty();
     mCellStateProperty = super.addCellProperty();
 
+    Pair[] indexedDistances = new Pair[pInitialNumberOfCells];
     for (int i = 0; i < pInitialNumberOfCells; i++)
     {
-      float x = (float) (Math.random());
-      float y = (float) (Math.random());
+      float angle = (float) (Math.random() * 2.0f * Math.PI) ;
+      float dist = (float) (Math.random());
+      indexedDistances[i] = new Pair(i, dist);
+      
+      float x = dist * (float) Math.cos(angle);
+      float y = dist * (float) Math.sin(angle);
 
-      final int lId = super.addParticle(0.45f + 0.1f * x,
-                                        0.45f + 0.1f * y,
+      // TODO: figure best range around center.  
+      // This depends on the number of particles and their radii in a non-linear way
+      final int lId = super.addParticle(0.5f + 0.06f * x,
+                                        0.5f + 0.06f * y,
                                         0.5f);
       super.setRadius(lId, getRandomRadius(i));
       super.setTargetRadius(lId, super.getRadius(lId));
@@ -81,59 +89,25 @@ public class TwoLayeredEpithelium extends LayeredEpitheliumDynamics
 
       mCellStateProperty.set(i, (float) (random()));
     }
+    Arrays.sort(indexedDistances);
 
-    // make the middle cell red
-    float[] dsSquared = new float[pInitialNumberOfCells];
-    float[] avgCenter = new float[2];
-    for (int i = 0; i < pInitialNumberOfCells; i++)
+    for (int j = 0; j < pInitialNumberOfCells; j++)
     {
-      float[] pos = getPosition(i);
-      avgCenter[0] += pos[0];
-      avgCenter[1] += pos[1];
-      // dsSquared[i] = (0.5f - pos[0]) * (0.5f - pos[0]) + (0.5f * pos[1]) *
-      // (0.5f * pos[1]);
-    }
-    avgCenter[0] /= pInitialNumberOfCells;
-    avgCenter[1] /= pInitialNumberOfCells;
-    for (int i = 0; i < pInitialNumberOfCells; i++)
-    {
-      float[] pos = getPosition(i);
-      dsSquared[i] = (avgCenter[0] - pos[0]) * (avgCenter[0] - pos[0])
-                     + (avgCenter[1] - pos[1])
-                       * (avgCenter[1] - pos[1]);
-    }
-    int middleIndex = 0;
-    float minDistance = dsSquared[0];
-    for (int i = 1; i < pInitialNumberOfCells; i++)
-    {
-      if (dsSquared[i] < minDistance)
-      {
-        minDistance = dsSquared[i];
-        middleIndex = i;
-      }
-    }
-
-    for (int j = 0; j < 1; j++)
-    {
-      mCellLabelProperty.getArray().getCurrentArray()[middleIndex] =
-                                                                   1;
-       mCellLabelProperty.getArray().getCurrentArray()[(int) (random()
-       * pInitialNumberOfCells)] =  2;
-       
-              mCellLabelProperty.getArray().getCurrentArray()[(int) (random()
-       * pInitialNumberOfCells)] =  3;
+      mCellLabelProperty.getArray().getCurrentArray()[indexedDistances[j].index] =
+                                                                   j+1;
     }
 
     super.updateNeighborhoodGrid();
 
   }
 
-  public final float[] getPosition(int pParticleId)
+  public float[] getPosition(int pParticleId)
   {
-    final int index = 3 * pParticleId; // note: 2 == pGridDimension.length
-    float[] pos = new float[2];
-    pos[0] = mPositions.getCurrentArray()[index];
-    pos[1] = mPositions.getCurrentArray()[index + 1];
+    final int index = super.getDimension() * pParticleId; // note: 2 == pGridDimension.length
+    float[] pos = new float[super.getDimension()];
+    for (int i = 0; i < super.getDimension(); i++) {
+       pos[i] = mPositions.getCurrentArray()[index + i];
+    }
     return pos;
   }
 
@@ -272,5 +246,27 @@ public class TwoLayeredEpithelium extends LayeredEpitheliumDynamics
                                                   (float) (0.1f
                                                            * random());
   }
+  
+  // Helper class used to sort the cells by distance to the center
+  private class Pair implements Comparable<Pair> {
+    public final int index;
+    public final float value;
+
+    /**
+     * Create Pair, should do this using generics 
+     * @param index
+     * @param value 
+     */
+    public Pair(int index, float value) {
+        this.index = index;
+        this.value = value;
+    }
+
+    @Override
+    public int compareTo(Pair other) {
+        //multiplied to -1 as the author need descending sort order
+        return Float.valueOf(this.value).compareTo(other.value);
+    }
+}
 
 }
