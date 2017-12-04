@@ -23,7 +23,7 @@ public class EpitheliumDemo {
       Color.BROWN, Color.CYAN, Color.ORANGE, Color.HOTPINK, Color.YELLOW, 
       Color.DARKGOLDENROD, Color.DARKMAGENTA, Color.TEAL, Color.DARKORANGE};
    private final static int STARTNRPARTICLES = 128;
-   private final static int ENDNRPARTICLES = STARTNRPARTICLES << 2; // on avg. 8 cell divisions 
+   private final static int ENDNRPARTICLES = STARTNRPARTICLES << 6; // avg. # of cell divisions 
 
    /**
     * @throws InterruptedException NA
@@ -35,7 +35,7 @@ public class EpitheliumDemo {
 
       float radius = 0.005f;
       final float diameter = 2 * radius;
-      final float layerDistance = 0.00000001f;
+      final float layerDistance =   diameter - 0.00000001f;
 
       TwoLayeredEpithelium lTwoLayeredEpithelium
               = new TwoLayeredEpithelium(STARTNRPARTICLES,
@@ -88,7 +88,9 @@ public class EpitheliumDemo {
       }
       
       System.out.println("Simulation, starting particles: " + STARTNRPARTICLES + 
-              " final particles: " + ENDNRPARTICLES + " Layer distance " + 
+              " final particles: " + 
+              lTwoLayeredEpithelium.getNumberOfParticles() + 
+              ", Layer distance: " + 
               layerDistance / diameter);
       System.out.println("#\tNeighbors\tAvg. Distance\tMaxDistance");
       int dataSetId = 0;

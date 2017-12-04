@@ -73,6 +73,8 @@ public class TwoLayeredEpithelium extends LayeredEpitheliumDynamics
     {
       float angle = (float) (Math.random() * 2.0f * Math.PI) ;
       float dist = (float) (Math.random());
+      dist = 1 - (dist * dist); // since the area on the outside of the circle
+                        // is much larger than on the inside of the circle...
       indexedDistances[i] = new Pair(i, dist);
       
       float x = dist * (float) Math.cos(angle);
