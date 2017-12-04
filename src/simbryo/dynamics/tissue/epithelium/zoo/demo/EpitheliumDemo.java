@@ -72,6 +72,10 @@ public class EpitheliumDemo {
          }
       }
       
+      if (lTwoLayeredEpithelium.getViewer().isShowing()) {
+         lTwoLayeredEpithelium.getViewer().updateDisplay(true);
+      }
+      
       // Analyze the result - only look at the colored nuclei
       List<List<Point3D>> pois = new ArrayList<>();
       for (int testLabel = 1; testLabel <= COLORS.length; testLabel++) {
@@ -91,7 +95,9 @@ public class EpitheliumDemo {
               " final particles: " + 
               lTwoLayeredEpithelium.getNumberOfParticles() + 
               ", Layer distance: " + 
-              layerDistance / diameter);
+              layerDistance / diameter + 
+              " Simulation steps: " + 
+              counter);
       System.out.println("#\tNeighbors\tAvg. Distance\tMaxDistance");
       int dataSetId = 0;
       // express distances as diameters 
